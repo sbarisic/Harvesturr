@@ -67,12 +67,17 @@ namespace Harvesturr {
 	}
 
 	class UnitMineral : GameUnit {
-		public const string UNIT_NAME = "mineral";
+		public const string UNIT_NAME_Megamineral = "megamineral";
+		public const string UNIT_NAME_Mineral = "mineral";
+
 		//public const int ConnectRangeHarvest = 64;
 		public int MineralCount;
 
-		public UnitMineral(Vector2 Position) : base(UNIT_NAME, Position) {
-			MineralCount = Utils.Random(32, 64);
+		public UnitMineral(Vector2 Position, bool Megamineral = false) : base(Megamineral ? UNIT_NAME_Megamineral : UNIT_NAME_Mineral, Position) {
+			if (Megamineral)
+				MineralCount = Utils.Random(300, 400);
+			else
+				MineralCount = Utils.Random(20, 40);
 			//MineralCount = 5;
 		}
 
@@ -133,7 +138,7 @@ namespace Harvesturr {
 
 		public UnitHarvester(Vector2 Position) : base(UNIT_NAME, Position) {
 			EnergyCharges = 0;
-			UpdateInterval = 2;
+			UpdateInterval = 5;
 			CanLinkEnergy = true;
 		}
 
@@ -175,7 +180,7 @@ namespace Harvesturr {
 		}
 
 		public override void ConsumeEnergyPacket(UnitEnergyPacket Packet) {
-			EnergyCharges += 3;
+			EnergyCharges += 2;
 		}
 
 		public override bool CanAcceptEnergyPacket() {
@@ -190,7 +195,7 @@ namespace Harvesturr {
 		public const string UNIT_NAME = "solarpanel";
 
 		public UnitSolarPanel(Vector2 Position) : base(UNIT_NAME, Position) {
-			UpdateInterval = 3;
+			UpdateInterval = 2;
 			CanLinkEnergy = true;
 		}
 

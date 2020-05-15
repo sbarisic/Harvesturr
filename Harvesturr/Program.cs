@@ -61,7 +61,7 @@ namespace Harvesturr {
 
 			GameMap.Load("test");
 			for (int i = 0; i < 100; i++)
-				Spawn(new UnitMineral(GameMap.RandomPoint()));
+				Spawn(new UnitMineral(GameMap.RandomPoint(), Utils.Random(0, 100) > 80));
 
 			GameTools.AddRange(IsGameToolAttribute.CreateAllGameTools());
 			Resources = 50;
@@ -76,7 +76,7 @@ namespace Harvesturr {
 			Spawn(ConduitB);
 			Spawn(ConduitC);
 			Spawn(new UnitEnergyPacket(ConduitA, ConduitB));*/
-			
+
 
 			while (!Raylib.WindowShouldClose()) {
 				ScreenWidth = Raylib.GetScreenWidth();
