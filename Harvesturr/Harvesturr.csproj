@@ -244,9 +244,6 @@
     <Content Include="native\x64\raylib.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="native\x64\raylib.pdb">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="native\x86\" />
