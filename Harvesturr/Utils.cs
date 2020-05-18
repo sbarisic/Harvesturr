@@ -39,5 +39,9 @@ namespace Harvesturr {
 
 			return Arr[Rnd.Next(0, Arr.Length)];
 		}
+
+		public static Vector2 Floor(Vector2 V) {
+			return new Vector2((int)Math.Floor(V.X), (int)Math.Floor(V.Y));
+		}
 	}
 }

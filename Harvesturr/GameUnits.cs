@@ -108,6 +108,7 @@ namespace Harvesturr {
 			CanLinkEnergy = true;
 		}
 
+		// TODO: Optimize
 		public GameUnit PickNextEnergyPacketTarget(IEnumerable<GameUnit> Except = null) {
 			IEnumerable<GameUnit> UnitsInRange = GameEngine.PickInRange(Position, ConnectRangePower);
 			UnitsInRange = UnitsInRange.Except(UnitsInRange.OfType<UnitMineral>());
@@ -196,6 +197,8 @@ namespace Harvesturr {
 
 		public UnitSolarPanel(Vector2 Position) : base(UNIT_NAME, Position) {
 			UpdateInterval = 2;
+			//UpdateInterval = 0.01f;
+
 			CanLinkEnergy = true;
 		}
 

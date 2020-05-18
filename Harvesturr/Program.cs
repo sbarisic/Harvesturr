@@ -40,6 +40,11 @@ namespace Harvesturr {
 		public static Vector2 MousePosScreen;
 		public static Vector2 MousePosWorld;
 
+		// Right click mouse dragging
+		static Vector2 MouseDragStartLocation;
+		static Vector2 MouseDragStartMouse;
+		static bool IsMouseDragging;
+
 		static List<GameTool> GameTools = new List<GameTool>();
 
 		static void GUILoadStyle(string Name) {
@@ -56,12 +61,12 @@ namespace Harvesturr {
 			GUILoadStyle("jungle");
 
 			GUIPanelColor = Raylib.Fade(Color.BLACK, 0.8f);
-			GameCamera = new Camera2D(new Vector2(Width, Height) / 2, new Vector2(300, 300), 0, 1);
+			GameCamera = new Camera2D(new Vector2(Width, Height) / 2, Vector2.Zero, 0, 2);
 			GameUnits = new GameUnit[4096];
 
 			GameMap.Load("test");
 			for (int i = 0; i < 100; i++)
-				Spawn(new UnitMineral(GameMap.RandomPoint(), Utils.Random(0, 100) > 80));
+				Spawn(new UnitMineral(GameMap.RandomMineralPoint(), Utils.Random(0, 100) > 80));
 
 			GameTools.AddRange(IsGameToolAttribute.CreateAllGameTools());
 			Resources = 50;
@@ -102,6 +107,9 @@ namespace Harvesturr {
 		}
 
 		static void Update(float Dt) {
+			MousePosScreen = Raylib.GetMousePosition();
+			MousePosWorld = Raylib.GetScreenToWorld2D(MousePosScreen, GameCamera);
+
 			float Amt = 100 * Dt;
 
 			if (Raylib.IsKeyDown(KeyboardKey.KEY_W))
@@ -116,13 +124,34 @@ namespace Harvesturr {
 			if (Raylib.IsKeyDown(KeyboardKey.KEY_D))
 				GameCamera.target += new Vector2(Amt, 0);
 
-			int Wheel = Raylib.GetMouseWheelMove();
-			if (Wheel != 0) {
-				GameCamera.zoom += Wheel / 10.0f;
+			if (!IsMouseDragging) {
+				int Wheel = Raylib.GetMouseWheelMove();
+				if (Wheel != 0) {
+					GameCamera.zoom += Wheel / 10.0f;
+
+					if (GameCamera.zoom < 0.5f)
+						GameCamera.zoom = 0.5f;
+
+					if (GameCamera.zoom > 3)
+						GameCamera.zoom = 3;
+				}
 			}
 
 			if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_MIDDLE_BUTTON))
-				GameCamera.zoom = 1;
+				GameCamera.zoom = 2;
+
+			if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_RIGHT_BUTTON)) {
+				MouseDragStartMouse = MousePosScreen;
+				MouseDragStartLocation = GameCamera.target;
+				IsMouseDragging = true;
+			} else if (Raylib.IsMouseButtonReleased(MouseButton.MOUSE_RIGHT_BUTTON)) {
+				IsMouseDragging = false;
+			}
+
+			if (IsMouseDragging) {
+				Vector2 Delta = (MouseDragStartMouse - MousePosScreen) * (1.0f / GameCamera.zoom);
+				GameCamera.target = MouseDragStartLocation + Delta;
+			}
 
 			GameMap.Update(Dt);
 
@@ -139,9 +168,6 @@ namespace Harvesturr {
 			for (int i = 0; i < GameTools.Count; i++)
 				if (GameTools[i].Active)
 					GameTools[i].Update(Dt);
-
-			MousePosScreen = Raylib.GetMousePosition();
-			MousePosWorld = Raylib.GetScreenToWorld2D(MousePosScreen, GameCamera);
 
 			if (Utils.IsInside(new Rectangle(0, 0, ScreenWidth, ScreenHeight - GUIRectHeight), MousePosScreen)) {
 				if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_LEFT_BUTTON))
@@ -315,6 +341,9 @@ namespace Harvesturr {
 
 	static class GameMap {
 		static Texture2D MapTex;
+
+		static int X;
+		static int Y;
 		static int Width;
 		static int Height;
 
@@ -323,21 +352,36 @@ namespace Harvesturr {
 
 			Width = MapTex.width;
 			Height = MapTex.height;
+
+			X = -(Width / 2);
+			Y = -(Height / 2);
 		}
 
 		public static void Update(float Dt) {
 		}
 
 		public static void DrawWorld() {
-			Raylib.DrawTexture(MapTex, 0, 0, Color.WHITE);
+			Raylib.DrawTexture(MapTex, X, Y, Color.WHITE);
 		}
 
 		public static bool IsInBounds(Vector2 Pos) {
-			return Utils.IsInside(new Rectangle(0, 0, Width, Height), Pos);
+			return Utils.IsInside(new Rectangle(X, Y, Width, Height), Pos);
 		}
 
 		public static Vector2 RandomPoint() {
-			return Utils.Random(new Vector2(0, 0), new Vector2(Width, Height));
+			Vector2 Pos = new Vector2(X, Y);
+			Vector2 Pos2 = Pos + new Vector2(Width, Height);
+
+			return Utils.Random(Pos, Pos2);
+		}
+
+		public static Vector2 RandomMineralPoint() {
+			Vector2 Pt = Vector2.Zero;
+
+			while (Vector2.Distance(Vector2.Zero, Pt) < 120)
+				Pt = RandomPoint();
+
+			return Pt;
 		}
 	}
 }

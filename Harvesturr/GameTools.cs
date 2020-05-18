@@ -89,9 +89,9 @@ namespace Harvesturr {
 				return true;
 
 			Rectangle CollisionRect = GameEngine.GetBoundingRect(ToolGhost.Value, MousePosWorld);
-			GameUnit[] Picks = GameEngine.Pick(CollisionRect).ToArray();
+			int PickCount = GameEngine.Pick(CollisionRect).Where(U => !(U is UnitEnergyPacket)).Count();
 
-			if (Picks.Length != 0)
+			if (PickCount != 0)
 				return false;
 
 			return true;
