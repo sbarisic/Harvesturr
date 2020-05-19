@@ -117,6 +117,7 @@ namespace Harvesturr {
 
 		public override void OnWorldClick(Vector2 WorldPos) {
 			Console.WriteLine(string.Format(CultureInfo.InvariantCulture, "new Vector2({0:F3}f, {1:F3}f)", WorldPos.X, WorldPos.Y));
+			GameEngine.AddLightningEffect(WorldPos, Color.SKYBLUE);
 		}
 
 		public override void DrawWorld() {

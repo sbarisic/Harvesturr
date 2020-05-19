@@ -8,6 +8,7 @@ using System.IO;
 using Raylib_cs;
 using Raygui_cs;
 using System.Numerics;
+using System.Diagnostics;
 
 namespace Harvesturr {
 	enum DrawState {
@@ -27,8 +28,13 @@ namespace Harvesturr {
 			Start();
 		}
 
+		const int MaxGameUnits = 4096;
+		static GameUnit[] GameUnits = new GameUnit[MaxGameUnits];
+		//static GameUnit[] GameUnitsTemp = new GameUnit[MaxGameUnits];
+
+		static EffectPainter[] Effects = new EffectPainter[128];
+
 		static Camera2D GameCamera;
-		static GameUnit[] GameUnits;
 		static int GUIRectHeight = 50;
 		static DrawState CurrentDrawState;
 
@@ -62,7 +68,7 @@ namespace Harvesturr {
 
 			GUIPanelColor = Raylib.Fade(Color.BLACK, 0.8f);
 			GameCamera = new Camera2D(new Vector2(Width, Height) / 2, Vector2.Zero, 0, 2);
-			GameUnits = new GameUnit[4096];
+			GameUnits = new GameUnit[MaxGameUnits];
 
 			GameMap.Load("test");
 			for (int i = 0; i < 100; i++)
@@ -70,6 +76,9 @@ namespace Harvesturr {
 
 			GameTools.AddRange(IsGameToolAttribute.CreateAllGameTools());
 			Resources = 50;
+
+			if (Debugger.IsAttached)
+				Resources += 999999;
 
 			// Test
 
@@ -197,10 +206,20 @@ namespace Harvesturr {
 
 		static void DrawWorld() {
 			GameMap.DrawWorld();
+			float Time = (float)Raylib.GetTime();
 
 			for (int i = 0; i < GameUnits.Length; i++)
 				if (GameUnits[i] != null)
 					GameUnits[i].DrawWorld();
+
+			for (int i = 0; i < Effects.Length; i++) {
+				if (Effects[i] != null) {
+					if (Effects[i].EndTime > Time)
+						Effects[i].Action();
+					else
+						Effects[i] = null;
+				}
+			}
 
 			for (int i = 0; i < GameTools.Count; i++)
 				if (GameTools[i].Active)
@@ -337,6 +356,41 @@ namespace Harvesturr {
 		public static void AddResource(int Amt) {
 			Resources += Amt;
 		}
+
+		static void AddEffect(EffectPainter Painter) {
+			for (int i = 0; i < Effects.Length; i++)
+				if (Effects[i] == null) {
+					Effects[i] = Painter;
+					return;
+				}
+		}
+
+		public static void AddEffect(Action Action, float Length) {
+			AddEffect(new EffectPainter(Action, Length));
+		}
+
+		public static void AddLightningEffect(Vector2 WorldPos, Color Clr, float Length = 0.1f) {
+			const int ArmCount = 3;
+			const int PartCount = 3;
+			const float Len = 8;
+
+			Vector2[] Points = new Vector2[ArmCount * PartCount];
+			for (int i = 0; i < Points.Length; i++)
+				Points[i] = Utils.Random(new Vector2(-Len), new Vector2(Len));
+
+			AddEffect(() => {
+				for (int Arm = 0; Arm < ArmCount; Arm++) {
+					Vector2 LastPoint = WorldPos;
+
+					for (int Part = 0; Part < PartCount; Part++) {
+						int Idx = Arm * PartCount + Part;
+
+						Raylib.DrawLineEx(LastPoint, LastPoint + Points[Idx], 1, Clr);
+						LastPoint += Points[Idx];
+					}
+				}
+			}, Length);
+		}
 	}
 
 	static class GameMap {
@@ -382,6 +436,16 @@ namespace Harvesturr {
 				Pt = RandomPoint();
 
 			return Pt;
+		}
+	}
+
+	class EffectPainter {
+		public float EndTime;
+		public Action Action;
+
+		public EffectPainter(Action Action, float Length = 1) {
+			this.Action = Action;
+			EndTime = (float)Raylib.GetTime() + Length;
 		}
 	}
 }

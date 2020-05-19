@@ -40,6 +40,7 @@ namespace Harvesturr {
 
 		public virtual void Destroy() {
 			Destroyed = true;
+			GameEngine.AddLightningEffect(Position, Color.SKYBLUE);
 		}
 
 		public virtual void Update(float Dt) {
@@ -104,26 +105,78 @@ namespace Harvesturr {
 		public const string UNIT_NAME = "conduit";
 		public const float ConnectRangePower = 96;
 
+		public int Heat;
+
 		public UnitConduit(Vector2 Position) : base(UNIT_NAME, Position) {
+			UpdateInterval = 0.2f;
 			CanLinkEnergy = true;
+			Heat = 0;
 		}
 
-		// TODO: Optimize
-		public GameUnit PickNextEnergyPacketTarget(IEnumerable<GameUnit> Except = null) {
-			IEnumerable<GameUnit> UnitsInRange = GameEngine.PickInRange(Position, ConnectRangePower);
-			UnitsInRange = UnitsInRange.Except(UnitsInRange.OfType<UnitMineral>());
+		public override void SlowUpdate() {
+			Heat -= 2;
 
-			IEnumerable<UnitConduit> ConduitsInRange = UnitsInRange.OfType<UnitConduit>();
-			UnitsInRange = UnitsInRange.Except(ConduitsInRange);
+			if (Heat < 0)
+				Heat = 0;
+		}
 
-			foreach (var U in UnitsInRange)
-				if (U.CanAcceptEnergyPacket())
-					return U;
+		public override void DrawWorld() {
+			DrawColor = Raylib.ColorFromNormalized(Vector4.Lerp(Vector4.One, new Vector4(1, 0.35f, 0.2f, 1), Heat / 100.0f));
+			base.DrawWorld();
+		}
 
-			if (Except != null)
-				ConduitsInRange = ConduitsInRange.Except(Except.Select(U => U as UnitConduit));
+		public override void ConsumeEnergyPacket(UnitEnergyPacket Packet) {
+			Heat++;
 
-			return Utils.Random(ConduitsInRange.ToArray());
+			if (Heat > 100) {
+				Heat = 100;
+				Packet.Destroy();
+			}
+		}
+
+		public GameUnit PickNextEnergyPacketTarget(params GameUnit[] Except) {
+			GameUnit[] UnitsInRange = GameEngine.PickInRange(Position, ConnectRangePower).ToArray();
+
+			if (UnitsInRange.Length == 0)
+				return null;
+
+			for (int i = 0; i < UnitsInRange.Length; i++) {
+				bool DoContinue = false;
+
+				for (int j = 0; j < Except.Length; j++)
+					if (UnitsInRange[i] == Except[j]) {
+						UnitsInRange[i] = null;
+						DoContinue = true;
+						break;
+					}
+
+				if (DoContinue)
+					continue;
+
+				if (UnitsInRange[i] is UnitMineral || UnitsInRange[i] is UnitEnergyPacket) {
+					UnitsInRange[i] = null;
+					continue;
+				}
+
+				if (UnitsInRange[i] is UnitConduit)
+					continue;
+
+				if (!UnitsInRange[i].CanAcceptEnergyPacket()) {
+					UnitsInRange[i] = null;
+					continue;
+				} else
+					return UnitsInRange[i];
+			}
+
+			int MaxLen = Utils.Rearrange(UnitsInRange);
+			if (MaxLen <= 0)
+				return null;
+
+			return UnitsInRange[Utils.Random(0, MaxLen)];
+		}
+
+		public override string ToString() {
+			return string.Format("Heat: {0}", Heat);
 		}
 	}
 
@@ -132,10 +185,6 @@ namespace Harvesturr {
 		public const float ConnectRangeHarvest = 64;
 
 		int EnergyCharges;
-
-		const float LineLifetime = 0.25f;
-		float LineEndTime;
-		Vector2 LineEnd;
 
 		public UnitHarvester(Vector2 Position) : base(UNIT_NAME, Position) {
 			EnergyCharges = 0;
@@ -164,8 +213,8 @@ namespace Harvesturr {
 				return;
 
 			if (TgtMineral.HarvestMineral()) {
-				LineEnd = TgtMineral.Position;
-				LineEndTime = (float)Raylib.GetTime() + LineLifetime;
+				GameEngine.AddEffect(() => Raylib.DrawLineEx(Position, TgtMineral.Position, 2, Color.GREEN), 0.25f);
+
 				EnergyCharges--;
 				GameEngine.AddResource(1);
 			}
@@ -173,15 +222,12 @@ namespace Harvesturr {
 
 		public override void DrawWorld() {
 			base.DrawWorld();
-
-			if (Raylib.GetTime() < LineEndTime)
-				Raylib.DrawLineEx(Position, LineEnd, 2, Color.GREEN);
-
 			GameEngine.DrawTooltip(Position, EnergyCharges.ToString());
 		}
 
 		public override void ConsumeEnergyPacket(UnitEnergyPacket Packet) {
-			EnergyCharges += 2;
+			EnergyCharges++;
+			Packet.Destroy();
 		}
 
 		public override bool CanAcceptEnergyPacket() {
@@ -196,7 +242,8 @@ namespace Harvesturr {
 		public const string UNIT_NAME = "solarpanel";
 
 		public UnitSolarPanel(Vector2 Position) : base(UNIT_NAME, Position) {
-			UpdateInterval = 2;
+			//UpdateInterval = 2;
+			UpdateInterval = 0.5f;
 			//UpdateInterval = 0.01f;
 
 			CanLinkEnergy = true;
@@ -247,25 +294,34 @@ namespace Harvesturr {
 		}
 
 		void OnTargetReached(GameUnit Target) {
+			this.Target = null;
 			GameUnit Next = null;
+			Target.ConsumeEnergyPacket(this);
+
+			if (Destroyed)
+				return;
 
 			if (Target is UnitConduit ConduitTarget) {
-				Next = ConduitTarget.PickNextEnergyPacketTarget(new GameUnit[] { Target, Previous });
+				Next = ConduitTarget.PickNextEnergyPacketTarget(Target, Previous);
 
 				if (Next == null)
 					Next = Previous;
 
 				Previous = Target;
-			} else
-				Target.ConsumeEnergyPacket(this);
+			}
 
-			if (Next == null || Next.Destroyed) {
-				Destroy();
+			if (Next != null && Next.Destroyed)
+				Next = null;
+
+			if (Next == null) {
+				if (this.Target == null)
+					Destroy();
+
 				return;
 			}
 
 			this.Target = Next;
-			Next.AwaitingPacket = this;
+			this.Target.AwaitingPacket = this;
 		}
 	}
 }
