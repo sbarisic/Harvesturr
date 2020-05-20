@@ -11,6 +11,7 @@ namespace Harvesturr {
 		Texture2D UnitTex;
 		public Vector2 Position;
 		public string Name;
+		public bool Pickable;
 
 		public bool CanLinkEnergy;
 		public float UpdateInterval;
@@ -32,6 +33,7 @@ namespace Harvesturr {
 			Name = UnitName;
 			Destroyed = false;
 			DrawColor = Color.WHITE;
+			Pickable = true;
 		}
 
 		public Rectangle GetBoundingRect() {
@@ -107,6 +109,8 @@ namespace Harvesturr {
 
 		public int Heat;
 
+		public UnitConduit LinkedConduit;
+
 		public UnitConduit(Vector2 Position) : base(UNIT_NAME, Position) {
 			UpdateInterval = 0.2f;
 			CanLinkEnergy = true;
@@ -123,6 +127,9 @@ namespace Harvesturr {
 		public override void DrawWorld() {
 			DrawColor = Raylib.ColorFromNormalized(Vector4.Lerp(Vector4.One, new Vector4(1, 0.35f, 0.2f, 1), Heat / 100.0f));
 			base.DrawWorld();
+
+			if (LinkedConduit != null)
+				Raylib.DrawLineEx(Position, LinkedConduit.Position, 1, Color.YELLOW);
 		}
 
 		public override void ConsumeEnergyPacket(UnitEnergyPacket Packet) {
@@ -135,6 +142,13 @@ namespace Harvesturr {
 		}
 
 		public GameUnit PickNextEnergyPacketTarget(params GameUnit[] Except) {
+			if (LinkedConduit != null) {
+				if (LinkedConduit.Destroyed)
+					LinkedConduit = null;
+				else
+					return LinkedConduit;
+			}
+
 			GameUnit[] UnitsInRange = GameEngine.PickInRange(Position, ConnectRangePower).ToArray();
 
 			if (UnitsInRange.Length == 0)
@@ -153,7 +167,7 @@ namespace Harvesturr {
 				if (DoContinue)
 					continue;
 
-				if (UnitsInRange[i] is UnitMineral || UnitsInRange[i] is UnitEnergyPacket) {
+				if (UnitsInRange[i] is UnitMineral) {
 					UnitsInRange[i] = null;
 					continue;
 				}
@@ -267,6 +281,7 @@ namespace Harvesturr {
 
 		public UnitEnergyPacket(Vector2 Position, GameUnit Target) : base(UNIT_NAME, Position) {
 			this.Target = Target;
+			Pickable = false;
 		}
 
 		public UnitEnergyPacket(UnitConduit Source, GameUnit Target) : this(Source.Position, Target) {

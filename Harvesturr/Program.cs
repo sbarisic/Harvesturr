@@ -52,6 +52,7 @@ namespace Harvesturr {
 		static bool IsMouseDragging;
 
 		static List<GameTool> GameTools = new List<GameTool>();
+		static GameTool ActiveGameTool;
 
 		static void GUILoadStyle(string Name) {
 			Raygui.GuiLoadStyle(string.Format("data/gui_styles/{0}/{0}.rgs", Name));
@@ -174,13 +175,14 @@ namespace Harvesturr {
 					GameUnits[i].Update(Dt);
 				}
 
-			for (int i = 0; i < GameTools.Count; i++)
-				if (GameTools[i].Active)
-					GameTools[i].Update(Dt);
+			ActiveGameTool?.Update(Dt);
 
-			if (Utils.IsInside(new Rectangle(0, 0, ScreenWidth, ScreenHeight - GUIRectHeight), MousePosScreen)) {
+			if (Utils.IsInside(new Rectangle(0, 0, ScreenWidth, ScreenHeight - GUIRectHeight), MousePosScreen) && GameMap.IsInBounds(MousePosWorld)) {
 				if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_LEFT_BUTTON))
-					WorldClick(MousePosWorld);
+					ActiveGameTool?.OnWorldMousePress(MousePosWorld, true);
+
+				if (Raylib.IsMouseButtonReleased(MouseButton.MOUSE_LEFT_BUTTON))
+					ActiveGameTool?.OnWorldMousePress(MousePosWorld, false);
 			}
 		}
 
@@ -194,39 +196,36 @@ namespace Harvesturr {
 			throw new Exception("Could not find free unit slot");
 		}
 
-		public static void WorldClick(Vector2 WorldPos) {
-			if (!GameMap.IsInBounds(WorldPos))
-				return;
-
-
-			for (int i = 0; i < GameTools.Count; i++)
-				if (GameTools[i].Active)
-					GameTools[i].OnWorldClick(WorldPos);
-		}
-
-		static void DrawWorld() {
-			GameMap.DrawWorld();
+		static void DrawEffects(bool ScreenSpace) {
 			float Time = (float)Raylib.GetTime();
-
-			for (int i = 0; i < GameUnits.Length; i++)
-				if (GameUnits[i] != null)
-					GameUnits[i].DrawWorld();
 
 			for (int i = 0; i < Effects.Length; i++) {
 				if (Effects[i] != null) {
+					if (Effects[i].ScreenSpace != ScreenSpace)
+						continue;
+
 					if (Effects[i].EndTime > Time)
 						Effects[i].Action();
 					else
 						Effects[i] = null;
 				}
 			}
+		}
 
-			for (int i = 0; i < GameTools.Count; i++)
-				if (GameTools[i].Active)
-					GameTools[i].DrawWorld();
+		static void DrawWorld() {
+			GameMap.DrawWorld();
+
+			for (int i = 0; i < GameUnits.Length; i++)
+				if (GameUnits[i] != null)
+					GameUnits[i].DrawWorld();
+
+			DrawEffects(false);
+			ActiveGameTool?.DrawWorld();
 		}
 
 		static void DrawScreen() {
+			DrawEffects(true);
+
 			Raylib.DrawRectangle(0, ScreenHeight - GUIRectHeight, ScreenWidth, GUIRectHeight, GUIPanelColor);
 			Raylib.DrawRectangle(0, 0, ScreenWidth, 24, GUIPanelColor);
 
@@ -235,8 +234,6 @@ namespace Harvesturr {
 			string ResourcesText = "R$ " + Resources;
 			int TextWidth = Raylib.MeasureText(ResourcesText, 20);
 			Raylib.DrawText(ResourcesText, ScreenWidth - TextWidth - 10, 2, 20, Color.GREEN);
-
-
 
 			int ButtonCount = 0;
 			for (int i = 0; i < GameTools.Count; i++) {
@@ -249,6 +246,7 @@ namespace Harvesturr {
 
 					T.Active = Checked;
 					T.OnSelected();
+					ActiveGameTool = T;
 				}
 			}
 		}
@@ -295,34 +293,34 @@ namespace Harvesturr {
 				Raylib.BeginMode2D(GameCamera);
 		}
 
-		public static IEnumerable<GameUnit> Pick(Vector2 WorldPos) {
+		static IEnumerable<GameUnit> GetAllGameUnits(bool PickUnpickable = false) {
 			for (int i = 0; i < GameUnits.Length; i++) {
 				if (GameUnits[i] == null)
 					continue;
 
-				if (Raylib.CheckCollisionPointRec(WorldPos, GameUnits[i].GetBoundingRect()))
-					yield return GameUnits[i];
+				if (!GameUnits[i].Pickable && !PickUnpickable)
+					continue;
+
+				yield return GameUnits[i];
 			}
 		}
 
-		public static IEnumerable<GameUnit> Pick(Rectangle Rect) {
-			for (int i = 0; i < GameUnits.Length; i++) {
-				if (GameUnits[i] == null)
-					continue;
-
-				if (Raylib.CheckCollisionRecs(Rect, GameUnits[i].GetBoundingRect()))
-					yield return GameUnits[i];
-			}
+		public static IEnumerable<GameUnit> Pick(Vector2 WorldPos, bool PickUnpickable = false) {
+			foreach (var U in GetAllGameUnits(PickUnpickable))
+				if (Raylib.CheckCollisionPointRec(WorldPos, U.GetBoundingRect()))
+					yield return U;
 		}
 
-		public static IEnumerable<GameUnit> PickInRange(Vector2 WorldPos, float Range) {
-			for (int i = 0; i < GameUnits.Length; i++) {
-				if (GameUnits[i] == null)
-					continue;
+		public static IEnumerable<GameUnit> Pick(Rectangle Rect, bool PickUnpickable = false) {
+			foreach (var U in GetAllGameUnits(PickUnpickable))
+				if (Raylib.CheckCollisionRecs(Rect, U.GetBoundingRect()))
+					yield return U;
+		}
 
-				if (Vector2.Distance(GameUnits[i].Position, WorldPos) < Range)
-					yield return GameUnits[i];
-			}
+		public static IEnumerable<GameUnit> PickInRange(Vector2 WorldPos, float Range, bool PickUnpickable = false) {
+			foreach (var U in GetAllGameUnits(PickUnpickable))
+				if (Vector2.Distance(U.Position, WorldPos) < Range)
+					yield return U;
 		}
 
 		public static Rectangle GetBoundingRect(Texture2D Tex, Vector2 WorldPos) {
@@ -365,31 +363,33 @@ namespace Harvesturr {
 				}
 		}
 
-		public static void AddEffect(Action Action, float Length) {
-			AddEffect(new EffectPainter(Action, Length));
+		public static void AddEffect(Action Action, float Length, bool ScreenSpace = false) {
+			AddEffect(new EffectPainter(Action, Length, ScreenSpace));
 		}
 
 		public static void AddLightningEffect(Vector2 WorldPos, Color Clr, float Length = 0.1f) {
-			const int ArmCount = 3;
-			const int PartCount = 3;
-			const float Len = 8;
+			int ArmCount = (int)Math.Ceiling(1.5f * GameCamera.zoom);
+			int PartCount = (int)Math.Ceiling(1.0f * GameCamera.zoom);
+			float Len = 8 * GameCamera.zoom;
 
 			Vector2[] Points = new Vector2[ArmCount * PartCount];
 			for (int i = 0; i < Points.Length; i++)
 				Points[i] = Utils.Random(new Vector2(-Len), new Vector2(Len));
 
 			AddEffect(() => {
+				Vector2 WrldPos = Raylib.GetWorldToScreen2D(WorldPos, GameCamera);
+
 				for (int Arm = 0; Arm < ArmCount; Arm++) {
-					Vector2 LastPoint = WorldPos;
+					Vector2 LastPoint = WrldPos;
 
 					for (int Part = 0; Part < PartCount; Part++) {
 						int Idx = Arm * PartCount + Part;
 
-						Raylib.DrawLineEx(LastPoint, LastPoint + Points[Idx], 1, Clr);
+						Raylib.DrawLineEx(LastPoint, LastPoint + Points[Idx], 2, Clr);
 						LastPoint += Points[Idx];
 					}
 				}
-			}, Length);
+			}, Length, true);
 		}
 	}
 
@@ -440,11 +440,13 @@ namespace Harvesturr {
 	}
 
 	class EffectPainter {
+		public bool ScreenSpace;
 		public float EndTime;
 		public Action Action;
 
-		public EffectPainter(Action Action, float Length = 1) {
+		public EffectPainter(Action Action, float Length = 1, bool ScreenSpace = false) {
 			this.Action = Action;
+			this.ScreenSpace = ScreenSpace;
 			EndTime = (float)Raylib.GetTime() + Length;
 		}
 	}

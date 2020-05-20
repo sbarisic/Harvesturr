@@ -34,6 +34,9 @@ namespace Harvesturr {
 
 		protected Texture2D? ToolGhost;
 
+		protected Vector2 MouseClickPos;
+		protected bool InMouseClick;
+
 		public GameTool(string Name) {
 			this.Name = Name;
 			this.Active = false;
@@ -41,6 +44,25 @@ namespace Harvesturr {
 
 		public virtual void OnSelected() {
 			Console.WriteLine("Selected {0}", Name);
+		}
+
+		public virtual void OnWorldMousePress(Vector2 WorldPos, bool Press) {
+			if (Press)
+				OnWorldClick(WorldPos);
+
+			if (Press) {
+				MouseClickPos = WorldPos;
+				InMouseClick = true;
+			} else if (!Press && InMouseClick) {
+				InMouseClick = false;
+
+				Vector2 EndPos = GameEngine.MousePosWorld;
+				if (MouseClickPos != EndPos)
+					OnMouseDrag(MouseClickPos, EndPos, EndPos - MouseClickPos);
+			}
+		}
+
+		public virtual void OnMouseDrag(Vector2 WorldStart, Vector2 WorldEnd, Vector2 DragNormal) {
 		}
 
 		public virtual void OnWorldClick(Vector2 WorldPos) {
@@ -112,7 +134,10 @@ namespace Harvesturr {
 
 	[IsGameTool]
 	class GameToolPicker : GameTool {
+		Color DragLineColor;
+
 		public GameToolPicker() : base("Picker") {
+			DragLineColor = new Color(50, 200, 100, 180);
 		}
 
 		public override void OnWorldClick(Vector2 WorldPos) {
@@ -120,7 +145,21 @@ namespace Harvesturr {
 			GameEngine.AddLightningEffect(WorldPos, Color.SKYBLUE);
 		}
 
+		public override void OnMouseDrag(Vector2 WorldStart, Vector2 WorldEnd, Vector2 DragNormal) {
+			UnitConduit UnitA = GameEngine.Pick(WorldStart).FirstOrDefault() as UnitConduit;
+			UnitConduit UnitB = GameEngine.Pick(WorldEnd).FirstOrDefault() as UnitConduit;
+
+			if (UnitA == UnitB)
+				UnitB = null;
+
+			if (UnitA != null)
+				UnitA.LinkedConduit = UnitB;
+		}
+
 		public override void DrawWorld() {
+			if (InMouseClick)
+				Raylib.DrawLineEx(MouseClickPos, GameEngine.MousePosWorld, 1, DragLineColor);
+
 			GameUnit PickedUnit = GameEngine.Pick(GameEngine.MousePosWorld).FirstOrDefault();
 
 			if (PickedUnit == null)
@@ -148,8 +187,6 @@ namespace Harvesturr {
 
 	[IsGameTool]
 	class GameToolHarvester : GameToolBuilder {
-		const float ConnectRangeHarvest = 64;
-
 		public GameToolHarvester() : base("Harvester", 8) {
 			ToolGhost = ResMgr.LoadTexture(UnitHarvester.UNIT_NAME);
 		}
