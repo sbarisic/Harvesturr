@@ -13,6 +13,7 @@ namespace Harvesturr {
 		public string Name;
 		public bool Pickable;
 
+		public int Health;
 		public bool CanLinkEnergy;
 		public float UpdateInterval;
 		public float NextUpdateTime;
@@ -34,10 +35,23 @@ namespace Harvesturr {
 			Destroyed = false;
 			DrawColor = Color.WHITE;
 			Pickable = true;
+			Health = 100;
 		}
 
 		public Rectangle GetBoundingRect() {
 			return GameEngine.GetBoundingRect(UnitTex, Position);
+		}
+
+		public Vector2 GetUnitWidth() {
+			return new Vector2(UnitTex.width, 0);
+		}
+
+		public Vector2 GetUnitHeight() {
+			return new Vector2(0, UnitTex.height);
+		}
+
+		public Vector2 GetUnitSize() {
+			return GetUnitWidth() + GetUnitHeight();
 		}
 
 		public virtual void Destroy() {
@@ -46,8 +60,12 @@ namespace Harvesturr {
 		}
 
 		public virtual void Update(float Dt) {
-			float CurTime = (float)Raylib.GetTime();
+			if (Health <= 0) {
+				Destroy();
+				return;
+			}
 
+			float CurTime = (float)Raylib.GetTime();
 			if (NextUpdateTime < CurTime) {
 				NextUpdateTime = CurTime + UpdateInterval;
 				SlowUpdate();
@@ -59,6 +77,11 @@ namespace Harvesturr {
 
 		public virtual void DrawWorld() {
 			GameEngine.DrawTextureCentered(UnitTex, Position, DrawColor);
+		}
+
+		public virtual void DrawGUI() {
+			if (GameEngine.DrawZoomDetails && Health < 100)
+				GameEngine.DrawBar(Position - GetUnitHeight(), Health / 100.0f, Color.GREEN);
 		}
 
 		public virtual void ConsumeEnergyPacket(UnitEnergyPacket Packet) {
@@ -127,9 +150,17 @@ namespace Harvesturr {
 		public override void DrawWorld() {
 			DrawColor = Raylib.ColorFromNormalized(Vector4.Lerp(Vector4.One, new Vector4(1, 0.35f, 0.2f, 1), Heat / 100.0f));
 			base.DrawWorld();
+		}
 
-			if (LinkedConduit != null)
-				Raylib.DrawLineEx(Position, LinkedConduit.Position, 1, Color.YELLOW);
+		public override void DrawGUI() {
+			base.DrawGUI();
+
+			if (GameEngine.DrawZoomDetails) {
+				if (LinkedConduit != null)
+					GameEngine.DrawDashedLine(Position, LinkedConduit.Position, 1, 6, Color.YELLOW);
+
+				GameEngine.DrawBar(Position - GetUnitHeight() / 2, Heat / 100.0f, DrawColor);
+			}
 		}
 
 		public override void ConsumeEnergyPacket(UnitEnergyPacket Packet) {
@@ -199,6 +230,7 @@ namespace Harvesturr {
 		public const float ConnectRangeHarvest = 64;
 
 		int EnergyCharges;
+		float LastEnergyChargeUseTime;
 
 		public UnitHarvester(Vector2 Position) : base(UNIT_NAME, Position) {
 			EnergyCharges = 0;
@@ -208,7 +240,10 @@ namespace Harvesturr {
 
 		public override void Update(float Dt) {
 			base.Update(Dt);
-			DrawColor = EnergyCharges > 0 ? Color.WHITE : Raylib.Fade(Color.BLACK, 0.5f);
+			DrawColor = Color.WHITE;
+
+			if (EnergyCharges <= 0 && (((float)Raylib.GetTime() - LastEnergyChargeUseTime) > UpdateInterval))
+				DrawColor = new Color(128, 128, 128, 190);
 		}
 
 		public override void SlowUpdate() {
@@ -230,13 +265,14 @@ namespace Harvesturr {
 				GameEngine.AddEffect(() => Raylib.DrawLineEx(Position, TgtMineral.Position, 2, Color.GREEN), 0.25f);
 
 				EnergyCharges--;
+
+				if (EnergyCharges <= 0) {
+					EnergyCharges = 0;
+					LastEnergyChargeUseTime = (float)Raylib.GetTime();
+				}
+
 				GameEngine.AddResource(1);
 			}
-		}
-
-		public override void DrawWorld() {
-			base.DrawWorld();
-			GameEngine.DrawTooltip(Position, EnergyCharges.ToString());
 		}
 
 		public override void ConsumeEnergyPacket(UnitEnergyPacket Packet) {
@@ -256,8 +292,8 @@ namespace Harvesturr {
 		public const string UNIT_NAME = "solarpanel";
 
 		public UnitSolarPanel(Vector2 Position) : base(UNIT_NAME, Position) {
-			//UpdateInterval = 2;
-			UpdateInterval = 0.5f;
+			UpdateInterval = 2;
+			//UpdateInterval = 0.5f;
 			//UpdateInterval = 0.01f;
 
 			CanLinkEnergy = true;

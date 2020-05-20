@@ -45,6 +45,8 @@ namespace Harvesturr {
 
 		public static Vector2 MousePosScreen;
 		public static Vector2 MousePosWorld;
+		public static float Zoom;
+		public static bool DrawZoomDetails;
 
 		// Right click mouse dragging
 		static Vector2 MouseDragStartLocation;
@@ -119,6 +121,8 @@ namespace Harvesturr {
 		static void Update(float Dt) {
 			MousePosScreen = Raylib.GetMousePosition();
 			MousePosWorld = Raylib.GetScreenToWorld2D(MousePosScreen, GameCamera);
+			Zoom = GameCamera.zoom;
+			DrawZoomDetails = Zoom >= 2;
 
 			float Amt = 100 * Dt;
 
@@ -144,6 +148,8 @@ namespace Harvesturr {
 
 					if (GameCamera.zoom > 3)
 						GameCamera.zoom = 3;
+
+					Console.WriteLine("Zoom: {0}", GameCamera.zoom);
 				}
 			}
 
@@ -219,7 +225,12 @@ namespace Harvesturr {
 				if (GameUnits[i] != null)
 					GameUnits[i].DrawWorld();
 
+			for (int i = 0; i < GameUnits.Length; i++)
+				if (GameUnits[i] != null)
+					GameUnits[i].DrawGUI();
+
 			DrawEffects(false);
+
 			ActiveGameTool?.DrawWorld();
 		}
 
@@ -291,6 +302,45 @@ namespace Harvesturr {
 
 			if (CurrentDrawState == DrawState.WORLD)
 				Raylib.BeginMode2D(GameCamera);
+		}
+
+		public static void DrawBar(Vector2 Pos, float Amt, Color Clr) {
+			if (CurrentDrawState == DrawState.NONE)
+				throw new Exception("Can not tooltip outside drawing functions");
+
+			if (CurrentDrawState == DrawState.WORLD) {
+				Pos = Raylib.GetWorldToScreen2D(Pos, GameCamera);
+				Raylib.EndMode2D();
+			}
+
+			const int Padding = 2;
+			const int Width = 48;
+			const int Height = 8;
+
+			Pos -= new Vector2(Width / 2, Height / 2);
+
+			if (Amt < 0)
+				Amt = 0;
+			else if (Amt > 1)
+				Amt = 1;
+
+			Raylib.DrawRectangle((int)Pos.X, (int)Pos.Y, Width, Height, GUIPanelColor);
+			Raylib.DrawRectangle((int)Pos.X + Padding, (int)Pos.Y + Padding, (int)((Width - Padding * 2) * Amt), Height - Padding * 2, Clr);
+
+			if (CurrentDrawState == DrawState.WORLD)
+				Raylib.BeginMode2D(GameCamera);
+		}
+
+		public static void DrawDashedLine(Vector2 Start, Vector2 End, float Thick, float SegmentLength, Color Clr) {
+			Vector2 A = Start;
+			Vector2 B = End;
+			Vector2 Dir = Vector2.Normalize(B - A);
+
+			do {
+				B = A + Dir * SegmentLength;
+				Raylib.DrawLineEx(A, B, Thick, Clr);
+				A = B + Dir * SegmentLength;
+			} while (Vector2.Distance(B, End) > (SegmentLength * 2));
 		}
 
 		static IEnumerable<GameUnit> GetAllGameUnits(bool PickUnpickable = false) {
@@ -368,9 +418,9 @@ namespace Harvesturr {
 		}
 
 		public static void AddLightningEffect(Vector2 WorldPos, Color Clr, float Length = 0.1f) {
-			int ArmCount = (int)Math.Ceiling(1.5f * GameCamera.zoom);
-			int PartCount = (int)Math.Ceiling(1.0f * GameCamera.zoom);
-			float Len = 8 * GameCamera.zoom;
+			int ArmCount = (int)Math.Ceiling(1.5f * Zoom);
+			int PartCount = (int)Math.Ceiling(1.0f * Zoom);
+			float Len = 8 * Zoom;
 
 			Vector2[] Points = new Vector2[ArmCount * PartCount];
 			for (int i = 0; i < Points.Length; i++)

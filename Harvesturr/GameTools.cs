@@ -160,6 +160,8 @@ namespace Harvesturr {
 			if (InMouseClick)
 				Raylib.DrawLineEx(MouseClickPos, GameEngine.MousePosWorld, 1, DragLineColor);
 
+			//Raylib.DrawLineEx(MouseClickPos, GameEngine.MousePosWorld, 1, DragLineColor);
+
 			GameUnit PickedUnit = GameEngine.Pick(GameEngine.MousePosWorld).FirstOrDefault();
 
 			if (PickedUnit == null)
