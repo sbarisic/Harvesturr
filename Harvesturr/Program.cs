@@ -21,18 +21,28 @@ namespace Harvesturr {
 		[DllImport("kernel32", SetLastError = true, CharSet = CharSet.Unicode)]
 		public static extern bool SetDllDirectory(string FileName);
 
+		public static bool DebugView;
+		public static bool DebugFast;
+
+		public static bool DebugPerformance;
+
 		static void Main(string[] args) {
 			if (!SetDllDirectory("native/" + ((IntPtr.Size == 8) ? "x64" : "x86")))
 				throw new Exception("Failed to set DLL directory");
 
+			bool DebugAll = args.Contains("--debug-all");
+
+			DebugView = DebugAll || args.Contains("--debug");
+			DebugPerformance = DebugAll || args.Contains("--performance");
+			DebugFast = DebugAll || args.Contains("--fast");
+
 			Start();
 		}
 
-		const int MaxGameUnits = 4096;
-		static GameUnit[] GameUnits = new GameUnit[MaxGameUnits];
+		static GameUnit[] GameUnits = new GameUnit[64];
 		//static GameUnit[] GameUnitsTemp = new GameUnit[MaxGameUnits];
 
-		static EffectPainter[] Effects = new EffectPainter[128];
+		static EffectPainter[] Effects = new EffectPainter[256];
 
 		static Camera2D GameCamera;
 		static int GUIRectHeight = 50;
@@ -71,17 +81,29 @@ namespace Harvesturr {
 
 			GUIPanelColor = Raylib.Fade(Color.BLACK, 0.8f);
 			GameCamera = new Camera2D(new Vector2(Width, Height) / 2, Vector2.Zero, 0, 2);
-			GameUnits = new GameUnit[MaxGameUnits];
 
 			GameMap.Load("test");
-			for (int i = 0; i < 100; i++)
-				Spawn(new UnitMineral(GameMap.RandomMineralPoint(), Utils.Random(0, 100) > 80));
+
+			if (DebugPerformance) {
+				const float Dist = 50;
+
+				Rectangle Rect = GameMap.GetBounds();
+				Vector2 Pos = new Vector2(Rect.x, Rect.y) + new Vector2(10);
+				int XCount = (int)(Rect.width / Dist);
+				int YCount = (int)(Rect.height / Dist);
+
+				for (int X = 0; X < XCount; X++)
+					for (int Y = 0; Y < YCount; Y++)
+						Spawn(new UnitConduit(Pos + new Vector2(X, Y) * Dist));
+			} else
+				for (int i = 0; i < 100; i++)
+					Spawn(new UnitMineral(GameMap.RandomMineralPoint(), Utils.Random(0, 100) > 80));
 
 			GameTools.AddRange(IsGameToolAttribute.CreateAllGameTools());
 			Resources = 50;
 
-			if (Debugger.IsAttached)
-				Resources += 999999;
+			if (DebugView)
+				Resources = int.MaxValue;
 
 			// Test
 
@@ -199,7 +221,9 @@ namespace Harvesturr {
 					return;
 				}
 
-			throw new Exception("Could not find free unit slot");
+			const int BucketSize = 128;
+			Array.Resize(ref GameUnits, GameUnits.Length + BucketSize);
+			Spawn(Unit);
 		}
 
 		static void DrawEffects(bool ScreenSpace) {
@@ -240,7 +264,11 @@ namespace Harvesturr {
 			Raylib.DrawRectangle(0, ScreenHeight - GUIRectHeight, ScreenWidth, GUIRectHeight, GUIPanelColor);
 			Raylib.DrawRectangle(0, 0, ScreenWidth, 24, GUIPanelColor);
 
-			Raylib.DrawText(string.Format("{0} / {1}", GameUnits.Count(U => U != null), GameUnits.Length), 2, 2, 20, Color.WHITE);
+			if (DebugView) {
+				float FrameTime = Raylib.GetFrameTime();
+				float FPS = 1.0f / FrameTime;
+				Raylib.DrawText(string.Format("{0} / {1} Units, {2:0.000} ms, {3:0.00} FPS", GameUnits.Count(U => U != null), GameUnits.Length, FrameTime, FPS), 2, 2, 20, Color.WHITE);
+			}
 
 			string ResourcesText = "R$ " + Resources;
 			int TextWidth = Raylib.MeasureText(ResourcesText, 20);
@@ -373,6 +401,71 @@ namespace Harvesturr {
 					yield return U;
 		}
 
+		public static void PickInRange(ref GameUnit[] Units, out int Count, Vector2 WorldPos, float Range, bool PickUnpickable = false) {
+			int Idx = 0;
+
+			foreach (var U in GetAllGameUnits(PickUnpickable))
+				if (Vector2.Distance(U.Position, WorldPos) < Range) {
+					if (Idx >= Units.Length)
+						Array.Resize(ref Units, Units.Length + 32);
+
+					Units[Idx++] = U;
+				}
+
+			Count = Idx;
+		}
+
+		static GameUnit[] UnitsInRng = new GameUnit[0];
+
+		public static GameUnit PickNextEnergyPacketTarget(UnitConduit Conduit, params GameUnit[] Except) {
+			if (Conduit.LinkedConduit != null) {
+				if (Conduit.LinkedConduit.Destroyed)
+					Conduit.LinkedConduit = null;
+				else
+					return Conduit.LinkedConduit;
+			}
+
+			//GameUnit[] UnitsInRange = GameEngine.PickInRange(Position, ConnectRangePower).ToArray();
+			GameEngine.PickInRange(ref UnitsInRng, out int Length, Conduit.Position, UnitConduit.ConnectRangePower);
+
+			if (Length == 0)
+				return null;
+
+			for (int i = 0; i < Length; i++) {
+				bool DoContinue = false;
+
+				for (int j = 0; j < Except.Length; j++)
+					if (UnitsInRng[i] == Except[j]) {
+						UnitsInRng[i] = null;
+						DoContinue = true;
+						break;
+					}
+
+				if (DoContinue)
+					continue;
+
+				if (UnitsInRng[i] is UnitMineral) {
+					UnitsInRng[i] = null;
+					continue;
+				}
+
+				if (UnitsInRng[i] is UnitConduit)
+					continue;
+
+				if (!UnitsInRng[i].CanAcceptEnergyPacket()) {
+					UnitsInRng[i] = null;
+					continue;
+				} else
+					return UnitsInRng[i];
+			}
+
+			int MaxLen = Utils.Rearrange(UnitsInRng);
+			if (MaxLen <= 0)
+				return null;
+
+			return UnitsInRng[Utils.Random(0, MaxLen)];
+		}
+
 		public static Rectangle GetBoundingRect(Texture2D Tex, Vector2 WorldPos) {
 			float X = WorldPos.X - (Tex.width / 2);
 			float Y = WorldPos.Y - (Tex.height / 2);
@@ -451,6 +544,9 @@ namespace Harvesturr {
 		static int Width;
 		static int Height;
 
+		public static Rectangle GetBounds() {
+			return new Rectangle(X, Y, Width, Height);
+		}
 		public static void Load(string MapName) {
 			MapTex = ResMgr.LoadTexture(MapName);
 

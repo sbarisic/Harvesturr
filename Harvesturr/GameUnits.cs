@@ -172,7 +172,10 @@ namespace Harvesturr {
 			}
 		}
 
-		public GameUnit PickNextEnergyPacketTarget(params GameUnit[] Except) {
+		// TODO: Optimize to stop object allocation
+		//GameUnit[] UnitsInRng = new GameUnit[0];
+
+		/*public GameUnit PickNextEnergyPacketTarget(params GameUnit[] Except) {
 			if (LinkedConduit != null) {
 				if (LinkedConduit.Destroyed)
 					LinkedConduit = null;
@@ -180,17 +183,18 @@ namespace Harvesturr {
 					return LinkedConduit;
 			}
 
-			GameUnit[] UnitsInRange = GameEngine.PickInRange(Position, ConnectRangePower).ToArray();
+			//GameUnit[] UnitsInRange = GameEngine.PickInRange(Position, ConnectRangePower).ToArray();
+			GameEngine.PickInRange(ref UnitsInRng, out int Length, Position, ConnectRangePower);
 
-			if (UnitsInRange.Length == 0)
+			if (Length == 0)
 				return null;
 
-			for (int i = 0; i < UnitsInRange.Length; i++) {
+			for (int i = 0; i < Length; i++) {
 				bool DoContinue = false;
 
 				for (int j = 0; j < Except.Length; j++)
-					if (UnitsInRange[i] == Except[j]) {
-						UnitsInRange[i] = null;
+					if (UnitsInRng[i] == Except[j]) {
+						UnitsInRng[i] = null;
 						DoContinue = true;
 						break;
 					}
@@ -198,27 +202,27 @@ namespace Harvesturr {
 				if (DoContinue)
 					continue;
 
-				if (UnitsInRange[i] is UnitMineral) {
-					UnitsInRange[i] = null;
+				if (UnitsInRng[i] is UnitMineral) {
+					UnitsInRng[i] = null;
 					continue;
 				}
 
-				if (UnitsInRange[i] is UnitConduit)
+				if (UnitsInRng[i] is UnitConduit)
 					continue;
 
-				if (!UnitsInRange[i].CanAcceptEnergyPacket()) {
-					UnitsInRange[i] = null;
+				if (!UnitsInRng[i].CanAcceptEnergyPacket()) {
+					UnitsInRng[i] = null;
 					continue;
 				} else
-					return UnitsInRange[i];
+					return UnitsInRng[i];
 			}
 
-			int MaxLen = Utils.Rearrange(UnitsInRange);
+			int MaxLen = Utils.Rearrange(UnitsInRng);
 			if (MaxLen <= 0)
 				return null;
 
-			return UnitsInRange[Utils.Random(0, MaxLen)];
-		}
+			return UnitsInRng[Utils.Random(0, MaxLen)];
+		}*/
 
 		public override string ToString() {
 			return string.Format("Heat: {0}", Heat);
@@ -296,6 +300,9 @@ namespace Harvesturr {
 			//UpdateInterval = 0.5f;
 			//UpdateInterval = 0.01f;
 
+			if (GameEngine.DebugFast)
+				UpdateInterval = 0.01f;
+
 			CanLinkEnergy = true;
 		}
 
@@ -353,7 +360,8 @@ namespace Harvesturr {
 				return;
 
 			if (Target is UnitConduit ConduitTarget) {
-				Next = ConduitTarget.PickNextEnergyPacketTarget(Target, Previous);
+				Next = GameEngine.PickNextEnergyPacketTarget(ConduitTarget, Target, Previous);
+				// Next = ConduitTarget.PickNextEnergyPacketTarget(Target, Previous);
 
 				if (Next == null)
 					Next = Previous;
