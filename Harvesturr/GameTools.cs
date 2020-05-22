@@ -143,6 +143,13 @@ namespace Harvesturr {
 		public override void OnWorldClick(Vector2 WorldPos) {
 			Console.WriteLine(string.Format(CultureInfo.InvariantCulture, "new Vector2({0:F3}f, {1:F3}f)", WorldPos.X, WorldPos.Y));
 			//GameEngine.AddLightningEffect(WorldPos, Color.SKYBLUE);
+
+			GameUnit PickedUnit = GameEngine.Pick(GameEngine.MousePosWorld).FirstOrDefault();
+
+			if (PickedUnit is GameUnitAlien Alien) {
+				const float PickForce = 256;
+				Alien.ApplyForce(Utils.Random(new Vector2(-PickForce), new Vector2(PickForce)));
+			}
 		}
 
 		public override void OnMouseDrag(Vector2 WorldStart, Vector2 WorldEnd, Vector2 DragNormal) {
@@ -157,8 +164,16 @@ namespace Harvesturr {
 		}
 
 		public override void DrawWorld() {
-			if (InMouseClick)
+			if (InMouseClick) {
 				Raylib.DrawLineEx(MouseClickPos, GameEngine.MousePosWorld, 1, DragLineColor);
+
+
+				if (GameEngine.Raycast(MouseClickPos, GameEngine.MousePosWorld, out RaycastResult Res)) {
+					GameEngine.DrawCircle(Res.Intersection.HitPoint, 3, Color.RED);
+				}
+
+			}
+
 
 			//Raylib.DrawLineEx(MouseClickPos, GameEngine.MousePosWorld, 1, DragLineColor);
 

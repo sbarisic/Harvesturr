@@ -40,9 +40,11 @@ namespace Harvesturr {
 		}
 
 		static GameUnit[] GameUnits = new GameUnit[64];
-		//static GameUnit[] GameUnitsTemp = new GameUnit[MaxGameUnits];
-
 		static EffectPainter[] Effects = new EffectPainter[256];
+
+		// Used by picking functions, automatically increase in size
+		static GameUnit[] GameUnitsTemp = new GameUnit[0];
+		static RaycastResult[] RaycastResultTemp = new RaycastResult[0];
 
 		static Camera2D GameCamera;
 		static int GUIRectHeight = 50;
@@ -57,6 +59,7 @@ namespace Harvesturr {
 		public static Vector2 MousePosWorld;
 		public static float Zoom;
 		public static bool DrawZoomDetails;
+		public static float Time;
 
 		// Right click mouse dragging
 		static Vector2 MouseDragStartLocation;
@@ -66,7 +69,6 @@ namespace Harvesturr {
 		static List<GameTool> GameTools = new List<GameTool>();
 		static GameTool ActiveGameTool;
 
-		static GameUnit[] UnitsInRng = new GameUnit[0];
 
 		static void GUILoadStyle(string Name) {
 			Raygui.GuiLoadStyle(string.Format("data/gui_styles/{0}/{0}.rgs", Name));
@@ -122,9 +124,16 @@ namespace Harvesturr {
 
 
 			while (!Raylib.WindowShouldClose()) {
+				float FrameTime = Raylib.GetFrameTime();
+				Time = (float)Raylib.GetTime();
+
 				ScreenWidth = Raylib.GetScreenWidth();
 				ScreenHeight = Raylib.GetScreenHeight();
-				Update(Raylib.GetFrameTime());
+
+				if (FrameTime < 0.5f)
+					Update(FrameTime);
+				else
+					Console.WriteLine("Skipping update, frame time {0} s", FrameTime);
 
 				Raylib.BeginDrawing();
 				Raylib.ClearBackground(Color.SKYBLUE);
@@ -231,8 +240,6 @@ namespace Harvesturr {
 		}
 
 		static void DrawEffects(bool ScreenSpace) {
-			float Time = (float)Raylib.GetTime();
-
 			for (int i = 0; i < Effects.Length; i++) {
 				if (Effects[i] != null) {
 					if (Effects[i].ScreenSpace != ScreenSpace)
@@ -416,7 +423,66 @@ namespace Harvesturr {
 					Units[Idx++] = U;
 				}
 
+			for (int i = Idx; i < Units.Length; i++)
+				Units[i] = null;
+
 			Count = Idx;
+		}
+
+		public static bool Collide(GameUnit A, GameUnit B) {
+			return Raylib.CheckCollisionRecs(A.GetBoundingRect(), B.GetBoundingRect());
+		}
+
+		public static bool Collide(Vector2 Pos, Vector2 Dir, Vector2 Center, float Radius, out Vector2 CollisionPoint) {
+			Ray R = new Ray(new Vector3(Pos, 0), new Vector3(Dir, 0));
+			Vector3 Point = Vector3.Zero;
+			CollisionPoint = Vector2.Zero;
+
+			if (Raylib.CheckCollisionRaySphereEx(R, new Vector3(Center, 0), Radius, ref Point)) {
+				CollisionPoint = new Vector2(Point.X, Point.Y);
+				return true;
+			}
+
+			return false;
+		}
+
+		public static bool Raycast(Vector2 StartPos, Vector2 EndPos, out RaycastResult Result) {
+			PickInRange(ref GameUnitsTemp, out int Length, StartPos, Vector2.Distance(StartPos, EndPos));
+			int TempPointIdx = 0;
+
+			for (int i = 0; i < Length; i++) {
+				if (TempPointIdx >= RaycastResultTemp.Length)
+					Array.Resize(ref RaycastResultTemp, RaycastResultTemp.Length + 16);
+
+				if (Utils.Intersects(StartPos, EndPos, GameUnitsTemp[i].GetBoundingRect(), out IntersectionResult IResult)) {
+					RaycastResultTemp[TempPointIdx] = new RaycastResult(IResult, GameUnitsTemp[i]);
+					TempPointIdx++;
+				}
+			}
+
+			if (TempPointIdx > 0) {
+				// TODO: Fucking optimize this shit
+				Result = RaycastResultTemp.Take(TempPointIdx).OrderBy(P => Vector2.DistanceSquared(StartPos, P.Intersection.HitPoint)).First();
+				return true;
+			}
+
+			Result = new RaycastResult(IntersectionResult.Empty, null);
+			return false;
+		}
+
+		public static GameUnit PickNextAttackTarget(Vector2 Position, float Range) {
+			PickInRange(ref GameUnitsTemp, out int Length, Position, Range);
+
+			for (int i = 0; i < Length; i++) {
+				if (GameUnitsTemp[i] is GameUnitAlien || GameUnitsTemp[i] is UnitMineral)
+					GameUnitsTemp[i] = null;
+			}
+
+			Length = Utils.Rearrange(GameUnitsTemp);
+			if (Length <= 0)
+				return null;
+
+			return GameUnitsTemp[Utils.Random(0, Length)];
 		}
 
 		public static GameUnit PickNextEnergyPacketTarget(UnitConduit CurConduit, GameUnit Except1, GameUnit Except2) {
@@ -427,38 +493,37 @@ namespace Harvesturr {
 					return CurConduit.LinkedConduit;
 			}
 
-			//GameUnit[] UnitsInRange = GameEngine.PickInRange(Position, ConnectRangePower).ToArray();
-			GameEngine.PickInRange(ref UnitsInRng, out int Length, CurConduit.Position, UnitConduit.ConnectRangePower);
+			PickInRange(ref GameUnitsTemp, out int Length, CurConduit.Position, UnitConduit.ConnectRangePower);
 
 			if (Length == 0)
 				return null;
 
 			for (int i = 0; i < Length; i++) {
-				if (UnitsInRng[i] == Except1 || UnitsInRng[i] == Except2) {
-					UnitsInRng[i] = null;
+				if (GameUnitsTemp[i] == Except1 || GameUnitsTemp[i] == Except2) {
+					GameUnitsTemp[i] = null;
 					continue;
 				}
 
-				if (UnitsInRng[i] is UnitMineral) {
-					UnitsInRng[i] = null;
+				if (GameUnitsTemp[i] is UnitMineral) {
+					GameUnitsTemp[i] = null;
 					continue;
 				}
 
-				if (UnitsInRng[i] is UnitConduit)
+				if (GameUnitsTemp[i] is UnitConduit)
 					continue;
 
-				if (!UnitsInRng[i].CanAcceptEnergyPacket()) {
-					UnitsInRng[i] = null;
+				if (!GameUnitsTemp[i].CanAcceptEnergyPacket()) {
+					GameUnitsTemp[i] = null;
 					continue;
 				} else
-					return UnitsInRng[i];
+					return GameUnitsTemp[i];
 			}
 
-			int MaxLen = Utils.Rearrange(UnitsInRng);
+			int MaxLen = Utils.Rearrange(GameUnitsTemp);
 			if (MaxLen <= 0)
 				return null;
 
-			return UnitsInRng[Utils.Random(0, MaxLen)];
+			return GameUnitsTemp[Utils.Random(0, MaxLen)];
 		}
 
 		public static Rectangle GetBoundingRect(Texture2D Tex, Vector2 WorldPos) {
@@ -582,6 +647,16 @@ namespace Harvesturr {
 		}
 	}
 
+	struct RaycastResult {
+		public IntersectionResult Intersection;
+		public GameUnit Unit;
+
+		public RaycastResult(IntersectionResult Intersection, GameUnit Unit) {
+			this.Intersection = Intersection;
+			this.Unit = Unit;
+		}
+	}
+
 	class EffectPainter {
 		public bool ScreenSpace;
 		public float EndTime;
@@ -590,7 +665,7 @@ namespace Harvesturr {
 		public EffectPainter(Action Action, float Length = 1, bool ScreenSpace = false) {
 			this.Action = Action;
 			this.ScreenSpace = ScreenSpace;
-			EndTime = (float)Raylib.GetTime() + Length;
+			EndTime = GameEngine.Time + Length;
 		}
 	}
 }

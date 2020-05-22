@@ -7,6 +7,22 @@ using System.Numerics;
 using Raylib_cs;
 
 namespace Harvesturr {
+	struct IntersectionResult {
+		public static readonly IntersectionResult Empty = new IntersectionResult();
+
+		public Vector2 Direction;
+		public Vector2 HitPoint;
+		public Vector2 Normal;
+		public Vector2 Reflection;
+
+		public IntersectionResult(Vector2 Direction, Vector2 HitPoint, Vector2 Normal, Vector2 Reflection) {
+			this.Direction = Direction;
+			this.HitPoint = HitPoint;
+			this.Normal = Normal;
+			this.Reflection = Reflection;
+		}
+	}
+
 	static class Utils {
 		static Random Rnd = new Random();
 
@@ -80,6 +96,88 @@ namespace Harvesturr {
 					return i;
 
 			return -1;
+		}
+
+		public static bool Intersects(Vector2 A1, Vector2 A2, Vector2 B1, Vector2 B2, ref IntersectionResult Result) {
+			Vector2 B = A2 - A1;
+			Vector2 D = B2 - B1;
+			float bDotDPerp = B.X * D.Y - B.Y * D.X;
+
+			// if b dot d == 0, it means the lines are parallel so have infinite intersection points
+			if (bDotDPerp == 0)
+				return false;
+
+			Vector2 C = B1 - A1;
+			float T = (C.X * D.Y - C.Y * D.X) / bDotDPerp;
+			if (T < 0 || T > 1)
+				return false;
+
+			float U = (C.X * B.Y - C.Y * B.X) / bDotDPerp;
+			if (U < 0 || U > 1)
+				return false;
+
+			Vector2 Dir = Vector2.Normalize(A2 - A1);
+			Vector2 Normal = Vector2.Zero;
+			Vector2 Ref = Vector2.Reflect(Dir, Normal);
+
+			Result = new IntersectionResult(Dir, A1 + T * B, Normal, Ref);
+			return true;
+		}
+
+		public static bool Intersects(Vector2 Start, Vector2 End, Rectangle Rect, out IntersectionResult Result) {
+			IntersectionResult ResA = new IntersectionResult();
+			IntersectionResult ResB = new IntersectionResult();
+
+			ref IntersectionResult CurRes = ref ResA;
+
+			Vector2 A1 = new Vector2(Rect.x, Rect.y);
+			Vector2 A2 = A1 + new Vector2(Rect.width, 0);
+
+			Vector2 B1 = new Vector2(Rect.x, Rect.y);
+			Vector2 B2 = B1 + new Vector2(0, Rect.height);
+
+			Vector2 C1 = B2;
+			Vector2 C2 = C1 + new Vector2(Rect.width, 0);
+
+			Vector2 D1 = A2;
+			Vector2 D2 = D1 + new Vector2(0, Rect.height);
+
+			int IntersectCount = 0;
+
+			if (Intersects(Start, End, A1, A2, ref CurRes)) {
+				CurRes = ref ResB;
+				IntersectCount++;
+			}
+
+			if (Intersects(Start, End, B1, B2, ref CurRes)) {
+				CurRes = ref ResB;
+				IntersectCount++;
+			}
+
+			if (Intersects(Start, End, C1, C2, ref CurRes)) {
+				CurRes = ref ResB;
+				IntersectCount++;
+			}
+
+			if (Intersects(Start, End, D1, D2, ref CurRes)) {
+				IntersectCount++;
+			}
+
+			if (IntersectCount <= 0) {
+				Result = new IntersectionResult();
+				return false;
+			} else if (IntersectCount == 1) {
+				Result = ResA;
+				return true;
+			} else if (IntersectCount == 2) {
+				if (Vector2.DistanceSquared(Start, ResA.HitPoint) < Vector2.DistanceSquared(Start, ResB.HitPoint))
+					Result = ResA;
+				else
+					Result = ResB;
+
+				return true;
+			} else
+				throw new Exception("Wat");
 		}
 	}
 }

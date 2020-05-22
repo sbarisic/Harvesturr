@@ -72,9 +72,8 @@ namespace Harvesturr {
 				return;
 			}
 
-			float CurTime = (float)Raylib.GetTime();
-			if (NextUpdateTime < CurTime) {
-				NextUpdateTime = CurTime + UpdateInterval;
+			if (NextUpdateTime < GameEngine.Time) {
+				NextUpdateTime = GameEngine.Time + UpdateInterval;
 				SlowUpdate();
 			}
 		}
@@ -96,26 +95,6 @@ namespace Harvesturr {
 
 		public virtual bool CanAcceptEnergyPacket() {
 			return false;
-		}
-	}
-
-	class GameUnitAlien : GameUnit {
-		protected float Rotation;
-		protected bool Rotate;
-
-		public GameUnitAlien(string UnitName, Vector2 Position) : base(UnitName, Position) {
-			Rotate = true;
-		}
-
-		public override void Update(float Dt) {
-			base.Update(Dt);
-
-			if (Rotate)
-				Rotation = (float)Raylib.GetTime() * 20;
-		}
-
-		public override void DrawWorld() {
-			GameEngine.DrawTextureCentered(UnitTex, Position, Rotation: Rotation, Clr: DrawColor);
 		}
 	}
 
@@ -221,7 +200,7 @@ namespace Harvesturr {
 			base.Update(Dt);
 			DrawColor = Color.WHITE;
 
-			if (EnergyCharges <= 0 && (((float)Raylib.GetTime() - LastEnergyChargeUseTime) > UpdateInterval))
+			if (EnergyCharges <= 0 && ((GameEngine.Time - LastEnergyChargeUseTime) > UpdateInterval))
 				DrawColor = new Color(128, 128, 128, 190);
 		}
 
@@ -247,7 +226,7 @@ namespace Harvesturr {
 
 				if (EnergyCharges <= 0) {
 					EnergyCharges = 0;
-					LastEnergyChargeUseTime = (float)Raylib.GetTime();
+					LastEnergyChargeUseTime = GameEngine.Time;
 				}
 
 				GameEngine.AddResource(1);
@@ -356,13 +335,6 @@ namespace Harvesturr {
 
 			this.Target = Next;
 			this.Target.AwaitingPacket = this;
-		}
-	}
-
-	class UnitAlienUfo : GameUnitAlien {
-		public const string UNIT_NAME = "ufo";
-
-		public UnitAlienUfo(Vector2 Position) : base(UNIT_NAME, Position) {
 		}
 	}
 }

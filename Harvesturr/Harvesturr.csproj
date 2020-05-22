@@ -52,7 +52,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GameTools.cs" />
-    <Compile Include="GameUnits.cs" />
+    <Compile Include="GameUnitAlien.cs" />
+    <Compile Include="GameUnit.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResourceMgr.cs" />
