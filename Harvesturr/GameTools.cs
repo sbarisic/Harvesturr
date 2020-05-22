@@ -92,7 +92,7 @@ namespace Harvesturr {
 				return;
 
 			Color GhostColor = CurrentLocationValid ? Color.GREEN : Color.RED;
-			GameEngine.DrawTextureCentered(ToolGhost.Value, GameEngine.MousePosWorld, Raylib.Fade(GhostColor, 0.5f));
+			GameEngine.DrawTextureCentered(ToolGhost.Value, GameEngine.MousePosWorld, Clr: Raylib.Fade(GhostColor, 0.5f));
 
 			if (CurrentLocationValid)
 				GameEngine.DrawTooltip(GameEngine.MousePosWorld, "R$ " + BuildCost, Color.GREEN);
@@ -142,7 +142,7 @@ namespace Harvesturr {
 
 		public override void OnWorldClick(Vector2 WorldPos) {
 			Console.WriteLine(string.Format(CultureInfo.InvariantCulture, "new Vector2({0:F3}f, {1:F3}f)", WorldPos.X, WorldPos.Y));
-			GameEngine.AddLightningEffect(WorldPos, Color.SKYBLUE);
+			//GameEngine.AddLightningEffect(WorldPos, Color.SKYBLUE);
 		}
 
 		public override void OnMouseDrag(Vector2 WorldStart, Vector2 WorldEnd, Vector2 DragNormal) {
@@ -164,7 +164,7 @@ namespace Harvesturr {
 
 			GameUnit PickedUnit = GameEngine.Pick(GameEngine.MousePosWorld).FirstOrDefault();
 
-			if (PickedUnit == null)
+			if (PickedUnit == null || PickedUnit is GameUnitAlien)
 				return;
 
 			GameEngine.DrawTooltip(GameEngine.MousePosWorld, PickedUnit.ToString());

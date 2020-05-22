@@ -66,6 +66,8 @@ namespace Harvesturr {
 		static List<GameTool> GameTools = new List<GameTool>();
 		static GameTool ActiveGameTool;
 
+		static GameUnit[] UnitsInRng = new GameUnit[0];
+
 		static void GUILoadStyle(string Name) {
 			Raygui.GuiLoadStyle(string.Format("data/gui_styles/{0}/{0}.rgs", Name));
 		}
@@ -98,6 +100,8 @@ namespace Harvesturr {
 			} else
 				for (int i = 0; i < 100; i++)
 					Spawn(new UnitMineral(GameMap.RandomMineralPoint(), Utils.Random(0, 100) > 80));
+
+			Spawn(new UnitAlienUfo(Vector2.Zero));
 
 			GameTools.AddRange(IsGameToolAttribute.CreateAllGameTools());
 			Resources = 50;
@@ -415,34 +419,25 @@ namespace Harvesturr {
 			Count = Idx;
 		}
 
-		static GameUnit[] UnitsInRng = new GameUnit[0];
-
-		public static GameUnit PickNextEnergyPacketTarget(UnitConduit Conduit, params GameUnit[] Except) {
-			if (Conduit.LinkedConduit != null) {
-				if (Conduit.LinkedConduit.Destroyed)
-					Conduit.LinkedConduit = null;
+		public static GameUnit PickNextEnergyPacketTarget(UnitConduit CurConduit, GameUnit Except1, GameUnit Except2) {
+			if (CurConduit.LinkedConduit != null) {
+				if (CurConduit.LinkedConduit.Destroyed)
+					CurConduit.LinkedConduit = null;
 				else
-					return Conduit.LinkedConduit;
+					return CurConduit.LinkedConduit;
 			}
 
 			//GameUnit[] UnitsInRange = GameEngine.PickInRange(Position, ConnectRangePower).ToArray();
-			GameEngine.PickInRange(ref UnitsInRng, out int Length, Conduit.Position, UnitConduit.ConnectRangePower);
+			GameEngine.PickInRange(ref UnitsInRng, out int Length, CurConduit.Position, UnitConduit.ConnectRangePower);
 
 			if (Length == 0)
 				return null;
 
 			for (int i = 0; i < Length; i++) {
-				bool DoContinue = false;
-
-				for (int j = 0; j < Except.Length; j++)
-					if (UnitsInRng[i] == Except[j]) {
-						UnitsInRng[i] = null;
-						DoContinue = true;
-						break;
-					}
-
-				if (DoContinue)
+				if (UnitsInRng[i] == Except1 || UnitsInRng[i] == Except2) {
+					UnitsInRng[i] = null;
 					continue;
+				}
 
 				if (UnitsInRng[i] is UnitMineral) {
 					UnitsInRng[i] = null;
@@ -472,8 +467,10 @@ namespace Harvesturr {
 			return new Rectangle(X, Y, Tex.width, Tex.height);
 		}
 
-		public static void DrawTextureCentered(Texture2D Tex, Vector2 WorldPos, Color? Clr = null) {
-			Raylib.DrawTexture(Tex, (int)WorldPos.X - (Tex.width / 2), (int)WorldPos.Y - (Tex.height / 2), Clr ?? Color.WHITE);
+		public static void DrawTextureCentered(Texture2D Tex, Vector2 WorldPos, float Rotation = 0, Color? Clr = null) {
+			//Raylib.DrawTexture(Tex, (int)WorldPos.X - (Tex.width / 2), (int)WorldPos.Y - (Tex.height / 2), Clr ?? Color.WHITE);
+			//Raylib.DrawTextureEx(Tex, new Vector2((int)WorldPos.X - (Tex.width / 2), (int)WorldPos.Y - (Tex.height / 2)), Rotation, Scale, Clr ?? Color.WHITE);
+			Raylib.DrawTexturePro(Tex, new Rectangle(0, 0, Tex.width, Tex.height), new Rectangle(WorldPos.X, WorldPos.Y, Tex.width, Tex.height), new Vector2(Tex.width, Tex.height) / 2, Rotation, Clr ?? Color.WHITE);
 		}
 
 		public static void DrawCircle(Vector2 Pos, float Radius, Color Clr, bool Outline = true) {

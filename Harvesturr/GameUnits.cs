@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace Harvesturr {
 	class GameUnit {
-		Texture2D UnitTex;
 		public Vector2 Position;
 		public string Name;
 		public bool Pickable;
+		public bool LightningOnDestroy;
 
 		public int Health;
 		public bool CanLinkEnergy;
@@ -19,6 +19,7 @@ namespace Harvesturr {
 		public float NextUpdateTime;
 		public UnitEnergyPacket AwaitingPacket;
 
+		protected Texture2D UnitTex;
 		protected Color DrawColor;
 
 		public bool Destroyed {
@@ -36,6 +37,7 @@ namespace Harvesturr {
 			DrawColor = Color.WHITE;
 			Pickable = true;
 			Health = 100;
+			LightningOnDestroy = false;
 		}
 
 		public Rectangle GetBoundingRect() {
@@ -55,8 +57,13 @@ namespace Harvesturr {
 		}
 
 		public virtual void Destroy() {
+			if (Destroyed)
+				return;
+
 			Destroyed = true;
-			GameEngine.AddLightningEffect(Position, Color.SKYBLUE);
+
+			if (LightningOnDestroy)
+				GameEngine.AddLightningEffect(Position, Color.SKYBLUE);
 		}
 
 		public virtual void Update(float Dt) {
@@ -76,7 +83,7 @@ namespace Harvesturr {
 		}
 
 		public virtual void DrawWorld() {
-			GameEngine.DrawTextureCentered(UnitTex, Position, DrawColor);
+			GameEngine.DrawTextureCentered(UnitTex, Position, Clr: DrawColor);
 		}
 
 		public virtual void DrawGUI() {
@@ -89,6 +96,26 @@ namespace Harvesturr {
 
 		public virtual bool CanAcceptEnergyPacket() {
 			return false;
+		}
+	}
+
+	class GameUnitAlien : GameUnit {
+		protected float Rotation;
+		protected bool Rotate;
+
+		public GameUnitAlien(string UnitName, Vector2 Position) : base(UnitName, Position) {
+			Rotate = true;
+		}
+
+		public override void Update(float Dt) {
+			base.Update(Dt);
+
+			if (Rotate)
+				Rotation = (float)Raylib.GetTime() * 20;
+		}
+
+		public override void DrawWorld() {
+			GameEngine.DrawTextureCentered(UnitTex, Position, Rotation: Rotation, Clr: DrawColor);
 		}
 	}
 
@@ -171,58 +198,6 @@ namespace Harvesturr {
 				Packet.Destroy();
 			}
 		}
-
-		// TODO: Optimize to stop object allocation
-		//GameUnit[] UnitsInRng = new GameUnit[0];
-
-		/*public GameUnit PickNextEnergyPacketTarget(params GameUnit[] Except) {
-			if (LinkedConduit != null) {
-				if (LinkedConduit.Destroyed)
-					LinkedConduit = null;
-				else
-					return LinkedConduit;
-			}
-
-			//GameUnit[] UnitsInRange = GameEngine.PickInRange(Position, ConnectRangePower).ToArray();
-			GameEngine.PickInRange(ref UnitsInRng, out int Length, Position, ConnectRangePower);
-
-			if (Length == 0)
-				return null;
-
-			for (int i = 0; i < Length; i++) {
-				bool DoContinue = false;
-
-				for (int j = 0; j < Except.Length; j++)
-					if (UnitsInRng[i] == Except[j]) {
-						UnitsInRng[i] = null;
-						DoContinue = true;
-						break;
-					}
-
-				if (DoContinue)
-					continue;
-
-				if (UnitsInRng[i] is UnitMineral) {
-					UnitsInRng[i] = null;
-					continue;
-				}
-
-				if (UnitsInRng[i] is UnitConduit)
-					continue;
-
-				if (!UnitsInRng[i].CanAcceptEnergyPacket()) {
-					UnitsInRng[i] = null;
-					continue;
-				} else
-					return UnitsInRng[i];
-			}
-
-			int MaxLen = Utils.Rearrange(UnitsInRng);
-			if (MaxLen <= 0)
-				return null;
-
-			return UnitsInRng[Utils.Random(0, MaxLen)];
-		}*/
 
 		public override string ToString() {
 			return string.Format("Heat: {0}", Heat);
@@ -325,6 +300,7 @@ namespace Harvesturr {
 		public UnitEnergyPacket(Vector2 Position, GameUnit Target) : base(UNIT_NAME, Position) {
 			this.Target = Target;
 			Pickable = false;
+			LightningOnDestroy = true;
 		}
 
 		public UnitEnergyPacket(UnitConduit Source, GameUnit Target) : this(Source.Position, Target) {
@@ -361,7 +337,6 @@ namespace Harvesturr {
 
 			if (Target is UnitConduit ConduitTarget) {
 				Next = GameEngine.PickNextEnergyPacketTarget(ConduitTarget, Target, Previous);
-				// Next = ConduitTarget.PickNextEnergyPacketTarget(Target, Previous);
 
 				if (Next == null)
 					Next = Previous;
@@ -381,6 +356,13 @@ namespace Harvesturr {
 
 			this.Target = Next;
 			this.Target.AwaitingPacket = this;
+		}
+	}
+
+	class UnitAlienUfo : GameUnitAlien {
+		public const string UNIT_NAME = "ufo";
+
+		public UnitAlienUfo(Vector2 Position) : base(UNIT_NAME, Position) {
 		}
 	}
 }
