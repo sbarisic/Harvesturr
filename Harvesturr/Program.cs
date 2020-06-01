@@ -69,6 +69,14 @@ namespace Harvesturr {
 		static List<GameTool> GameTools = new List<GameTool>();
 		static GameTool ActiveGameTool;
 
+		// Lockstep stuff
+		static Stopwatch LockstepTimer = Stopwatch.StartNew();
+		static int SimulatedSteps;
+
+		// Timing stuff
+		//static bool Paused = false;
+		static Stopwatch GameTimer = Stopwatch.StartNew();
+
 
 		static void GUILoadStyle(string Name) {
 			Raygui.GuiLoadStyle(string.Format("data/gui_styles/{0}/{0}.rgs", Name));
@@ -122,18 +130,20 @@ namespace Harvesturr {
 			Spawn(ConduitC);
 			Spawn(new UnitEnergyPacket(ConduitA, ConduitB));*/
 
+			GameTimer.Restart();
 
 			while (!Raylib.WindowShouldClose()) {
 				float FrameTime = Raylib.GetFrameTime();
-				Time = (float)Raylib.GetTime();
+				Time = (float)GameTimer.Elapsed.TotalSeconds;
 
 				ScreenWidth = Raylib.GetScreenWidth();
 				ScreenHeight = Raylib.GetScreenHeight();
 
-				if (FrameTime < 0.5f)
+				Lockstep(Time, 1.0f / 60, 1.0f / 10);
+				/*if (FrameTime < 0.5f)
 					Update(FrameTime);
 				else
-					Console.WriteLine("Skipping update, frame time {0} s", FrameTime);
+					Console.WriteLine("Skipping update, frame time {0} s", FrameTime);*/
 
 				Raylib.BeginDrawing();
 				Raylib.ClearBackground(Color.SKYBLUE);
@@ -151,6 +161,24 @@ namespace Harvesturr {
 			}
 
 			Raylib.CloseWindow();
+		}
+
+		static void Lockstep(float Elapsed, float StepInterval, float MaxTime) {
+			float RequiredSteps = (Elapsed / StepInterval) - SimulatedSteps;
+			int RequiredStepsInt = (int)Math.Floor(RequiredSteps);
+
+			if (RequiredStepsInt <= 0)
+				return;
+
+			LockstepTimer.Restart();
+
+			for (int i = 0; i < RequiredStepsInt; i++) {
+				Update(StepInterval);
+				SimulatedSteps++;
+
+				if (LockstepTimer.Elapsed.TotalSeconds > MaxTime)
+					break;
+			}
 		}
 
 		static void Update(float Dt) {
@@ -224,6 +252,18 @@ namespace Harvesturr {
 
 				if (Raylib.IsMouseButtonReleased(MouseButton.MOUSE_LEFT_BUTTON))
 					ActiveGameTool?.OnWorldMousePress(MousePosWorld, false);
+			}
+		}
+
+		public static void PauseGame(bool Pause) {
+			bool Paused = !GameTimer.IsRunning;
+
+			if (Paused && !Pause) {
+				GameTimer.Start();
+				//Paused = false;
+			} else if (!Paused && Pause) {
+				GameTimer.Stop();
+				//Paused = true;
 			}
 		}
 
