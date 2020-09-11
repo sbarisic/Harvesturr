@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -76,6 +77,10 @@ namespace Harvesturr {
 				NextUpdateTime = GameEngine.Time + UpdateInterval;
 				SlowUpdate();
 			}
+		}
+
+		public virtual void ReceiveDamage(GameUnit AttackingUnit, int Damage) {
+			Health -= Damage;
 		}
 
 		public virtual void SlowUpdate() {

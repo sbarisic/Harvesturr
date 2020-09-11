@@ -8,8 +8,12 @@ using System.Threading.Tasks;
 
 namespace Harvesturr {
 	class GameUnitAlien : GameUnit {
-		protected float AttackRange;
+		protected float AttackRange; // Scan for enemy range
+		protected float AttackDamageRange; // Deal damage range
 		protected int AttackDamage;
+		protected float AttackInterval;
+
+		protected float NextAttackTime;
 
 		protected bool Rotate;
 		protected float Rotation;
@@ -22,9 +26,13 @@ namespace Harvesturr {
 
 		protected GameUnit AttackTarget;
 
+		bool EnemyInDamageRange;
+
 		public GameUnitAlien(string UnitName, Vector2 Position) : base(UnitName, Position) {
 			AttackRange = 128;
-			AttackDamage = 1;
+			AttackDamageRange = 16;
+			AttackDamage = 5;
+			AttackInterval = 1;
 
 			UpdateInterval = 2;
 			Rotate = true;
@@ -40,6 +48,22 @@ namespace Harvesturr {
 
 			Position += (MoveDirection * MoveSpeed * Dt) + (Velocity * Dt);
 			Velocity = Velocity * Friction;
+
+			if (AttackTarget != null && AttackTarget.Destroyed)
+				AttackTarget = null;
+
+			if (AttackTarget != null) {
+				if (Vector2.Distance(Position, AttackTarget.Position) <= AttackDamageRange) {
+					EnemyInDamageRange = true;
+
+					if (NextAttackTime < GameEngine.Time) {
+						NextAttackTime = GameEngine.Time + AttackInterval;
+						Attack(AttackTarget);
+					}
+				} else {
+					EnemyInDamageRange = false;
+				}
+			}
 		}
 
 		public override void SlowUpdate() {
@@ -51,8 +75,13 @@ namespace Harvesturr {
 			MoveDirection = CalculateMoveDirection();
 		}
 
+		public virtual void Attack(GameUnit Target) {
+			Console.WriteLine("Attacking!");
+			Target.ReceiveDamage(this, AttackDamage);
+		}
+
 		public virtual Vector2 CalculateMoveDirection() {
-			if (AttackTarget == null)
+			if (AttackTarget == null || EnemyInDamageRange)
 				return Vector2.Zero;
 
 			return Vector2.Normalize(AttackTarget.Position - Position);
