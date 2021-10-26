@@ -51,11 +51,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CSV.cs" />
+    <Compile Include="EffectPainter.cs" />
+    <Compile Include="GameEngine.cs" />
+    <Compile Include="GameMap.cs" />
     <Compile Include="GameTools.cs" />
     <Compile Include="GameUnitAlien.cs" />
     <Compile Include="GameUnit.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Raycast.cs" />
     <Compile Include="ResourceMgr.cs" />
     <Compile Include="Utils.cs" />
   </ItemGroup>
@@ -112,6 +117,13 @@
     <None Include="data\gui_styles\terminal\README.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="data\maps\maps.tiled-project" />
+    <None Include="data\maps\maps.tiled-session" />
+    <None Include="data\maps\test\test.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="data\maps\test\test.tmx" />
+    <None Include="data\textures\tileset.pdn" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="NETStandard.Library">
@@ -242,6 +254,9 @@
     <Content Include="data\textures\test.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="data\textures\tileset.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="data\textures\ufo.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -251,6 +266,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="native\x86\" />
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptCompile Include="data\maps\tileset.tsx" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

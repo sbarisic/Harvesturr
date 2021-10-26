@@ -1,0 +1,40 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "test/test.tmx",
+    "expandedProjectPaths": [
+        "test",
+        "."
+    ],
+    "file.lastUsedOpenFilter": "All Files (*)",
+    "fileStates": {
+        "test/test.tmx": {
+            "scale": 0.25,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 1594,
+                "y": 1476
+            }
+        },
+        "tileset.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 2
+        }
+    },
+    "last.exportedFilePath": "D:/Projects/Harvesturr/Harvesturr/data/maps/test",
+    "last.imagePath": "D:/Projects/Harvesturr/Harvesturr/data/textures",
+    "map.lastUsedExportFilter": "CSV files (*.csv)",
+    "map.lastUsedFormat": "tmx",
+    "map.renderOrder": null,
+    "openFiles": [
+        "test/test.tmx"
+    ],
+    "project": "maps.tiled-project",
+    "recentFiles": [
+        "test/test.tmx",
+        "tileset.tsx"
+    ],
+    "tileset.lastUsedFormat": "tsx"
+}
