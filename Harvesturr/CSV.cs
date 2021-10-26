@@ -9,9 +9,9 @@ namespace Harvesturr
 {
     static class CSV
     {
-        public static int[] ParseIntCSV(string FileName, out int W, out int H)
+        public static int[] ParseIntCSV(string CSVSrc, out int W, out int H)
         {
-            string Text = File.ReadAllText(FileName).Trim();
+            string Text = CSVSrc.Trim();
             string[] Lines = Text.Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
 
             H = Lines.Length;

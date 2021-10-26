@@ -16,6 +16,7 @@ namespace Harvesturr
     {
         WORLD,
         SCREEN,
+        RENDERTEXTURE,
         NONE
     }
 
@@ -121,7 +122,7 @@ namespace Harvesturr
 
             if (!IsMouseDragging)
             {
-                int Wheel = Raylib.GetMouseWheelMove();
+                int Wheel = (int)Raylib.GetMouseWheelMove();
                 if (Wheel != 0)
                 {
                     GameCamera.zoom += Wheel / 10.0f;

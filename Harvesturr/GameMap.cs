@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using System.IO;
 using Raylib_cs;
-using Raygui_cs;
 using System.Numerics;
 using System.Diagnostics;
 
@@ -22,23 +21,32 @@ namespace Harvesturr
 
         public int ID;
 
-        public bool FlipH;
-        public bool FlipV;
-        public bool FlipD;
+        public bool FlipHorizontal;
+        public bool FlipVertical;
+        public bool FlipDiagonal;
 
         public GameTile(int IDRaw)
         {
-            FlipH = (IDRaw & FLIPPED_HORIZONTALLY_FLAG) > 0;
-            FlipV = (IDRaw & FLIPPED_VERTICALLY_FLAG) > 0;
-            FlipD = (IDRaw & FLIPPED_DIAGONALLY_FLAG) > 0;
+            int FlipH = (int)(IDRaw & FLIPPED_HORIZONTALLY_FLAG);
+            int FlipV = (int)(IDRaw & FLIPPED_VERTICALLY_FLAG);
+            int FlipD = (int)(IDRaw & FLIPPED_DIAGONALLY_FLAG);
 
-            ID = IDRaw & ~((FlipH ? 1 : 0) | (FlipV ? 1 : 0) | (FlipD ? 1 : 0));
+            ID = IDRaw & ~(FlipH | FlipV | FlipD);
+
+            FlipHorizontal = FlipH > 0;
+            FlipVertical = FlipV > 0;
+            FlipDiagonal = FlipD > 0;
+        }
+
+        public override string ToString()
+        {
+            return string.Format("{0} - H {1}, V {2}, D {3}", ID, FlipHorizontal, FlipVertical, FlipDiagonal);
         }
     }
 
     static class GameMap
     {
-        static Texture2D MapTex;
+        static Texture2D TilemapTex;
 
         static int TileWidth = 32;
         static int TileHeight = 32;
@@ -48,7 +56,10 @@ namespace Harvesturr
         static int Width;
         static int Height;
 
-        static int[] Tiles;
+        static GameTile[] Tiles;
+
+        static RenderTexture2D MapCached;
+        static Camera2D MapCamera;
 
         static int TotalWidth
         {
@@ -73,25 +84,51 @@ namespace Harvesturr
 
         public static void Load(string MapName)
         {
-            string MapFile = Path.Combine("data/maps", MapName, MapName + ".csv");
-            Tiles = CSV.ParseIntCSV(MapFile, out Width, out Height);
-
-            MapTex = ResMgr.LoadTexture(MapName);
+            Tiles = CSV.ParseIntCSV(ResMgr.LoadMapCSV(MapName, MapName), out Width, out Height).Select(T => new GameTile(T)).ToArray();
+            TilemapTex = ResMgr.LoadTexture("tileset");
 
             //Width = 50;
             //Height = 50;
 
             X = -(TotalWidth / 2);
             Y = -(TotalHeight / 2);
+
+            MapCached = Raylib.LoadRenderTexture(TotalWidth, TotalHeight);
+            MapCamera = new Camera2D(Vector2.Zero, Vector2.Zero, 0, 1);
+            CacheDrawWorld();
         }
 
         public static void Update(float Dt)
         {
         }
 
+        static void CacheDrawWorld()
+        {
+            Raylib.BeginTextureMode(MapCached);
+            Raylib.ClearBackground(Color.PINK);
+            //Raylib.BeginMode2D(MapCamera);
+
+            int TilesX = TilemapTex.width / TileWidth;
+            // int TilesY = TilemapTex.height / TileHeight;
+
+            for (int i = 0; i < Tiles.Length; i++)
+            {
+                int TileX = Tiles[i].ID % TilesX;
+                int TileY = Tiles[i].ID / TilesX;
+
+                int WorldX = (i % Width) * TileWidth;
+                int WorldY = (i / Width) * TileWidth;
+
+                Raylib.DrawTextureRec(TilemapTex, new Rectangle(TileX * TileWidth, TileY * TileHeight, TileWidth, TileHeight), new Vector2(WorldX, WorldY), Color.WHITE);
+            }
+
+            //Raylib.EndMode2D();
+            Raylib.EndTextureMode();
+        }
+
         public static void DrawWorld()
         {
-            Raylib.DrawTexture(MapTex, X, Y, Color.WHITE);
+            Raylib.DrawTexture(MapCached.texture, X, Y, Color.WHITE);
         }
 
         public static bool IsInBounds(Vector2 Pos)

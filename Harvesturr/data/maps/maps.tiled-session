@@ -11,30 +11,33 @@
     "file.lastUsedOpenFilter": "All Files (*)",
     "fileStates": {
         "test/test.tmx": {
-            "scale": 0.25,
+            "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 1594,
-                "y": 1476
+                "x": 1524.25,
+                "y": 1602.75
             }
         },
         "tileset.tsx": {
-            "scaleInDock": 1,
-            "scaleInEditor": 2
+            "scaleInDock": 0.5,
+            "scaleInEditor": 4
         }
     },
-    "last.exportedFilePath": "D:/Projects/Harvesturr/Harvesturr/data/maps/test",
+    "last.exportedFilePath": "C:/Projects/Harvesturr/Harvesturr/data/maps/test",
+    "last.externalTilesetPath": "C:/Projects/Harvesturr/Harvesturr/data/maps",
     "last.imagePath": "D:/Projects/Harvesturr/Harvesturr/data/textures",
     "map.lastUsedExportFilter": "CSV files (*.csv)",
     "map.lastUsedFormat": "tmx",
     "map.renderOrder": null,
     "openFiles": [
-        "test/test.tmx"
-    ],
-    "project": "maps.tiled-project",
-    "recentFiles": [
         "test/test.tmx",
         "tileset.tsx"
     ],
+    "project": "maps.tiled-project",
+    "recentFiles": [
+        "tileset.tsx",
+        "test/test.tmx"
+    ],
+    "tileset.lastUsedFilter": "Tiled tileset files (*.tsx *.xml)",
     "tileset.lastUsedFormat": "tsx"
 }
