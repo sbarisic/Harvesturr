@@ -133,13 +133,15 @@ namespace Harvesturr
 
         public static bool IsInBounds(Vector2 Pos)
         {
-            return Utils.IsInside(new Rectangle(X, Y, Width, Height), Pos);
+            return Utils.IsInside(GetBounds(), Pos);
         }
 
         public static Vector2 RandomPoint()
         {
-            Vector2 Pos = new Vector2(X, Y);
-            Vector2 Pos2 = Pos + new Vector2(Width, Height);
+            Rectangle Bounds = GetBounds();
+
+            Vector2 Pos = new Vector2(Bounds.x, Bounds.y);
+            Vector2 Pos2 = Pos + new Vector2(Bounds.width, Bounds.height);
 
             return Utils.Random(Pos, Pos2);
         }

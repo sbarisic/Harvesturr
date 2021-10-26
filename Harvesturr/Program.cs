@@ -57,7 +57,7 @@ namespace Harvesturr
                         GameEngine.Spawn(new UnitConduit(Pos + new Vector2(X, Y) * Dist));
             }
             else
-                for (int i = 0; i < 100; i++)
+                for (int i = 0; i < 400; i++)
                     GameEngine.Spawn(new UnitMineral(GameMap.RandomMineralPoint(), Utils.Random(0, 100) > 80));
 
             //Spawn(new UnitAlienUfo(Vector2.Zero));
