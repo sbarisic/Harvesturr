@@ -168,6 +168,7 @@ namespace Harvesturr
                         continue;
                     }
 
+                    GameUnits[i].IsMouseHover = Raylib.CheckCollisionPointRec(MousePosWorld, GameUnits[i].GetBoundingRect());
                     GameUnits[i].Update(Dt);
                 }
 
@@ -620,6 +621,14 @@ namespace Harvesturr
                     }
                 }
             }, Length, true);
+        }
+
+        public static void DrawLinkLines(Vector2 Pos, float Radius, Color Clr, Func<IEnumerable<GameUnit>, IEnumerable<GameUnit>> Filter)
+        {
+            Raylib.DrawCircleLines((int)Pos.X, (int)Pos.Y, Radius, Clr);
+
+            foreach (var C in Filter(GameEngine.PickInRange(Pos, Radius)))
+                Raylib.DrawLineV(Pos, C.Position, Clr);
         }
     }
 

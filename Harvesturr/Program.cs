@@ -37,9 +37,9 @@ namespace Harvesturr
             const int Height = 768;
 
             Raylib.InitWindow(Width, Height, "Harvesturr");
+            Raylib.SetWindowState(ConfigFlags.FLAG_WINDOW_RESIZABLE);
             Raylib.SetTargetFPS(60);
 
-            Raylib.SetWindowState(ConfigFlags.FLAG_WINDOW_RESIZABLE);
 
             GameEngine.GUILoadStyle("jungle");
 
@@ -73,7 +73,7 @@ namespace Harvesturr
             GameEngine.Resources = 50;
 
             if (GameEngine.DebugView)
-                GameEngine.Resources = int.MaxValue;
+                GameEngine.Resources = 10000000;
 
             // Test
 
@@ -90,7 +90,7 @@ namespace Harvesturr
 
             while (!Raylib.WindowShouldClose())
             {
-                float FrameTime = Raylib.GetFrameTime();
+                // float FrameTime = Raylib.GetFrameTime();
                 GameEngine.Time = (float)GameEngine.GameTimer.Elapsed.TotalSeconds;
 
                 GameEngine.ScreenWidth = Raylib.GetScreenWidth();
