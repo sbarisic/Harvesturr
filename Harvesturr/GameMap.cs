@@ -59,7 +59,6 @@ namespace Harvesturr
         static GameTile[] Tiles;
 
         static RenderTexture2D MapCached;
-        static Camera2D MapCamera;
 
         static int TotalWidth
         {
@@ -94,7 +93,6 @@ namespace Harvesturr
             Y = -(TotalHeight / 2);
 
             MapCached = Raylib.LoadRenderTexture(TotalWidth, TotalHeight);
-            MapCamera = new Camera2D(Vector2.Zero, Vector2.Zero, 0, 1);
             CacheDrawWorld();
         }
 
@@ -106,7 +104,6 @@ namespace Harvesturr
         {
             Raylib.BeginTextureMode(MapCached);
             Raylib.ClearBackground(Color.PINK);
-            //Raylib.BeginMode2D(MapCamera);
 
             int TilesX = TilemapTex.width / TileWidth;
             // int TilesY = TilemapTex.height / TileHeight;
@@ -122,7 +119,6 @@ namespace Harvesturr
                 Raylib.DrawTextureRec(TilemapTex, new Rectangle(TileX * TileWidth, TileY * TileHeight, TileWidth, TileHeight), new Vector2(WorldX, WorldY), Color.WHITE);
             }
 
-            //Raylib.EndMode2D();
             Raylib.EndTextureMode();
         }
 

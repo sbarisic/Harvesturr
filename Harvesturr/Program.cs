@@ -26,7 +26,10 @@ namespace Harvesturr
 
             GameEngine.DebugView = DebugAll || args.Contains("--debug");
             GameEngine.DebugPerformance = DebugAll || args.Contains("--performance");
-            GameEngine.DebugFast = DebugAll || args.Contains("--fast");
+            GameEngine.DebugFast = DebugAll || args.Contains("--fast"); // Fast update interval
+
+            // Disable this
+            GameEngine.DebugView = true;
 
 
 
@@ -35,6 +38,8 @@ namespace Harvesturr
 
             Raylib.InitWindow(Width, Height, "Harvesturr");
             Raylib.SetTargetFPS(60);
+
+            Raylib.SetWindowState(ConfigFlags.FLAG_WINDOW_RESIZABLE);
 
             GameEngine.GUILoadStyle("jungle");
 
