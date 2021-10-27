@@ -329,7 +329,7 @@ namespace Harvesturr
                 Raylib.BeginMode2D(GameCamera);
         }
 
-        public static void DrawBar(Vector2 Pos, float Amt, Color Clr)
+        public static void DrawBar(Vector2 Pos, float Amt, Color Clr, out int BarHeight)
         {
             if (CurrentDrawState == DrawState.NONE)
                 throw new Exception("Can not tooltip outside drawing functions");
@@ -343,6 +343,7 @@ namespace Harvesturr
             const int Padding = 2;
             const int Width = 48;
             const int Height = 8;
+            BarHeight = Height;
 
             Pos -= new Vector2(Width / 2, Height / 2);
 
@@ -356,6 +357,11 @@ namespace Harvesturr
 
             if (CurrentDrawState == DrawState.WORLD)
                 Raylib.BeginMode2D(GameCamera);
+        }
+
+        public static void DrawBar(Vector2 Pos, float Amt, Color Clr)
+        {
+            DrawBar(Pos, Amt, Clr, out int BarHeight);
         }
 
         public static void DrawDashedLine(Vector2 Start, Vector2 End, float Thick, float SegmentLength, Color Clr)

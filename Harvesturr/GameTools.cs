@@ -233,7 +233,7 @@ namespace Harvesturr
 
         public override void OnSpawnSuccess(Vector2 WorldPos)
         {
-            GameEngine.Spawn(new UnitConduit(WorldPos));
+            GameEngine.Spawn(new UnitBuildingWIP(WorldPos, typeof(UnitConduit)));
         }
     }
 
@@ -267,7 +267,7 @@ namespace Harvesturr
 
         public override void OnSpawnSuccess(Vector2 WorldPos)
         {
-            GameEngine.Spawn(new UnitHarvester(WorldPos));
+            GameEngine.Spawn(new UnitBuildingWIP(WorldPos, typeof(UnitHarvester)));
         }
     }
 
@@ -287,7 +287,7 @@ namespace Harvesturr
 
         public override void OnSpawnSuccess(Vector2 WorldPos)
         {
-            GameEngine.Spawn(new UnitSolarPanel(WorldPos));
+            GameEngine.Spawn(new UnitBuildingWIP(WorldPos, typeof(UnitSolarPanel)));
         }
     }
 }

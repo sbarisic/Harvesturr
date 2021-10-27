@@ -6,6 +6,7 @@ using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Harvesturr
@@ -166,6 +167,7 @@ namespace Harvesturr
     class UnitConduit : GameUnit
     {
         public const string UNIT_NAME = "conduit";
+        public const int BUILD_COST = 5;
         public const float ConnectRangePower = 96;
 
         public int Heat;
@@ -231,6 +233,7 @@ namespace Harvesturr
     class UnitHarvester : GameUnit
     {
         public const string UNIT_NAME = "harvester";
+        public const int BUILD_COST = 10;
         public const float ConnectRangeHarvest = 64;
 
         int EnergyCharges;
@@ -313,6 +316,7 @@ namespace Harvesturr
     class UnitSolarPanel : GameUnit
     {
         public const string UNIT_NAME = "solarpanel";
+        public const int BUILD_COST = 15;
 
         public UnitSolarPanel(Vector2 Position) : base(UNIT_NAME, Position)
         {
@@ -426,38 +430,52 @@ namespace Harvesturr
 
     class UnitBuildingWIP : GameUnit
     {
-        public const string UNIT_NAME = "buildingwip";
-
-        public UnitBuildingWIP(Vector2 Position) : base(UNIT_NAME, Position)
+        static object GetField(Type BaseBuildingType, string FieldName)
         {
-            UpdateInterval = 2;
-            //UpdateInterval = 0.5f;
-            //UpdateInterval = 0.01f;
+            if (BaseBuildingType.BaseType != typeof(GameUnit))
+                throw new Exception("BaseBuildingType needs to be derived from GameUnit");
 
-            if (GameEngine.DebugFast)
-                UpdateInterval = 0.01f;
-
-            CanLinkEnergy = true;
+            return BaseBuildingType.GetField(FieldName, BindingFlags.Public | BindingFlags.Static).GetValue(null);
         }
 
-        public override void SlowUpdate()
+        Type BaseBuildingType;
+        int MaxBuildCost;
+        int BuildCostRemaining;
+
+        public UnitBuildingWIP(Vector2 Position, Type BaseBuildingType) : base((string)GetField(BaseBuildingType, "UNIT_NAME") + "_wip", Position)
         {
-            UnitConduit RandomTarget = Utils.Random(GameEngine.PickInRange(Position, UnitConduit.ConnectRangePower).OfType<UnitConduit>().ToArray());
+            this.BaseBuildingType = BaseBuildingType;
+            BuildCostRemaining = MaxBuildCost = (int)GetField(BaseBuildingType, "BUILD_COST");
+        }
 
-            if (RandomTarget == null)
-                return;
+        public override void DrawGUI()
+        {
+            if (GameEngine.DrawZoomDetails)
+                GameEngine.DrawBar(Position - GetUnitHeight() - new Vector2(0, 4), 1.0f - ((float)BuildCostRemaining / MaxBuildCost), Color.ORANGE);
 
-            GameEngine.Spawn(new UnitEnergyPacket(Position, RandomTarget));
+            base.DrawGUI();
         }
 
         public override void DrawWorld()
         {
-            if (IsMouseHover)
-            {
-                GameEngine.DrawLinkLines(Position, UnitConduit.ConnectRangePower, Color.YELLOW, Enumerable.OfType<UnitConduit>);
-            }
-
             base.DrawWorld();
+        }
+
+        public override void ConsumeEnergyPacket(UnitEnergyPacket Packet)
+        {
+            BuildCostRemaining--;
+
+            if (BuildCostRemaining <= 0)
+            {
+                Destroy();
+                GameUnit Unit = (GameUnit)Activator.CreateInstance(BaseBuildingType, Position);
+                GameEngine.Spawn(Unit);
+            }
+        }
+
+        public override bool CanAcceptEnergyPacket()
+        {
+            return true;
         }
     }
 }
