@@ -172,6 +172,12 @@ namespace Harvesturr
                 const float PickForce = 256;
                 Alien.ApplyForce(Utils.Random(new Vector2(-PickForce), new Vector2(PickForce)));
             }
+
+            if (Raylib.IsKeyDown(KeyboardKey.KEY_Q))
+            {
+                UnitAlienUfo NewAlien = new UnitAlienUfo(WorldPos);
+                GameEngine.Spawn(NewAlien);
+            }
         }
 
         public override void OnMouseDrag(Vector2 WorldStart, Vector2 WorldEnd, Vector2 DragNormal)
@@ -252,19 +258,6 @@ namespace Harvesturr
 
         public override void DrawWorld()
         {
-            /*Vector2 Pos = GameEngine.MousePosWorld;
-			GameEngine.DrawCircle(Pos, UnitConduit.ConnectRangePower, Color.YELLOW);
-			GameEngine.DrawCircle(Pos, ConnectRangeHarvest, Color.GREEN);
-
-			UnitConduit[] Conduits = GameEngine.PickInRange(Pos, UnitConduit.ConnectRangePower).OfType<UnitConduit>().ToArray();
-			UnitMineral[] Minerals = GameEngine.PickInRange(Pos, ConnectRangeHarvest).OfType<UnitMineral>().ToArray();
-
-			foreach (var C in Conduits)
-				Raylib.DrawLineV(Pos, C.Position, Color.YELLOW);
-
-			foreach (var M in Minerals)
-				Raylib.DrawLineV(Pos, M.Position, Color.GREEN);*/
-
             GameEngine.DrawLinkLines(GameEngine.MousePosWorld, UnitConduit.ConnectRangePower, Color.YELLOW, Enumerable.OfType<UnitConduit>);
             GameEngine.DrawLinkLines(GameEngine.MousePosWorld, UnitHarvester.ConnectRangeHarvest, Color.GREEN, Enumerable.OfType<UnitMineral>);
             base.DrawWorld();
@@ -293,6 +286,27 @@ namespace Harvesturr
         public override void OnSpawnSuccess(Vector2 WorldPos)
         {
             GameEngine.Spawn(new UnitBuildingWIP(WorldPos, typeof(UnitSolarPanel)));
+        }
+    }
+
+    [IsGameTool]
+    class GameToolLaser : GameToolBuilder
+    {
+        public GameToolLaser() : base("Laser", 10)
+        {
+            ToolGhost = ResMgr.LoadTexture(UnitLaser.UNIT_NAME);
+        }
+
+        public override void DrawWorld()
+        {
+            GameEngine.DrawLinkLines(GameEngine.MousePosWorld, UnitConduit.ConnectRangePower, Color.YELLOW, Enumerable.OfType<UnitConduit>);
+            GameEngine.DrawLinkLines(GameEngine.MousePosWorld, UnitLaser.AttackRangeLaser, Color.RED, Enumerable.OfType<UnitLaser>);
+            base.DrawWorld();
+        }
+
+        public override void OnSpawnSuccess(Vector2 WorldPos)
+        {
+            GameEngine.Spawn(new UnitBuildingWIP(WorldPos, typeof(UnitLaser)));
         }
     }
 }

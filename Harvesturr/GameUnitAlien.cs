@@ -29,7 +29,9 @@ namespace Harvesturr {
 		bool EnemyInDamageRange;
 
 		public GameUnitAlien(string UnitName, Vector2 Position) : base(UnitName, Position) {
-			AttackRange = 128;
+			//AttackRange = 128;
+			AttackRange = 2000;
+
 			AttackDamageRange = 16;
 			AttackDamage = 5;
 			AttackInterval = 1;
@@ -38,6 +40,9 @@ namespace Harvesturr {
 			Rotate = true;
 			RotationSpeed = 0;
 			MoveSpeed = 0;
+
+			MaxHealth = 50;
+			Health = 50;
 		}
 
 		public override void Update(float Dt) {
@@ -46,6 +51,7 @@ namespace Harvesturr {
 			if (Rotate && RotationSpeed != 0)
 				Rotation = GameEngine.Time * RotationSpeed;
 
+			// Uncomment to move
 			Position += (MoveDirection * MoveSpeed * Dt) + (Velocity * Dt);
 			Velocity = Velocity * Friction;
 
@@ -70,13 +76,13 @@ namespace Harvesturr {
 			base.SlowUpdate();
 
 			if (AttackTarget == null)
-				AttackTarget = GameEngine.PickNextAttackTarget(Position, AttackRange);
+				AttackTarget = GameEngine.PickNextAttackTarget(Position, AttackRange, true);
 
 			MoveDirection = CalculateMoveDirection();
 		}
 
 		public virtual void Attack(GameUnit Target) {
-			Console.WriteLine("Attacking!");
+			// Console.WriteLine("Attacking!");
 			Target.ReceiveDamage(this, AttackDamage);
 		}
 

@@ -20,6 +20,7 @@ namespace Harvesturr
 
         public bool IsMouseHover;
 
+        public int MaxHealth;
         public int Health;
         public bool CanLinkEnergy;
         public float UpdateInterval;
@@ -45,7 +46,8 @@ namespace Harvesturr
             Destroyed = false;
             DrawColor = Color.WHITE;
             Pickable = true;
-            Health = 100;
+            MaxHealth = 100;
+            Health = MaxHealth;
             LightningOnDestroy = false;
         }
 
@@ -111,8 +113,8 @@ namespace Harvesturr
 
         public virtual void DrawGUI()
         {
-            if (GameEngine.DrawZoomDetails && Health < 100)
-                GameEngine.DrawBar(Position - GetUnitHeight(), Health / 100.0f, Color.GREEN);
+            if (GameEngine.DrawZoomDetails && Health < MaxHealth)
+                GameEngine.DrawBar(Position - GetUnitHeight(), Health / (float)MaxHealth, Color.GREEN);
         }
 
         public virtual void ConsumeEnergyPacket(UnitEnergyPacket Packet)
@@ -211,6 +213,10 @@ namespace Harvesturr
 
                 if (Heat > 5)
                     GameEngine.DrawBar(Position - GetUnitHeight() / 2, Heat / 100.0f, DrawColor);
+            } else
+            {
+                if (LinkedConduit != null)
+                    Raylib.DrawLineEx(Position, LinkedConduit.Position, 1, Color.YELLOW);
             }
         }
 
@@ -484,6 +490,94 @@ namespace Harvesturr
         public override bool CanAcceptEnergyPacket()
         {
             return true;
+        }
+    }
+
+    class UnitLaser : GameUnit
+    {
+        public const string UNIT_NAME = "laser";
+        public const int BUILD_COST = 10;
+        public const int SINGLE_LASER_DAMAGE = 1;
+
+        public const float AttackRangeLaser = 128;
+
+        int EnergyCharges;
+        float LastEnergyChargeUseTime;
+
+        GameUnitAlien Target;
+
+        public UnitLaser(Vector2 Position) : base(UNIT_NAME, Position)
+        {
+            EnergyCharges = 0;
+            UpdateInterval = 0.1f;
+            CanLinkEnergy = true;
+        }
+
+        public override void Update(float Dt)
+        {
+            base.Update(Dt);
+            DrawColor = Color.WHITE;
+
+            if (EnergyCharges <= 0 && ((GameEngine.Time - LastEnergyChargeUseTime) > UpdateInterval))
+                DrawColor = new Color(128, 128, 128, 190);
+        }
+
+        public int CalculateLaserDamage()
+        {
+            return SINGLE_LASER_DAMAGE;
+        }
+
+        public override void SlowUpdate()
+        {
+            if (EnergyCharges <= 0)
+                return;
+
+            if (Target == null)
+            {
+                GameUnitAlien[] Aliens = GameEngine.PickInRange(Position, AttackRangeLaser).OfType<GameUnitAlien>().ToArray();
+                Target = Utils.Random(Aliens);
+
+                if (Target == null)
+                    return;
+
+            }
+            else if (Target.Destroyed)
+            {
+                Target = null;
+                return;
+            }
+
+            EnergyCharges--;
+            Target.ReceiveDamage(this, CalculateLaserDamage());
+        }
+
+        public override void DrawWorld()
+        {
+            if (IsMouseHover)
+            {
+                GameEngine.DrawLinkLines(Position, AttackRangeLaser, Color.RED, Enumerable.OfType<UnitLaser>);
+            }
+
+            if (Target != null && EnergyCharges > 0)
+            {
+                Raylib.DrawLineEx(Position, Target.Position, 1, Color.RED);
+            }
+
+            base.DrawWorld();
+        }
+
+        public override void ConsumeEnergyPacket(UnitEnergyPacket Packet)
+        {
+            EnergyCharges += 25;
+            Packet.Destroy();
+        }
+
+        public override bool CanAcceptEnergyPacket()
+        {
+            if (AwaitingPacket != null && !AwaitingPacket.Destroyed)
+                return false;
+
+            return EnergyCharges <= 50;
         }
     }
 }

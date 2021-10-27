@@ -30,7 +30,7 @@ namespace Harvesturr
             GameEngine.DebugFastBuild = DebugAll || args.Contains("--fastbuild"); // Fast structure building
 
             // Disable this
-            GameEngine.DebugView = true;
+            GameEngine.DebugView = false;
             GameEngine.DebugFastBuild = true;
 
 

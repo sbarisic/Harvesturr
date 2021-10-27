@@ -66,6 +66,8 @@ namespace Harvesturr
         //static bool Paused = false;
         public static Stopwatch GameTimer = Stopwatch.StartNew();
 
+        static float NextWaveSpawnTime;
+
         public static void GUILoadStyle(string Name)
         {
             Raygui.GuiLoadStyle(string.Format("data/gui_styles/{0}/{0}.rgs", Name));
@@ -182,6 +184,22 @@ namespace Harvesturr
 
                 if (Raylib.IsMouseButtonReleased(MouseButton.MOUSE_LEFT_BUTTON))
                     ActiveGameTool?.OnWorldMousePress(MousePosWorld, false);
+            }
+
+            if (NextWaveSpawnTime < Time)
+            {
+                NextWaveSpawnTime = Time + 7;
+                SpawnEnemyWave(1, 5);
+            }
+        }
+
+        public static void SpawnEnemyWave(int Wave, int Count)
+        {
+            for (int i = 0; i < Count; i++)
+            {
+                Vector2 Pt = Utils.RandomPointOnCircle(1600);
+                UnitAlienUfo Ufo = new UnitAlienUfo(Pt);
+                Spawn(Ufo);
             }
         }
 
@@ -385,7 +403,7 @@ namespace Harvesturr
                 A = B + Dir * SegmentLength;
             } while (Vector2.Distance(B, End) > (SegmentLength * 2));
 
-            if (Vector2.Distance(B, End)>SegmentLength)            
+            if (Vector2.Distance(B, End) > SegmentLength)
                 Raylib.DrawLineEx(B + (Dir * SegmentLength), End, Thick, Clr);
         }
 
@@ -491,7 +509,7 @@ namespace Harvesturr
             return false;
         }
 
-        public static GameUnit PickNextAttackTarget(Vector2 Position, float Range)
+        public static GameUnit PickNextAttackTarget(Vector2 Position, float Range, bool Nearest)
         {
             PickInRange(ref GameUnitsTemp, out int Length, Position, Range);
 
@@ -501,11 +519,18 @@ namespace Harvesturr
                     GameUnitsTemp[i] = null;
             }
 
-            Length = Utils.Rearrange(GameUnitsTemp);
-            if (Length <= 0)
-                return null;
+            if (Nearest)
+            {
+                return GameUnitsTemp.Where(P => P != null).OrderBy(P => Vector2.DistanceSquared(Position, P.Position)).FirstOrDefault();
+            }
+            else
+            {
+                Length = Utils.Rearrange(GameUnitsTemp);
+                if (Length <= 0)
+                    return null;
 
-            return GameUnitsTemp[Utils.Random(0, Length)];
+                return GameUnitsTemp[Utils.Random(0, Length)];
+            }
         }
 
         public static GameUnit PickNextEnergyPacketTarget(UnitConduit CurConduit, GameUnit Except1, GameUnit Except2)
@@ -640,12 +665,13 @@ namespace Harvesturr
             }, Length, true);
         }
 
-        public static void DrawLinkLines(Vector2 Pos, float Radius, Color Clr, Func<IEnumerable<GameUnit>, IEnumerable<GameUnit>> Filter)
+        public static void DrawLinkLines(Vector2 Pos, float Radius, Color Clr, Func<IEnumerable<GameUnit>, IEnumerable<GameUnit>> Filter = null)
         {
             Raylib.DrawCircleLines((int)Pos.X, (int)Pos.Y, Radius, Clr);
 
-            foreach (var C in Filter(GameEngine.PickInRange(Pos, Radius)))
-                Raylib.DrawLineV(Pos, C.Position, Clr);
+            if (Filter != null)
+                foreach (var C in Filter(GameEngine.PickInRange(Pos, Radius)))
+                    Raylib.DrawLineV(Pos, C.Position, Clr);
         }
     }
 

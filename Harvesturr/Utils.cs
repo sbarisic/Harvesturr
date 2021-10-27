@@ -58,6 +58,12 @@ namespace Harvesturr
             return new Vector2(X, Y);
         }
 
+        public static Vector2 RandomPointOnCircle(float Radius)
+        {
+            float Angle = Rnd.Next(360);
+            return new Vector2(Radius * (float)Math.Cos(Angle), Radius * (float)Math.Sin(Angle));
+        }
+
         public static bool IsInside(Rectangle Rect, Vector2 Pos)
         {
             float Width = Rect.width + Rect.x;
