@@ -26,7 +26,7 @@ namespace Harvesturr
         public float NextUpdateTime;
         public UnitEnergyPacket AwaitingPacket;
 
-        protected Texture2D UnitTex;
+        protected Texture2DRef UnitTex;
         protected Color DrawColor;
 
         public bool Destroyed

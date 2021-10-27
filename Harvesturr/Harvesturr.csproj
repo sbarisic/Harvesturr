@@ -126,7 +126,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="data\maps\test\test.tmx" />
-    <None Include="data\textures\tileset.pdn" />
+    <None Include="data\textures\tileset.pdn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Content Include="data\gui_styles\ashes\ashes.rgs">

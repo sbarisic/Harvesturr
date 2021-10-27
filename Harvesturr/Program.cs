@@ -37,6 +37,7 @@ namespace Harvesturr
             const int Width = 1366;
             const int Height = 768;
 
+            ResMgr.InitFileWatcher();
             Raylib.InitWindow(Width, Height, "Harvesturr");
             Raylib.SetWindowState(ConfigFlags.FLAG_WINDOW_RESIZABLE);
             Raylib.SetTargetFPS(60);
@@ -71,7 +72,7 @@ namespace Harvesturr
             if (GameEngine.DebugView)
                 GameEngine.Resources = 10000000;
 
-            Texture2D BackgroundNoise = ResMgr.LoadTexture("background_noise");
+            Texture2DRef BackgroundNoise = ResMgr.LoadTexture("background_noise");
 
             GameEngine.GameTimer.Restart();
 

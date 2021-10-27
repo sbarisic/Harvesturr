@@ -46,7 +46,7 @@ namespace Harvesturr
 
     static class GameMap
     {
-        static Texture2D TilemapTex;
+        static Texture2DRef TilemapTex;
 
         static int TileWidth = 32;
         static int TileHeight = 32;

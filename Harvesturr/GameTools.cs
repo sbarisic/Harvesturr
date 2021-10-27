@@ -39,7 +39,7 @@ namespace Harvesturr
         public string Name;
         public bool Active;
 
-        protected Texture2D? ToolGhost;
+        protected Texture2DRef ToolGhost;
 
         protected Vector2 MouseClickPos;
         protected bool InMouseClick;
@@ -113,7 +113,7 @@ namespace Harvesturr
                 return;
 
             Color GhostColor = CurrentLocationValid ? Color.GREEN : Color.RED;
-            GameEngine.DrawTextureCentered(ToolGhost.Value, GameEngine.MousePosWorld, Clr: Raylib.Fade(GhostColor, 0.5f));
+            GameEngine.DrawTextureCentered(ToolGhost, GameEngine.MousePosWorld, Clr: Raylib.Fade(GhostColor, 0.5f));
 
             if (CurrentLocationValid)
                 GameEngine.DrawTooltip(GameEngine.MousePosWorld, "R$ " + BuildCost, Color.GREEN);
@@ -124,7 +124,7 @@ namespace Harvesturr
             if (ToolGhost == null)
                 return true;
 
-            Rectangle CollisionRect = GameEngine.GetBoundingRect(ToolGhost.Value, MousePosWorld);
+            Rectangle CollisionRect = GameEngine.GetBoundingRect(ToolGhost, MousePosWorld);
             int PickCount = GameEngine.Pick(CollisionRect).Where(U => !(U is UnitEnergyPacket)).Count();
 
             if (PickCount != 0)
