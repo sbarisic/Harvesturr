@@ -103,7 +103,7 @@ namespace Harvesturr
         static void CacheDrawWorld()
         {
             Raylib.BeginTextureMode(MapCached);
-            Raylib.ClearBackground(Color.PINK);
+            Raylib.ClearBackground(Color.BLANK);
 
             int TilesX = TilemapTex.width / TileWidth;
             // int TilesY = TilemapTex.height / TileHeight;

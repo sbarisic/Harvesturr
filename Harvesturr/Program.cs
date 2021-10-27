@@ -75,16 +75,7 @@ namespace Harvesturr
             if (GameEngine.DebugView)
                 GameEngine.Resources = 10000000;
 
-            // Test
-
-            /*UnitConduit ConduitA = new UnitConduit(new Vector2(314.844f, 167.216f));
-			UnitConduit ConduitB = new UnitConduit(new Vector2(380.955f, 166.661f));
-			UnitConduit ConduitC = new UnitConduit(new Vector2(348.513f, 215.875f));
-
-			Spawn(ConduitA);
-			Spawn(ConduitB);
-			Spawn(ConduitC);
-			Spawn(new UnitEnergyPacket(ConduitA, ConduitB));*/
+            Texture2D BackgroundNoise = ResMgr.LoadTexture("background_noise");
 
             GameEngine.GameTimer.Restart();
 
@@ -103,7 +94,8 @@ namespace Harvesturr
 					Console.WriteLine("Skipping update, frame time {0} s", FrameTime);*/
 
                 Raylib.BeginDrawing();
-                Raylib.ClearBackground(Color.SKYBLUE);
+                Raylib.ClearBackground(Color.PURPLE);
+                Raylib.DrawTextureTiled(BackgroundNoise, new Rectangle(0, 0, BackgroundNoise.width, BackgroundNoise.height), new Rectangle(0, 0, GameEngine.ScreenWidth, GameEngine.ScreenHeight), Vector2.Zero, 0, 1, Color.WHITE);
 
                 Raylib.BeginMode2D(GameEngine.GameCamera);
                 GameEngine.CurrentDrawState = DrawState.WORLD;

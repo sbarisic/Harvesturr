@@ -5,22 +5,22 @@
     },
     "activeFile": "test/test.tmx",
     "expandedProjectPaths": [
-        "test",
-        "."
+        ".",
+        "test"
     ],
     "file.lastUsedOpenFilter": "All Files (*)",
     "fileStates": {
         "test/test.tmx": {
-            "scale": 2,
+            "scale": 0.25,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 1524.25,
-                "y": 1602.75
+                "x": 2488,
+                "y": 1958
             }
         },
         "tileset.tsx": {
-            "scaleInDock": 0.5,
-            "scaleInEditor": 4
+            "scaleInDock": 4,
+            "scaleInEditor": 3
         }
     },
     "last.exportedFilePath": "C:/Projects/Harvesturr/Harvesturr/data/maps/test",
