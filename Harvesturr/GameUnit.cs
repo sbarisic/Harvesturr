@@ -209,7 +209,8 @@ namespace Harvesturr
                 if (LinkedConduit != null)
                     GameEngine.DrawDashedLine(Position, LinkedConduit.Position, 1, 6, Color.YELLOW);
 
-                GameEngine.DrawBar(Position - GetUnitHeight() / 2, Heat / 100.0f, DrawColor);
+                if (Heat > 5)
+                    GameEngine.DrawBar(Position - GetUnitHeight() / 2, Heat / 100.0f, DrawColor);
             }
         }
 
@@ -446,6 +447,7 @@ namespace Harvesturr
         {
             this.BaseBuildingType = BaseBuildingType;
             BuildCostRemaining = MaxBuildCost = (int)GetField(BaseBuildingType, "BUILD_COST");
+            CanLinkEnergy = true;
         }
 
         public override void DrawGUI()
