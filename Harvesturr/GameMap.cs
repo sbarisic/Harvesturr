@@ -94,6 +94,10 @@ namespace Harvesturr
 
             MapCached = Raylib.LoadRenderTexture(TotalWidth, TotalHeight);
             CacheDrawWorld();
+
+            DestroyAllMinerals();
+            SpawnAllMinerals();
+            GameEngine.SpawnStarters();
         }
 
         public static void Update(float Dt)
@@ -132,24 +136,49 @@ namespace Harvesturr
             return Utils.IsInside(GetBounds(), Pos);
         }
 
-        public static Vector2 RandomPoint()
+        public static Vector2 RandomPoint(float DistanceFromBounds = 0)
         {
             Rectangle Bounds = GetBounds();
 
-            Vector2 Pos = new Vector2(Bounds.x, Bounds.y);
-            Vector2 Pos2 = Pos + new Vector2(Bounds.width, Bounds.height);
+            Vector2 Pos = new Vector2(Bounds.x + DistanceFromBounds, Bounds.y + DistanceFromBounds);
+            Vector2 Pos2 = Pos + new Vector2(Bounds.width - DistanceFromBounds * 2, Bounds.height - DistanceFromBounds * 2);
 
             return Utils.Random(Pos, Pos2);
         }
 
-        public static Vector2 RandomMineralPoint()
+        public static Vector2 RandomMineralPoint(float DistanceFromBounds = 0)
         {
             Vector2 Pt = Vector2.Zero;
 
             while (Vector2.Distance(Vector2.Zero, Pt) < 120)
-                Pt = RandomPoint();
+                Pt = RandomPoint(DistanceFromBounds);
 
             return Pt;
+        }
+
+        public static void DestroyAllMinerals()
+        {
+            IEnumerable<UnitMineral> Minerals = GameEngine.GetAllGameUnits().Select(U => U as UnitMineral).Where(U => U != null);
+
+            foreach (var M in Minerals)
+            {
+                M.Destroy();
+            }
+        }
+
+        public static void SpawnAllMinerals()
+        {
+            for (int i = 0; i < 50; i++)
+            {
+                Vector2 Pt = RandomMineralPoint(200);
+
+
+                for (int j = 0; j < 15; j++)
+                {
+                    Vector2 RandomOffset = Utils.RandomPoint(120, false);
+                    GameEngine.Spawn(new UnitMineral(Pt + RandomOffset, Utils.Random(0, 100) > 80));
+                }
+            }
         }
     }
 }

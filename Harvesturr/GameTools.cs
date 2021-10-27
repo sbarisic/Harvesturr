@@ -177,7 +177,12 @@ namespace Harvesturr
         public override void OnMouseDrag(Vector2 WorldStart, Vector2 WorldEnd, Vector2 DragNormal)
         {
             UnitConduit UnitA = GameEngine.Pick(WorldStart).FirstOrDefault() as UnitConduit;
-            UnitConduit UnitB = GameEngine.Pick(WorldEnd).FirstOrDefault() as UnitConduit;
+            GameUnit UnitB = GameEngine.Pick(WorldEnd).FirstOrDefault();
+
+            if (UnitB != null && !UnitB.CanLinkEnergy)
+            {
+                UnitB = null;
+            }
 
             if (UnitA == UnitB)
                 UnitB = null;

@@ -42,6 +42,22 @@ namespace Harvesturr
             return new Vector2(X, Y);
         }
 
+        public static Vector2 RandomPoint(float Radius, bool Uniform = false)
+        {
+            float Angle = (float)(Rnd.NextDouble() * Math.PI * 2);
+            float Rad;
+
+            if (Uniform)
+                Rad = (float)(Math.Sqrt(Rnd.NextDouble()) * Radius);
+            else
+                Rad = (float)(Rnd.NextDouble() * Radius);
+
+            float X = (float)(Rad * Math.Cos(Angle));
+            float Y = (float)(Rad * Math.Sin(Angle));
+
+            return new Vector2(X, Y);
+        }
+
         public static bool IsInside(Rectangle Rect, Vector2 Pos)
         {
             float Width = Rect.width + Rect.x;

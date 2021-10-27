@@ -24,6 +24,7 @@ namespace Harvesturr
     {
         public static bool DebugView;
         public static bool DebugFast;
+        public static bool DebugFastBuild;
 
         public static bool DebugPerformance;
 
@@ -364,18 +365,28 @@ namespace Harvesturr
             DrawBar(Pos, Amt, Clr, out int BarHeight);
         }
 
-        public static void DrawDashedLine(Vector2 Start, Vector2 End, float Thick, float SegmentLength, Color Clr)
+        public static void DrawDashedLine(Vector2 Start, Vector2 End, float Thick, float SegmentLength, Color Clr, float Offset = 0)
         {
             Vector2 A = Start;
             Vector2 B = End;
             Vector2 Dir = Vector2.Normalize(B - A);
 
+            Vector2 StartOffset = Dir * (Offset % (SegmentLength * 2));
+            A = A + StartOffset;
+
+            if (StartOffset.Length() > SegmentLength)
+                Raylib.DrawLineEx(Start, Start + StartOffset - (Dir * SegmentLength), Thick, Clr);
+
             do
             {
                 B = A + Dir * SegmentLength;
                 Raylib.DrawLineEx(A, B, Thick, Clr);
+
                 A = B + Dir * SegmentLength;
             } while (Vector2.Distance(B, End) > (SegmentLength * 2));
+
+            if (Vector2.Distance(B, End)>SegmentLength)            
+                Raylib.DrawLineEx(B + (Dir * SegmentLength), End, Thick, Clr);
         }
 
         public static IEnumerable<GameUnit> GetAllGameUnits(bool PickUnpickable = false)

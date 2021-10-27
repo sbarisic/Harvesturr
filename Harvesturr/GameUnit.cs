@@ -172,7 +172,7 @@ namespace Harvesturr
 
         public int Heat;
 
-        public UnitConduit LinkedConduit;
+        public GameUnit LinkedConduit;
 
         public UnitConduit(Vector2 Position) : base(UNIT_NAME, Position)
         {
@@ -207,7 +207,7 @@ namespace Harvesturr
             if (GameEngine.DrawZoomDetails)
             {
                 if (LinkedConduit != null)
-                    GameEngine.DrawDashedLine(Position, LinkedConduit.Position, 1, 6, Color.YELLOW);
+                    GameEngine.DrawDashedLine(Position, LinkedConduit.Position, 1, 6, Color.YELLOW, GameEngine.Time * 10);
 
                 if (Heat > 5)
                     GameEngine.DrawBar(Position - GetUnitHeight() / 2, Heat / 100.0f, DrawColor);
@@ -448,6 +448,12 @@ namespace Harvesturr
             this.BaseBuildingType = BaseBuildingType;
             BuildCostRemaining = MaxBuildCost = (int)GetField(BaseBuildingType, "BUILD_COST");
             CanLinkEnergy = true;
+
+            if (GameEngine.DebugFastBuild)
+            {
+                MaxBuildCost = 1;
+                BuildCostRemaining = 1;
+            }
         }
 
         public override void DrawGUI()

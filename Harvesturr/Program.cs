@@ -27,10 +27,11 @@ namespace Harvesturr
             GameEngine.DebugView = DebugAll || args.Contains("--debug");
             GameEngine.DebugPerformance = DebugAll || args.Contains("--performance");
             GameEngine.DebugFast = DebugAll || args.Contains("--fast"); // Fast update interval
+            GameEngine.DebugFastBuild = DebugAll || args.Contains("--fastbuild"); // Fast structure building
 
             // Disable this
             GameEngine.DebugView = true;
-
+            GameEngine.DebugFastBuild = true;
 
 
             const int Width = 1366;
@@ -39,7 +40,6 @@ namespace Harvesturr
             Raylib.InitWindow(Width, Height, "Harvesturr");
             Raylib.SetWindowState(ConfigFlags.FLAG_WINDOW_RESIZABLE);
             Raylib.SetTargetFPS(60);
-
 
             GameEngine.GUILoadStyle("jungle");
 
@@ -50,6 +50,7 @@ namespace Harvesturr
 
             if (GameEngine.DebugPerformance)
             {
+                GameMap.DestroyAllMinerals();
                 const float Dist = 50;
 
                 Rectangle Rect = GameMap.GetBounds();
@@ -61,13 +62,8 @@ namespace Harvesturr
                     for (int Y = 0; Y < YCount; Y++)
                         GameEngine.Spawn(new UnitConduit(Pos + new Vector2(X, Y) * Dist));
             }
-            else
-                for (int i = 0; i < 400; i++)
-                    GameEngine.Spawn(new UnitMineral(GameMap.RandomMineralPoint(), Utils.Random(0, 100) > 80));
 
             //Spawn(new UnitAlienUfo(Vector2.Zero));
-
-            GameEngine.SpawnStarters();
 
             GameEngine.GameTools.AddRange(IsGameToolAttribute.CreateAllGameTools());
             GameEngine.Resources = 50;
