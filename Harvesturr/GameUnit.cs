@@ -30,6 +30,8 @@ namespace Harvesturr
         protected Texture2DRef UnitTex;
         protected Color DrawColor;
 
+        protected SoundRef Sfx_OnDestroy;
+
         public bool Destroyed
         {
             get;
@@ -75,6 +77,9 @@ namespace Harvesturr
         {
             if (Destroyed)
                 return;
+
+            if (Sfx_OnDestroy != null)
+                GameEngine.PlaySfx(Position, Sfx_OnDestroy);
 
             Destroyed = true;
 
@@ -377,6 +382,8 @@ namespace Harvesturr
             this.Target = Target;
             Pickable = false;
             LightningOnDestroy = true;
+
+            Sfx_OnDestroy = ResMgr.LoadSound("energy_packet_explode");
         }
 
         public UnitEnergyPacket(UnitConduit Source, GameUnit Target) : this(Source.Position, Target)

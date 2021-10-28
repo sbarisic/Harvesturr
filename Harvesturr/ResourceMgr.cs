@@ -12,6 +12,7 @@ namespace Harvesturr
     static class ResMgr
     {
         static Dictionary<string, Texture2DRef> Textures = new Dictionary<string, Texture2DRef>();
+        static Dictionary<string, SoundRef> Sounds = new Dictionary<string, SoundRef>();
 
         public static void InitFileWatcher()
         {
@@ -31,14 +32,21 @@ namespace Harvesturr
                 string FullPath = Path.GetFileName(e.FullPath).ToLower();
                 string FileName = Path.GetFileNameWithoutExtension(FullPath);
 
-                if (Path.GetExtension(FullPath) != ".png")
-                    return;
-
-
-                foreach (KeyValuePair<string, Texture2DRef> Tex in Textures)
+                if (Path.GetExtension(FullPath) == ".png")
                 {
-                    if (Tex.Key == FileName)
-                        Tex.Value.MarkForReload = true;
+                    foreach (KeyValuePair<string, Texture2DRef> Tex in Textures)
+                    {
+                        if (Tex.Key == FileName)
+                            Tex.Value.MarkForReload = true;
+                    }
+                }
+                else if (Path.GetExtension(FullPath) == ".wav")
+                {
+                    foreach (KeyValuePair<string, SoundRef> S in Sounds)
+                    {
+                        if (S.Key == FileName)
+                            S.Value.MarkForReload = true;
+                    }
                 }
             }
         }
@@ -51,6 +59,16 @@ namespace Harvesturr
             Texture2DRef Tex = new Texture2DRef("data/textures/" + Name + ".png");
             Textures.Add(Name, Tex);
             return Tex;
+        }
+
+        public static SoundRef LoadSound(string Name)
+        {
+            if (Sounds.ContainsKey(Name))
+                return Sounds[Name];
+
+            SoundRef Sfx = new SoundRef("data/sfx/" + Name + ".wav");
+            Sounds.Add(Name, Sfx);
+            return Sfx;
         }
 
         public static string LoadMapCSV(string MapName, string Name)
@@ -103,6 +121,37 @@ namespace Harvesturr
         {
             Ref.Update();
             return Ref.Texture;
+        }
+    }
+
+    class SoundRef
+    {
+        public string FullPath;
+        public bool MarkForReload;
+        Sound Sound;
+
+        public SoundRef(string FullPath)
+        {
+            this.FullPath = FullPath;
+            this.Sound = Raylib.LoadSound(FullPath);
+            MarkForReload = false;
+        }
+
+        public void Update()
+        {
+            if (MarkForReload)
+            {
+                MarkForReload = false;
+
+                Raylib.UnloadSound(Sound);
+                Sound = Raylib.LoadSound(FullPath);
+            }
+        }
+
+        public static implicit operator Sound(SoundRef Ref)
+        {
+            Ref.Update();
+            return Ref.Sound;
         }
     }
 }

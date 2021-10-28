@@ -39,6 +39,8 @@ namespace Harvesturr
 
             ResMgr.InitFileWatcher();
             Raylib.InitWindow(Width, Height, "Harvesturr");
+            Raylib.InitAudioDevice();
+
             Raylib.SetWindowState(ConfigFlags.FLAG_WINDOW_RESIZABLE);
             Raylib.SetTargetFPS(60);
 
@@ -78,11 +80,19 @@ namespace Harvesturr
 
             while (!Raylib.WindowShouldClose())
             {
+                GameEngine.ScreenWidth = Raylib.GetScreenWidth();
+                GameEngine.ScreenHeight = Raylib.GetScreenHeight();
+
+                if (Raylib.IsWindowResized())
+                {
+                    Console.WriteLine("Window resized, {0}x{1}", GameEngine.ScreenWidth, GameEngine.ScreenHeight);
+                    GameEngine.GameCamera.offset = new Vector2(GameEngine.ScreenWidth, GameEngine.ScreenHeight) / 2;
+                }
+
                 // float FrameTime = Raylib.GetFrameTime();
                 GameEngine.Time = (float)GameEngine.GameTimer.Elapsed.TotalSeconds;
 
-                GameEngine.ScreenWidth = Raylib.GetScreenWidth();
-                GameEngine.ScreenHeight = Raylib.GetScreenHeight();
+
 
                 GameEngine.Lockstep(GameEngine.Time, 1.0f / 60, 1.0f / 10);
                 /*if (FrameTime < 0.5f)

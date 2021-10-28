@@ -545,7 +545,7 @@ namespace Harvesturr
             GameUnit LinkedConduit = null;
             UnitConduit CurConduit = CurUnit as UnitConduit;
 
-            if (CurConduit != null &&  CurConduit.LinkedConduit != null)
+            if (CurConduit != null && CurConduit.LinkedConduit != null)
             {
                 if (CurConduit.LinkedConduit.Destroyed)
                     CurConduit.LinkedConduit = null;
@@ -685,6 +685,23 @@ namespace Harvesturr
             if (Filter != null)
                 foreach (var C in Filter(GameEngine.PickInRange(Pos, Radius)))
                     Raylib.DrawLineV(Pos, C.Position, Clr);
+        }
+
+        public static void PlaySfx(Vector2 Pos, SoundRef Sfx)
+        {
+            Sound Snd = Sfx;
+
+            float ZoomMul = 1;
+            float Volume = 1;
+
+            if (GameEngine.Zoom < 2)
+                ZoomMul = GameEngine.Zoom / 3;
+
+            float Dist = Vector2.Distance(GameCamera.target, Pos);
+            Console.WriteLine("Sound dist: {0}", Dist);
+
+            Raylib.SetSoundVolume(Snd, Volume * ZoomMul);
+            Raylib.PlaySoundMulti(Snd);
         }
     }
 
