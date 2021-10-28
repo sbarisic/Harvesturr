@@ -67,6 +67,7 @@ namespace Harvesturr
         public static Stopwatch GameTimer = Stopwatch.StartNew();
 
         static float NextWaveSpawnTime;
+        static int Wave;
 
         public static void GUILoadStyle(string Name)
         {
@@ -188,16 +189,22 @@ namespace Harvesturr
 
             if (NextWaveSpawnTime < Time)
             {
-                NextWaveSpawnTime = Time + 7;
-                SpawnEnemyWave(1, 5);
+                NextWaveSpawnTime = Time + 10;
+                // SpawnEnemyWave(Wave++);
             }
         }
 
-        public static void SpawnEnemyWave(int Wave, int Count)
+        public static void SpawnEnemyWave(int Wave)
         {
+            int Count = (int)(((float)Wave - 5) / 5 * 2.0f);
+            if (Count < 0)
+                Count = 0;
+
+            Console.WriteLine("Wave {0}, Count {1}", Wave, Count);
+
             for (int i = 0; i < Count; i++)
             {
-                Vector2 Pt = Utils.RandomPointOnCircle(1600);
+                Vector2 Pt = Utils.RandomPointOnRect(GameMap.GetBounds());
                 UnitAlienUfo Ufo = new UnitAlienUfo(Pt);
                 Spawn(Ufo);
             }
@@ -535,18 +542,17 @@ namespace Harvesturr
 
         public static GameUnit PickNextEnergyPacketTarget(UnitConduit CurConduit, GameUnit Except1, GameUnit Except2)
         {
+            GameUnit LinkedConduit = null;
+
             if (CurConduit.LinkedConduit != null)
             {
                 if (CurConduit.LinkedConduit.Destroyed)
                     CurConduit.LinkedConduit = null;
                 else
-                    return CurConduit.LinkedConduit;
+                    LinkedConduit = CurConduit.LinkedConduit;
             }
 
             PickInRange(ref GameUnitsTemp, out int Length, CurConduit.Position, UnitConduit.ConnectRangePower);
-
-            if (Length == 0)
-                return null;
 
             for (int i = 0; i < Length; i++)
             {
@@ -574,9 +580,15 @@ namespace Harvesturr
                     return GameUnitsTemp[i];
             }
 
+            if (Length == 0)
+                return LinkedConduit;
+
             int MaxLen = Utils.Rearrange(GameUnitsTemp);
             if (MaxLen <= 0)
-                return null;
+                return LinkedConduit;
+
+            if (LinkedConduit != null)
+                return LinkedConduit;
 
             return GameUnitsTemp[Utils.Random(0, MaxLen)];
         }

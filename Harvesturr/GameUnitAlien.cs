@@ -30,7 +30,7 @@ namespace Harvesturr {
 
 		public GameUnitAlien(string UnitName, Vector2 Position) : base(UnitName, Position) {
 			//AttackRange = 128;
-			AttackRange = 2000;
+			AttackRange = 4000;
 
 			AttackDamageRange = 16;
 			AttackDamage = 5;

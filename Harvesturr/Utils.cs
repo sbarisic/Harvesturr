@@ -35,6 +35,11 @@ namespace Harvesturr
             return Rnd.Next(IncMin, ExMax);
         }
 
+        public static float Random(float Min, float Max)
+        {
+            return Min + (float)(Rnd.NextDouble() * (Max - Min));
+        }
+
         public static Vector2 Random(Vector2 A, Vector2 B)
         {
             int X = Random((int)A.X, (int)B.X);
@@ -58,10 +63,28 @@ namespace Harvesturr
             return new Vector2(X, Y);
         }
 
+        public static bool RandomBool()
+        {
+            return Rnd.Next(0, 2) > 0;
+        }
+
         public static Vector2 RandomPointOnCircle(float Radius)
         {
             float Angle = Rnd.Next(360);
             return new Vector2(Radius * (float)Math.Cos(Angle), Radius * (float)Math.Sin(Angle));
+        }
+
+        public static Vector2 RandomPointOnRect(float X, float Y, float W, float H)
+        {
+            if (RandomBool())
+                return new Vector2(Random(X, X + W), RandomBool() ? Y : Y + H);
+
+            return new Vector2(RandomBool() ? X : X + W, Random(Y, Y + H));
+        }
+
+        public static Vector2 RandomPointOnRect(Rectangle Rect)
+        {
+            return RandomPointOnRect(Rect.x, Rect.y, Rect.width, Rect.height);
         }
 
         public static bool IsInside(Rectangle Rect, Vector2 Pos)
