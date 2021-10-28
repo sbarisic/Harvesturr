@@ -78,6 +78,9 @@ namespace Harvesturr
 
             Sfx_ExplosionSmall = new SoundRef[] { ResMgr.LoadSound("explosion_small_1"), ResMgr.LoadSound("explosion_small_2") };
             Sfx_ExplosionBig = new SoundRef[] { ResMgr.LoadSound("explosion_big_1"), ResMgr.LoadSound("explosion_big_2") };
+
+            // TODO: Music
+            // https://www.newgrounds.com/search/conduct/audio?sort=score-desc&suitabilities=e%2Ct&match=tags&tags=chiptune
         }
 
         public static void GUILoadStyle(string Name)
