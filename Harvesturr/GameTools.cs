@@ -177,6 +177,9 @@ namespace Harvesturr
             {
                 UnitAlienUfo NewAlien = new UnitAlienUfo(WorldPos);
                 GameEngine.Spawn(NewAlien);
+            } else if (Raylib.IsKeyDown(KeyboardKey.KEY_R))
+            {
+                PickedUnit?.Destroy();
             }
         }
 

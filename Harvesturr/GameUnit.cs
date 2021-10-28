@@ -73,13 +73,13 @@ namespace Harvesturr
             return GetUnitWidth() + GetUnitHeight();
         }
 
-        public virtual void Destroy()
+        public virtual void Destroy(bool SuppressSfx = false)
         {
             if (Destroyed)
                 return;
 
-            if (Sfx_OnDestroy != null)
-                GameEngine.PlaySfx(Position, Sfx_OnDestroy);
+            if (!SuppressSfx)
+                GameEngine.PlaySfx(this, Sfx_OnDestroy);
 
             Destroyed = true;
 
@@ -188,6 +188,8 @@ namespace Harvesturr
             UpdateInterval = 0.2f;
             CanLinkEnergy = true;
             Heat = 0;
+
+            Sfx_OnDestroy = GameEngine.SfxGetExplosion();
         }
 
         public override void SlowUpdate()
@@ -256,11 +258,16 @@ namespace Harvesturr
         int EnergyCharges;
         float LastEnergyChargeUseTime;
 
+        SoundRef Sfx_Laser;
+
         public UnitHarvester(Vector2 Position) : base(UNIT_NAME, Position)
         {
             EnergyCharges = 0;
             UpdateInterval = 5;
             CanLinkEnergy = true;
+
+            Sfx_Laser = ResMgr.LoadSound("harvester_laser"); 
+            Sfx_OnDestroy = GameEngine.SfxGetExplosion();
         }
 
         public override void Update(float Dt)
@@ -291,6 +298,7 @@ namespace Harvesturr
 
             if (TgtMineral.HarvestMineral())
             {
+                GameEngine.PlaySfx(this, Sfx_Laser);
                 GameEngine.AddEffect(() => Raylib.DrawLineEx(Position, TgtMineral.Position, 2, Color.GREEN), 0.25f);
 
                 EnergyCharges--;
@@ -318,7 +326,7 @@ namespace Harvesturr
         public override bool ConsumeEnergyPacket(UnitEnergyPacket Packet)
         {
             EnergyCharges++;
-            Packet.Destroy();
+            Packet.Destroy(true);
 
             return base.ConsumeEnergyPacket(Packet);
         }
@@ -347,6 +355,7 @@ namespace Harvesturr
                 UpdateInterval = 0.01f;
 
             CanLinkEnergy = true;
+            Sfx_OnDestroy = GameEngine.SfxGetExplosion(true);
         }
 
         public override void SlowUpdate()
@@ -463,6 +472,8 @@ namespace Harvesturr
         int MaxBuildCost;
         int BuildCostRemaining;
 
+        SoundRef Sfx_FinishBuilding;
+
         public UnitBuildingWIP(Vector2 Position, Type BaseBuildingType) : base((string)GetField(BaseBuildingType, "UNIT_NAME") + "_wip", Position)
         {
             this.BaseBuildingType = BaseBuildingType;
@@ -474,6 +485,9 @@ namespace Harvesturr
                 MaxBuildCost = 1;
                 BuildCostRemaining = 1;
             }
+
+            Sfx_FinishBuilding = ResMgr.LoadSound("building_finish_constructing");
+            Sfx_OnDestroy = GameEngine.SfxGetExplosion();
         }
 
         public override void DrawGUI()
@@ -491,11 +505,14 @@ namespace Harvesturr
 
         public override bool ConsumeEnergyPacket(UnitEnergyPacket Packet)
         {
+            Packet.Destroy(true);
             BuildCostRemaining--;
 
             if (BuildCostRemaining <= 0)
             {
-                Destroy();
+                GameEngine.PlaySfx(this, Sfx_FinishBuilding);
+                Destroy(true);
+
                 GameUnit Unit = (GameUnit)Activator.CreateInstance(BaseBuildingType, Position);
                 GameEngine.Spawn(Unit);
 
@@ -539,6 +556,8 @@ namespace Harvesturr
             EnergyCharges = 0;
             UpdateInterval = 0.1f;
             CanLinkEnergy = true;
+            
+            Sfx_OnDestroy = GameEngine.SfxGetExplosion(true);
         }
 
         public override void Update(float Dt)
@@ -600,7 +619,7 @@ namespace Harvesturr
                 return true;
 
             EnergyCharges += 25;
-            Packet.Destroy();
+            Packet.Destroy(true);
 
             return base.ConsumeEnergyPacket(Packet);
         }

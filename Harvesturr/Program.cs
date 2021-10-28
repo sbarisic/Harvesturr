@@ -39,7 +39,7 @@ namespace Harvesturr
 
             ResMgr.InitFileWatcher();
             Raylib.InitWindow(Width, Height, "Harvesturr");
-            Raylib.InitAudioDevice();
+            GameEngine.InitSfx();
 
             Raylib.SetWindowState(ConfigFlags.FLAG_WINDOW_RESIZABLE);
             Raylib.SetTargetFPS(60);

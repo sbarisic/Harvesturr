@@ -69,6 +69,17 @@ namespace Harvesturr
         static float NextWaveSpawnTime;
         static int Wave;
 
+        static SoundRef[] Sfx_ExplosionSmall;
+        static SoundRef[] Sfx_ExplosionBig;
+
+        public static void InitSfx()
+        {
+            Raylib.InitAudioDevice();
+
+            Sfx_ExplosionSmall = new SoundRef[] { ResMgr.LoadSound("explosion_small_1"), ResMgr.LoadSound("explosion_small_2") };
+            Sfx_ExplosionBig = new SoundRef[] { ResMgr.LoadSound("explosion_big_1"), ResMgr.LoadSound("explosion_big_2") };
+        }
+
         public static void GUILoadStyle(string Name)
         {
             Raygui.GuiLoadStyle(string.Format("data/gui_styles/{0}/{0}.rgs", Name));
@@ -687,9 +698,22 @@ namespace Harvesturr
                     Raylib.DrawLineV(Pos, C.Position, Clr);
         }
 
+        public static SoundRef SfxGetExplosion(bool Big = false)
+        {
+            return Utils.Random(Big ? Sfx_ExplosionBig : Sfx_ExplosionSmall);
+        }
+
+        public static void PlaySfx(GameUnit Unit, SoundRef Sfx)
+        {
+            PlaySfx(Unit.Position, Sfx);
+        }
+
         public static void PlaySfx(Vector2 Pos, SoundRef Sfx)
         {
             const float SoundFalloffDist = 600;
+
+            if (Sfx == null)
+                return;
 
             Sound Snd = Sfx;
             float ZoomMul = 1;
