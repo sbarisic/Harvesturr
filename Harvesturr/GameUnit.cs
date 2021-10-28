@@ -117,8 +117,10 @@ namespace Harvesturr
                 GameEngine.DrawBar(Position - GetUnitHeight(), Health / (float)MaxHealth, Color.GREEN);
         }
 
-        public virtual void ConsumeEnergyPacket(UnitEnergyPacket Packet)
+        // Return true to find next target from current position, return false to destroy
+        public virtual bool ConsumeEnergyPacket(UnitEnergyPacket Packet)
         {
+            return true;
         }
 
         public virtual bool CanAcceptEnergyPacket()
@@ -213,14 +215,15 @@ namespace Harvesturr
 
                 if (Heat > 5)
                     GameEngine.DrawBar(Position - GetUnitHeight() / 2, Heat / 100.0f, DrawColor);
-            } else
+            }
+            else
             {
                 if (LinkedConduit != null)
                     Raylib.DrawLineEx(Position, LinkedConduit.Position, 1, Color.YELLOW);
             }
         }
 
-        public override void ConsumeEnergyPacket(UnitEnergyPacket Packet)
+        public override bool ConsumeEnergyPacket(UnitEnergyPacket Packet)
         {
             Heat++;
 
@@ -229,6 +232,8 @@ namespace Harvesturr
                 Heat = 100;
                 Packet.Destroy();
             }
+
+            return base.ConsumeEnergyPacket(Packet);
         }
 
         public override string ToString()
@@ -305,10 +310,12 @@ namespace Harvesturr
             base.DrawWorld();
         }
 
-        public override void ConsumeEnergyPacket(UnitEnergyPacket Packet)
+        public override bool ConsumeEnergyPacket(UnitEnergyPacket Packet)
         {
             EnergyCharges++;
             Packet.Destroy();
+
+            return base.ConsumeEnergyPacket(Packet);
         }
 
         public override bool CanAcceptEnergyPacket()
@@ -316,7 +323,7 @@ namespace Harvesturr
             if (AwaitingPacket != null && !AwaitingPacket.Destroyed)
                 return false;
 
-            return EnergyCharges <= 0;
+            return EnergyCharges <= 1;
         }
     }
 
@@ -404,14 +411,14 @@ namespace Harvesturr
         {
             this.Target = null;
             GameUnit Next = null;
-            Target.ConsumeEnergyPacket(this);
+            bool PickNextTargetAnyway = Target.ConsumeEnergyPacket(this);
 
             if (Destroyed)
                 return;
 
-            if (Target is UnitConduit ConduitTarget)
+            if (Target is UnitConduit || PickNextTargetAnyway)
             {
-                Next = GameEngine.PickNextEnergyPacketTarget(ConduitTarget, Target, Previous);
+                Next = GameEngine.PickNextEnergyPacketTarget(Target, Target, Previous);
 
                 if (Next == null)
                     Next = Previous;
@@ -475,16 +482,25 @@ namespace Harvesturr
             base.DrawWorld();
         }
 
-        public override void ConsumeEnergyPacket(UnitEnergyPacket Packet)
+        public override bool ConsumeEnergyPacket(UnitEnergyPacket Packet)
         {
             BuildCostRemaining--;
 
             if (BuildCostRemaining <= 0)
             {
+                IEnumerable<UnitEnergyPacket> RecPackets = GameEngine.PickInRange(Position, UnitConduit.ConnectRangePower, true).Select(U => U as UnitEnergyPacket).Where(U => U != null && U.Target == this);
+
                 Destroy();
                 GameUnit Unit = (GameUnit)Activator.CreateInstance(BaseBuildingType, Position);
                 GameEngine.Spawn(Unit);
+
+                foreach (UnitEnergyPacket P in RecPackets)
+                {
+                    P.Target = Unit;
+                }
             }
+
+            return false;
         }
 
         public override bool CanAcceptEnergyPacket()
@@ -566,10 +582,15 @@ namespace Harvesturr
             base.DrawWorld();
         }
 
-        public override void ConsumeEnergyPacket(UnitEnergyPacket Packet)
+        public override bool ConsumeEnergyPacket(UnitEnergyPacket Packet)
         {
+            if (EnergyCharges > 60)
+                return true;
+
             EnergyCharges += 25;
             Packet.Destroy();
+
+            return base.ConsumeEnergyPacket(Packet);
         }
 
         public override bool CanAcceptEnergyPacket()

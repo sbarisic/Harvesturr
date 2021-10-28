@@ -540,11 +540,12 @@ namespace Harvesturr
             }
         }
 
-        public static GameUnit PickNextEnergyPacketTarget(UnitConduit CurConduit, GameUnit Except1, GameUnit Except2)
+        public static GameUnit PickNextEnergyPacketTarget(GameUnit CurUnit, GameUnit Except1, GameUnit Except2)
         {
             GameUnit LinkedConduit = null;
+            UnitConduit CurConduit = CurUnit as UnitConduit;
 
-            if (CurConduit.LinkedConduit != null)
+            if (CurConduit != null &&  CurConduit.LinkedConduit != null)
             {
                 if (CurConduit.LinkedConduit.Destroyed)
                     CurConduit.LinkedConduit = null;
@@ -552,7 +553,7 @@ namespace Harvesturr
                     LinkedConduit = CurConduit.LinkedConduit;
             }
 
-            PickInRange(ref GameUnitsTemp, out int Length, CurConduit.Position, UnitConduit.ConnectRangePower);
+            PickInRange(ref GameUnitsTemp, out int Length, CurUnit.Position, UnitConduit.ConnectRangePower);
 
             for (int i = 0; i < Length; i++)
             {
