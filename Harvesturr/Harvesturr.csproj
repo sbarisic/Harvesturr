@@ -52,6 +52,7 @@
     <Compile Include="EffectPainter.cs" />
     <Compile Include="GameEngine.cs" />
     <Compile Include="GameMap.cs" />
+    <Compile Include="GameMusic.cs" />
     <Compile Include="GameTools.cs" />
     <Compile Include="GameUnitAlien.cs" />
     <Compile Include="GameUnit.cs" />
@@ -228,6 +229,15 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="data\gui_styles\terminal\terminal.rgs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="data\music\Meteors.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="data\music\Pluto.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="data\music\StarchipAdventure.mp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="data\sfx\building_finish_constructing.wav">

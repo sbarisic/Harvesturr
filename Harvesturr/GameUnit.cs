@@ -79,7 +79,7 @@ namespace Harvesturr
                 return;
 
             if (!SuppressSfx)
-                GameEngine.PlaySfx(this, Sfx_OnDestroy);
+                GameMusic.PlaySfx(this, Sfx_OnDestroy);
 
             Destroyed = true;
 
@@ -189,7 +189,7 @@ namespace Harvesturr
             CanLinkEnergy = true;
             Heat = 0;
 
-            Sfx_OnDestroy = GameEngine.SfxGetExplosion();
+            Sfx_OnDestroy = GameMusic.SfxGetExplosion();
         }
 
         public override void SlowUpdate()
@@ -267,7 +267,7 @@ namespace Harvesturr
             CanLinkEnergy = true;
 
             Sfx_Laser = ResMgr.LoadSound("harvester_laser"); 
-            Sfx_OnDestroy = GameEngine.SfxGetExplosion();
+            Sfx_OnDestroy = GameMusic.SfxGetExplosion();
         }
 
         public override void Update(float Dt)
@@ -298,7 +298,7 @@ namespace Harvesturr
 
             if (TgtMineral.HarvestMineral())
             {
-                GameEngine.PlaySfx(this, Sfx_Laser);
+                GameMusic.PlaySfx(this, Sfx_Laser);
                 GameEngine.AddEffect(() => Raylib.DrawLineEx(Position, TgtMineral.Position, 2, Color.GREEN), 0.25f);
 
                 EnergyCharges--;
@@ -355,7 +355,7 @@ namespace Harvesturr
                 UpdateInterval = 0.01f;
 
             CanLinkEnergy = true;
-            Sfx_OnDestroy = GameEngine.SfxGetExplosion(true);
+            Sfx_OnDestroy = GameMusic.SfxGetExplosion(true);
         }
 
         public override void SlowUpdate()
@@ -487,7 +487,7 @@ namespace Harvesturr
             }
 
             Sfx_FinishBuilding = ResMgr.LoadSound("building_finish_constructing");
-            Sfx_OnDestroy = GameEngine.SfxGetExplosion();
+            Sfx_OnDestroy = GameMusic.SfxGetExplosion();
         }
 
         public override void DrawGUI()
@@ -510,7 +510,7 @@ namespace Harvesturr
 
             if (BuildCostRemaining <= 0)
             {
-                GameEngine.PlaySfx(this, Sfx_FinishBuilding);
+                GameMusic.PlaySfx(this, Sfx_FinishBuilding);
                 Destroy(true);
 
                 GameUnit Unit = (GameUnit)Activator.CreateInstance(BaseBuildingType, Position);
@@ -557,7 +557,7 @@ namespace Harvesturr
             UpdateInterval = 0.1f;
             CanLinkEnergy = true;
             
-            Sfx_OnDestroy = GameEngine.SfxGetExplosion(true);
+            Sfx_OnDestroy = GameMusic.SfxGetExplosion(true);
         }
 
         public override void Update(float Dt)

@@ -71,6 +71,18 @@ namespace Harvesturr
             return Sfx;
         }
 
+        public static string[] GetAllMusic()
+        {
+            return Directory.EnumerateFiles("data/music/", "*.mp3").Select(Path.GetFileNameWithoutExtension).ToArray();
+        }
+
+        public static Music LoadMusic(string Name)
+        {
+            Music M = Raylib.LoadMusicStream("data/music/" + Name + ".mp3");
+            return M;
+        }
+
+
         public static string LoadMapCSV(string MapName, string Name)
         {
             return File.ReadAllText(string.Format("data/maps/{0}/{1}.csv", MapName, Name));

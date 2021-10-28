@@ -39,7 +39,7 @@ namespace Harvesturr
 
             ResMgr.InitFileWatcher();
             Raylib.InitWindow(Width, Height, "Harvesturr");
-            GameEngine.InitSfx();
+            GameMusic.Init();
 
             Raylib.SetWindowState(ConfigFlags.FLAG_WINDOW_RESIZABLE);
             Raylib.SetTargetFPS(60);
@@ -93,7 +93,7 @@ namespace Harvesturr
                 GameEngine.Time = (float)GameEngine.GameTimer.Elapsed.TotalSeconds;
 
 
-
+                GameMusic.Update();
                 GameEngine.Lockstep(GameEngine.Time, 1.0f / 60, 1.0f / 10);
                 /*if (FrameTime < 0.5f)
 					Update(FrameTime);
