@@ -689,8 +689,9 @@ namespace Harvesturr
 
         public static void PlaySfx(Vector2 Pos, SoundRef Sfx)
         {
-            Sound Snd = Sfx;
+            const float SoundFalloffDist = 600;
 
+            Sound Snd = Sfx;
             float ZoomMul = 1;
             float Volume = 1;
 
@@ -698,10 +699,16 @@ namespace Harvesturr
                 ZoomMul = GameEngine.Zoom / 3;
 
             float Dist = Vector2.Distance(GameCamera.target, Pos);
-            Console.WriteLine("Sound dist: {0}", Dist);
+            // Console.WriteLine("Sound dist: {0}", Dist);
 
-            Raylib.SetSoundVolume(Snd, Volume * ZoomMul);
-            Raylib.PlaySoundMulti(Snd);
+            Volume = (SoundFalloffDist - Dist) / SoundFalloffDist;
+            Volume = Volume * ZoomMul;
+
+            if (Volume > 0.001f)
+            {
+                Raylib.SetSoundVolume(Snd, Volume);
+                Raylib.PlaySoundMulti(Snd);
+            }
         }
     }
 
