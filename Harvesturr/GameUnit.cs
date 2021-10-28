@@ -488,15 +488,20 @@ namespace Harvesturr
 
             if (BuildCostRemaining <= 0)
             {
-                IEnumerable<UnitEnergyPacket> RecPackets = GameEngine.PickInRange(Position, UnitConduit.ConnectRangePower, true).Select(U => U as UnitEnergyPacket).Where(U => U != null && U.Target == this);
-
                 Destroy();
                 GameUnit Unit = (GameUnit)Activator.CreateInstance(BaseBuildingType, Position);
                 GameEngine.Spawn(Unit);
 
-                foreach (UnitEnergyPacket P in RecPackets)
+                // Relink all energy packets to constructed building
+                foreach (UnitEnergyPacket P in GameEngine.PickInRange(Position, UnitConduit.ConnectRangePower, true).Select(U => U as UnitEnergyPacket).Where(U => U != null && U.Target == this))
                 {
                     P.Target = Unit;
+                }
+
+                // Relink all linked conduits back to this unit
+                foreach (UnitConduit C in GameEngine.PickInRange(Position, UnitConduit.ConnectRangePower).Select(U => U as UnitConduit).Where(U => U != null && U.LinkedConduit == this))
+                {
+                    C.LinkedConduit = Unit;
                 }
             }
 
