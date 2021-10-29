@@ -189,7 +189,7 @@ namespace Harvesturr
             CanLinkEnergy = true;
             Heat = 0;
 
-            Sfx_OnDestroy = GameMusic.SfxGetExplosion();
+            Sfx_OnDestroy = GameMusic.Sfx_ExplosionSmall;
         }
 
         public override void SlowUpdate()
@@ -266,8 +266,8 @@ namespace Harvesturr
             UpdateInterval = 5;
             CanLinkEnergy = true;
 
-            Sfx_Laser = ResMgr.LoadSound("harvester_laser"); 
-            Sfx_OnDestroy = GameMusic.SfxGetExplosion();
+            Sfx_Laser = ResMgr.LoadSound("harvester_laser");
+            Sfx_OnDestroy = GameMusic.Sfx_ExplosionSmall;
         }
 
         public override void Update(float Dt)
@@ -355,7 +355,7 @@ namespace Harvesturr
                 UpdateInterval = 0.01f;
 
             CanLinkEnergy = true;
-            Sfx_OnDestroy = GameMusic.SfxGetExplosion(true);
+            Sfx_OnDestroy = GameMusic.Sfx_ExplosionBig;
         }
 
         public override void SlowUpdate()
@@ -487,7 +487,7 @@ namespace Harvesturr
             }
 
             Sfx_FinishBuilding = ResMgr.LoadSound("building_finish_constructing");
-            Sfx_OnDestroy = GameMusic.SfxGetExplosion();
+            Sfx_OnDestroy = GameMusic.Sfx_ExplosionSmall;
         }
 
         public override void DrawGUI()
@@ -547,8 +547,6 @@ namespace Harvesturr
         public const float AttackRangeLaser = 128;
 
         int EnergyCharges;
-        float LastEnergyChargeUseTime;
-
         GameUnitAlien Target;
 
         public UnitLaser(Vector2 Position) : base(UNIT_NAME, Position)
@@ -556,8 +554,8 @@ namespace Harvesturr
             EnergyCharges = 0;
             UpdateInterval = 0.1f;
             CanLinkEnergy = true;
-            
-            Sfx_OnDestroy = GameMusic.SfxGetExplosion(true);
+
+            Sfx_OnDestroy = GameMusic.Sfx_ExplosionBig;
         }
 
         public override void Update(float Dt)
@@ -565,7 +563,7 @@ namespace Harvesturr
             base.Update(Dt);
             DrawColor = Color.WHITE;
 
-            if (EnergyCharges <= 0 && ((GameEngine.Time - LastEnergyChargeUseTime) > UpdateInterval))
+            if (EnergyCharges <= 0)
                 DrawColor = new Color(128, 128, 128, 190);
         }
 

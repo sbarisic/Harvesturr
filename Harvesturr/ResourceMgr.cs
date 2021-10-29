@@ -144,9 +144,13 @@ namespace Harvesturr
 
         public SoundRef(string FullPath)
         {
-            this.FullPath = FullPath;
-            this.Sound = Raylib.LoadSound(FullPath);
             MarkForReload = false;
+
+            if (FullPath != null)
+            {
+                this.FullPath = FullPath;
+                this.Sound = Raylib.LoadSound(FullPath);
+            }
         }
 
         public void Update()
@@ -160,10 +164,30 @@ namespace Harvesturr
             }
         }
 
+        public virtual Sound GetSound()
+        {
+            Update();
+            return Sound;
+        }
+
         public static implicit operator Sound(SoundRef Ref)
         {
-            Ref.Update();
-            return Ref.Sound;
+            return Ref.GetSound();
+        }
+    }
+
+    class MultiSoundRef : SoundRef
+    {
+        SoundRef[] Sounds;
+
+        public MultiSoundRef(params SoundRef[] Sounds) : base(null)
+        {
+            this.Sounds = Sounds;
+        }
+
+        public override Sound GetSound()
+        {
+            return Utils.Random(Sounds).GetSound();
         }
     }
 }

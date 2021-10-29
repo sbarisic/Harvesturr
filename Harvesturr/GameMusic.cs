@@ -11,8 +11,9 @@ namespace Harvesturr
 {
     static class GameMusic
     {
-        static SoundRef[] Sfx_ExplosionSmall;
-        static SoundRef[] Sfx_ExplosionBig;
+        public static MultiSoundRef Sfx_ExplosionSmall;
+        public static MultiSoundRef Sfx_ExplosionBig;
+        public static MultiSoundRef Sfx_Hit;
 
         static Dictionary<string, Music> Sfx_Music;
 
@@ -23,8 +24,9 @@ namespace Harvesturr
         {
             Raylib.InitAudioDevice();
 
-            Sfx_ExplosionSmall = new SoundRef[] { ResMgr.LoadSound("explosion_small_1"), ResMgr.LoadSound("explosion_small_2") };
-            Sfx_ExplosionBig = new SoundRef[] { ResMgr.LoadSound("explosion_big_1"), ResMgr.LoadSound("explosion_big_2") };
+            Sfx_ExplosionSmall = new MultiSoundRef(ResMgr.LoadSound("explosion_small_1"), ResMgr.LoadSound("explosion_small_2"));
+            Sfx_ExplosionBig = new MultiSoundRef(ResMgr.LoadSound("explosion_big_1"), ResMgr.LoadSound("explosion_big_2"));
+            Sfx_Hit = new MultiSoundRef(ResMgr.LoadSound("hit_1"), ResMgr.LoadSound("hit_2"), ResMgr.LoadSound("hit_3"));
 
             // TODO: Music
             // https://www.newgrounds.com/search/conduct/audio?sort=score-desc&suitabilities=e%2Ct&match=tags&tags=chiptune
@@ -48,11 +50,6 @@ namespace Harvesturr
                 Raylib.SetMusicVolume(CurrentMusic, 0.1f);
                 Raylib.UpdateMusicStream(CurrentMusic);
             }
-        }
-
-        public static SoundRef SfxGetExplosion(bool Big = false)
-        {
-            return Utils.Random(Big ? Sfx_ExplosionBig : Sfx_ExplosionSmall);
         }
 
         public static void PlaySfx(GameUnit Unit, SoundRef Sfx)

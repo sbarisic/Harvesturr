@@ -67,7 +67,6 @@ namespace Harvesturr
         public static Stopwatch GameTimer = Stopwatch.StartNew();
 
         static float NextWaveSpawnTime;
-        static int Wave;
 
         public static void GUILoadStyle(string Name)
         {
