@@ -75,9 +75,9 @@ namespace Harvesturr
                 }
 
                 // Relink all linked conduits back to this unit
-                foreach (UnitConduit C in GameEngine.PickInRange(Position, UnitConduit.ConnectRangePower).Select(U => U as UnitConduit).Where(U => U != null && U.LinkedConduit == this))
+                foreach (UnitConduit C in GameEngine.PickInRange(Position, UnitConduit.ConnectRangePower).Select(U => U as UnitConduit).Where(U => U != null && U.GetLinkedConduit == this))
                 {
-                    C.LinkedConduit = Unit;
+                    C.LinkConduit(Unit);
                 }
             }
 

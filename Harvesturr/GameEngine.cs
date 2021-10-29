@@ -26,6 +26,7 @@ namespace Harvesturr
         public static bool DebugFast;
         public static bool DebugFastBuild;
 
+        public static bool DebugDrawLaserRange;
         public static bool DebugPerformance;
 
         public static GameUnit[] GameUnits = new GameUnit[64];
@@ -546,13 +547,8 @@ namespace Harvesturr
             GameUnit LinkedConduit = null;
             UnitConduit CurConduit = CurUnit as UnitConduit;
 
-            if (CurConduit != null && CurConduit.LinkedConduit != null)
-            {
-                if (CurConduit.LinkedConduit.Destroyed)
-                    CurConduit.LinkedConduit = null;
-                else
-                    LinkedConduit = CurConduit.LinkedConduit;
-            }
+            if (CurConduit != null && CurConduit.GetLinkedConduit != null)
+                LinkedConduit = CurConduit.GetLinkedConduit;
 
             PickInRange(ref GameUnitsTemp, out int Length, CurUnit.Position, UnitConduit.ConnectRangePower);
 

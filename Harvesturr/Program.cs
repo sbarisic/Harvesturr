@@ -30,9 +30,11 @@ namespace Harvesturr
             GameEngine.DebugFastBuild = DebugAll || args.Contains("--fastbuild"); // Fast structure building
 
             // Disable this
-            GameEngine.DebugView = false;
+            GameEngine.DebugView = true;
             GameEngine.DebugFastBuild = true;
 
+            // Draw laser range always
+            GameEngine.DebugDrawLaserRange = true;
 
             const int Width = 1366;
             const int Height = 768;

@@ -17,8 +17,18 @@ namespace Harvesturr
         public const float ConnectRangePower = 96;
 
         public int Heat;
+        GameUnit LinkedConduit;
 
-        public GameUnit LinkedConduit;
+        public GameUnit GetLinkedConduit
+        {
+            get
+            {
+                if (LinkedConduit != null && LinkedConduit.Destroyed)
+                    return null;
+
+                return LinkedConduit;
+            }
+        }
 
         public UnitConduit(Vector2 Position) : base(UNIT_NAME, Position)
         {
@@ -29,12 +39,31 @@ namespace Harvesturr
             Sfx_OnDestroy = GameMusic.Sfx_ExplosionSmall;
         }
 
+        public virtual void LinkConduit(GameUnit NewConduit)
+        {
+            if (NewConduit == this)
+            {
+                LinkedConduit = null;
+                return;
+            }
+
+            LinkedConduit = NewConduit;
+        }
+
         public override void SlowUpdate()
         {
             Heat -= 2;
 
             if (Heat < 0)
                 Heat = 0;
+        }
+
+        public override void Update(float Dt)
+        {
+            if (LinkedConduit != null && LinkedConduit.Destroyed)
+                LinkedConduit = null;
+
+            base.Update(Dt);
         }
 
         public override void DrawWorld()

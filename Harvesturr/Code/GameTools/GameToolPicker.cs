@@ -46,7 +46,7 @@ namespace Harvesturr
 
         public override void OnMouseDrag(Vector2 WorldStart, Vector2 WorldEnd, Vector2 DragNormal)
         {
-            UnitConduit UnitA = GameEngine.Pick(WorldStart).FirstOrDefault() as UnitConduit;
+            GameUnit UnitA = GameEngine.Pick(WorldStart).FirstOrDefault();
             GameUnit UnitB = GameEngine.Pick(WorldEnd).FirstOrDefault();
 
             if (UnitB != null && !UnitB.CanLinkEnergy)
@@ -57,12 +57,22 @@ namespace Harvesturr
             if (UnitA == UnitB)
                 UnitB = null;
 
-            if (UnitA != null)
+            // Linking conduits
+            if (UnitA != null && UnitA is UnitConduit ConduitA)
             {
                 if (UnitB != null && Vector2.Distance(UnitA.Position, UnitB.Position) < UnitConduit.ConnectRangePower)
-                    UnitA.LinkedConduit = UnitB;
+                    ConduitA.LinkConduit(UnitB);
                 else
-                    UnitA.LinkedConduit = null;
+                    ConduitA.LinkConduit(null);
+            }
+
+            // Linking lasers
+            if (UnitA != null && UnitA is UnitLaser LaserA)
+            {
+                if (UnitB != null && UnitB is UnitLaser LaserB && Vector2.Distance(UnitA.Position, UnitB.Position) < LaserA.GetAttackRange)
+                    LaserA.LinkLaser(LaserB);
+                else
+                    LaserA.LinkLaser(null);
             }
         }
 

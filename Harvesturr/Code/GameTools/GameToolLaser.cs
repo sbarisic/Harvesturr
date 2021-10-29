@@ -21,7 +21,7 @@ namespace Harvesturr
         public override void DrawWorld()
         {
             GameEngine.DrawLinkLines(GameEngine.MousePosWorld, UnitConduit.ConnectRangePower, Color.YELLOW, Enumerable.OfType<UnitConduit>);
-            GameEngine.DrawLinkLines(GameEngine.MousePosWorld, UnitLaser.AttackRangeLaser, Color.RED, Enumerable.OfType<UnitLaser>);
+            GameEngine.DrawLinkLines(GameEngine.MousePosWorld, UnitLaser.SINGLE_LASER_RNG, Color.RED, Enumerable.OfType<UnitLaser>);
             base.DrawWorld();
         }
 
