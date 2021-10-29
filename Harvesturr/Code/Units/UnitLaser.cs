@@ -25,8 +25,8 @@ namespace Harvesturr
         int AttackDamage;
         float AttackRange;
 
-        int MaxEnergyCharges;
-        int EnergyCharges;
+        public int MaxEnergyCharges;
+        public int EnergyCharges;
 
         GameUnitAlien Target;
         UnitLaser LinkedLaser;
@@ -130,6 +130,12 @@ namespace Harvesturr
 
             AttackRange = SINGLE_LASER_RNG + (SINGLE_LASER_RNG * (AttackDamage / SINGLE_LASER_DMG - 1) * 0.2f);
 
+            if (EnergyCharges <= 0)
+            {
+                AttackDamage = 0;
+                AttackRange = SINGLE_LASER_RNG;
+            }
+
             if (LinkedLaser != null && !LinkedLaser.Destroyed)
                 LinkedLaser.CalculationDirty = true;
         }
@@ -151,12 +157,20 @@ namespace Harvesturr
         public override void SlowUpdate()
         {
             if (EnergyCharges <= 0)
+            {
+                IsAttacking = false;
                 return;
+            }
+
+            CalculationDirty = true;
 
             // Don't do anything if linked
             if (LinkedLaser != null)
             {
                 IsAttacking = LinkedLaser.IsAttacking;
+
+                if (IsAttacking)
+                    EnergyCharges--;
                 return;
             }
 
@@ -243,7 +257,7 @@ namespace Harvesturr
             if (EnergyCharges >= MaxEnergyCharges)
                 return true;
 
-            EnergyCharges += 25;
+            EnergyCharges += 15;
             Packet.Destroy(true);
 
             return base.ConsumeEnergyPacket(Packet);

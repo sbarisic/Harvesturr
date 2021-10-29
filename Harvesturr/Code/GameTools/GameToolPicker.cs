@@ -42,6 +42,12 @@ namespace Harvesturr
             {
                 PickedUnit?.Destroy();
             }
+            else if (Raylib.IsKeyDown(KeyboardKey.KEY_T))
+            {
+                UnitLaser PickedLaser = PickedUnit as UnitLaser;
+                if (PickedLaser != null)
+                    PickedLaser.EnergyCharges = PickedLaser.MaxEnergyCharges;
+            }
         }
 
         public override void OnMouseDrag(Vector2 WorldStart, Vector2 WorldEnd, Vector2 DragNormal)

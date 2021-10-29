@@ -30,7 +30,8 @@ namespace Harvesturr
 
         public override void SlowUpdate()
         {
-            UnitConduit RandomTarget = Utils.Random(GameEngine.PickInRange(Position, UnitConduit.ConnectRangePower).OfType<UnitConduit>().ToArray());
+            IEnumerable<GameUnit> UnitsInRange = GameEngine.PickInRange(Position, UnitConduit.ConnectRangePower).Where(U => U is UnitConduit || U is UnitBuildingWIP);
+            GameUnit RandomTarget = Utils.Random(UnitsInRange.ToArray());
 
             if (RandomTarget == null)
                 return;

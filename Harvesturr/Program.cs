@@ -34,7 +34,7 @@ namespace Harvesturr
             GameEngine.DebugFastBuild = true;
 
             // Draw laser range always
-            GameEngine.DebugDrawLaserRange = true;
+            GameEngine.DebugDrawLaserRange = false;
 
             const int Width = 1366;
             const int Height = 768;
