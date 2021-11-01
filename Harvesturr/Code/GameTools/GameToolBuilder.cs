@@ -34,7 +34,7 @@ namespace Harvesturr
             GameEngine.DrawTextureCentered(ToolGhost, GameEngine.MousePosWorld, Clr: Raylib.Fade(GhostColor, 0.5f));
 
             if (CurrentLocationValid)
-                GameEngine.DrawTooltip(GameEngine.MousePosWorld, "R$ " + BuildCost, Color.GREEN);
+                GUI.DrawTooltip(GameEngine.MousePosWorld, "R$ " + BuildCost, Color.GREEN);
         }
 
         public virtual bool IsValidLocation(Vector2 MousePosWorld)

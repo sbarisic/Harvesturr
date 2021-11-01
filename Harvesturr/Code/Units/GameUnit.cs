@@ -117,7 +117,7 @@ namespace Harvesturr
         public virtual void DrawGUI()
         {
             if (GameEngine.DrawZoomDetails && Health < MaxHealth)
-                GameEngine.DrawBar(Position - GetUnitHeight(), Health / (float)MaxHealth, Color.GREEN);
+                GUI.DrawBar(Position - GetUnitHeight(), Health / (float)MaxHealth, Color.GREEN);
         }
 
         // Return true to find next target from current position, return false to destroy

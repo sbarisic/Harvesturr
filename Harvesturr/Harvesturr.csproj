@@ -61,6 +61,7 @@
     <Compile Include="Code\GameTools\GameToolLaser.cs" />
     <Compile Include="Code\GameTools\GameToolPicker.cs" />
     <Compile Include="Code\GameTools\GameToolSolarPanel.cs" />
+    <Compile Include="GUI.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Raycast.cs" />

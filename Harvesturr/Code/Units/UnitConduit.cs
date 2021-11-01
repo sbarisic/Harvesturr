@@ -87,7 +87,7 @@ namespace Harvesturr
                     GameEngine.DrawDashedLine(Position, LinkedConduit.Position, 1, 6, Color.YELLOW, GameEngine.Time * 10);
 
                 if (Heat > 5)
-                    GameEngine.DrawBar(Position - GetUnitHeight() / 2, Heat / 100.0f, DrawColor);
+                    GUI.DrawBar(Position - GetUnitHeight() / 2, Heat / 100.0f, DrawColor);
             }
             else
             {

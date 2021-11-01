@@ -241,7 +241,7 @@ namespace Harvesturr
                     }
                 }
 
-                GameEngine.DrawBar(Position - GetUnitHeight() - new Vector2(0, 4), (float)EnergyCharges / MaxEnergyCharges, Color.YELLOW);
+                GUI.DrawBar(Position - GetUnitHeight() - new Vector2(0, 4), (float)EnergyCharges / MaxEnergyCharges, Color.YELLOW);
             }
             else
             {

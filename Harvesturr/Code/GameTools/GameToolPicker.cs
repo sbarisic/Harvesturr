@@ -104,7 +104,7 @@ namespace Harvesturr
             if (PickedUnit == null || PickedUnit is GameUnitAlien)
                 return;
 
-            GameEngine.DrawTooltip(GameEngine.MousePosWorld, PickedUnit.ToString());
+            GUI.DrawTooltip(GameEngine.MousePosWorld, PickedUnit.ToString());
         }
     }
 }

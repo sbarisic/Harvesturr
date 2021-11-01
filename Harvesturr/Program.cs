@@ -42,13 +42,13 @@ namespace Harvesturr
             ResMgr.InitFileWatcher();
             Raylib.InitWindow(Width, Height, "Harvesturr");
             GameMusic.Init();
+            GUI.Init();
 
             Raylib.SetWindowState(ConfigFlags.FLAG_WINDOW_RESIZABLE);
             Raylib.SetTargetFPS(60);
 
             GameEngine.GUILoadStyle("jungle");
 
-            GameEngine.GUIPanelColor = Raylib.Fade(Color.BLACK, 0.8f);
             GameEngine.GameCamera = new Camera2D(new Vector2(Width, Height) / 2, Vector2.Zero, 0, 2);
 
             GameMap.Load("test");
@@ -70,7 +70,6 @@ namespace Harvesturr
 
             //Spawn(new UnitAlienUfo(Vector2.Zero));
 
-            GameEngine.GameTools.AddRange(IsGameToolAttribute.CreateAllGameTools());
             GameEngine.Resources = 50;
 
             if (GameEngine.DebugView)

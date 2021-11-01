@@ -45,7 +45,7 @@ namespace Harvesturr
         public override void DrawGUI()
         {
             if (GameEngine.DrawZoomDetails)
-                GameEngine.DrawBar(Position - GetUnitHeight() - new Vector2(0, 4), 1.0f - ((float)BuildCostRemaining / MaxBuildCost), Color.ORANGE);
+                GUI.DrawBar(Position - GetUnitHeight() - new Vector2(0, 4), 1.0f - ((float)BuildCostRemaining / MaxBuildCost), Color.ORANGE);
 
             base.DrawGUI();
         }
