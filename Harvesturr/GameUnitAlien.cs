@@ -1,17 +1,13 @@
 ﻿using Raylib_cs;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Harvesturr
-{
-	class GameUnitAlien : GameUnit
-	{
+namespace Harvesturr {
+	class GameUnitAlien : GameUnit {
 		protected float AttackRange; // Scan for enemy range
 		protected float AttackDamageRange; // Deal damage range
 		protected int AttackDamage;
@@ -32,11 +28,8 @@ namespace Harvesturr
 
 		bool EnemyInDamageRange;
 
-		public GameUnitAlien(string UnitName, Vector2 Position) : base(UnitName, Position)
-		{
-			//AttackRange = 128;
-			AttackRange = 4000;
-
+		public GameUnitAlien(string UnitName, Vector2 Position) : base(UnitName, Position) {
+			AttackRange = 128;
 			AttackDamageRange = 16;
 			AttackDamage = 5;
 			AttackInterval = 1;
@@ -45,86 +38,79 @@ namespace Harvesturr
 			Rotate = true;
 			RotationSpeed = 0;
 			MoveSpeed = 0;
-
-			MaxHealth = 50;
-			Health = 50;
 		}
 
-		public override void Update(float Dt)
-		{
+		public override void Update(float Dt) {
 			base.Update(Dt);
 
 			if (Rotate && RotationSpeed != 0)
 				Rotation = GameEngine.Time * RotationSpeed;
 
-			// Uncomment to move
 			Position += (MoveDirection * MoveSpeed * Dt) + (Velocity * Dt);
 			Velocity = Velocity * Friction;
 
 			if (AttackTarget != null && AttackTarget.Destroyed)
 				AttackTarget = null;
 
-			if (AttackTarget != null)
-			{
-				if (Vector2.Distance(Position, AttackTarget.Position) <= AttackDamageRange)
-				{
+			if (AttackTarget != null) {
+				if (Vector2.Distance(Position, AttackTarget.Position) <= AttackDamageRange) {
 					EnemyInDamageRange = true;
 
-					if (NextAttackTime < GameEngine.Time)
-					{
+					if (NextAttackTime < GameEngine.Time) {
 						NextAttackTime = GameEngine.Time + AttackInterval;
 						Attack(AttackTarget);
 					}
-				}
-				else
-				{
+				} else {
 					EnemyInDamageRange = false;
 				}
 			}
 		}
 
-		public override void SlowUpdate()
-		{
+		public override void SlowUpdate() {
 			base.SlowUpdate();
 
 			if (AttackTarget == null)
-				AttackTarget = GameEngine.PickNextAttackTarget(Position, AttackRange, true);
+				AttackTarget = GameEngine.PickNextAttackTarget(Position, AttackRange);
 
 			MoveDirection = CalculateMoveDirection();
 		}
 
-		public virtual void Attack(GameUnit Target)
-		{
-			// Console.WriteLine("Attacking!");
-
-			GameMusic.PlaySfx(this, GameMusic.Sfx_Hit);
+		public virtual void Attack(GameUnit Target) {
+			Console.WriteLine("Attacking!");
 			Target.ReceiveDamage(this, AttackDamage);
+
+			ApplyForce(Utils.RandomDir() * 128);
 		}
 
-		public virtual Vector2 CalculateMoveDirection()
-		{
+		public virtual Vector2 CalculateMoveDirection() {
 			if (AttackTarget == null || EnemyInDamageRange)
 				return Vector2.Zero;
 
 			return Vector2.Normalize(AttackTarget.Position - Position);
 		}
 
-		public override void DrawWorld()
-		{
+		public override void DrawWorld() {
 			GameEngine.DrawTextureCentered(UnitTex, Position, Rotation: Rotation, Clr: DrawColor);
 		}
 
-		public override void DrawGUI()
-		{
+		public override void DrawGUI() {
 			base.DrawGUI();
 
 			if (GameEngine.DrawZoomDetails && GameEngine.DebugView)
 				GameEngine.DrawCircle(Position, AttackRange, Color.PINK);
 		}
 
-		public void ApplyForce(Vector2 Vec)
-		{
+		public void ApplyForce(Vector2 Vec) {
 			Velocity += Vec;
+		}
+	}
+
+	class UnitAlienUfo : GameUnitAlien {
+		public const string UNIT_NAME = "ufo";
+
+		public UnitAlienUfo(Vector2 Position) : base(UNIT_NAME, Position) {
+			RotationSpeed = 48;
+			MoveSpeed = 8;
 		}
 	}
 }
