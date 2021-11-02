@@ -8,10 +8,8 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Harvesturr
-{
-	class GameUnitAlien : GameUnit
-	{
+namespace Harvesturr {
+	class GameUnitAlien : GameUnit {
 		protected float AttackRange; // Scan for enemy range
 		protected float AttackDamageRange; // Deal damage range
 		protected int AttackDamage;
@@ -32,8 +30,7 @@ namespace Harvesturr
 
 		bool EnemyInDamageRange;
 
-		public GameUnitAlien(string UnitName, Vector2 Position) : base(UnitName, Position)
-		{
+		public GameUnitAlien(string UnitName, Vector2 Position) : base(UnitName, Position) {
 			//AttackRange = 128;
 			AttackRange = 4000;
 
@@ -50,8 +47,7 @@ namespace Harvesturr
 			Health = 50;
 		}
 
-		public override void Update(float Dt)
-		{
+		public override void Update(float Dt) {
 			base.Update(Dt);
 
 			if (Rotate && RotationSpeed != 0)
@@ -64,27 +60,21 @@ namespace Harvesturr
 			if (AttackTarget != null && AttackTarget.Destroyed)
 				AttackTarget = null;
 
-			if (AttackTarget != null)
-			{
-				if (Vector2.Distance(Position, AttackTarget.Position) <= AttackDamageRange)
-				{
+			if (AttackTarget != null) {
+				if (Vector2.Distance(Position, AttackTarget.Position) <= AttackDamageRange) {
 					EnemyInDamageRange = true;
 
-					if (NextAttackTime < GameEngine.Time)
-					{
+					if (NextAttackTime < GameEngine.Time) {
 						NextAttackTime = GameEngine.Time + AttackInterval;
 						Attack(AttackTarget);
 					}
-				}
-				else
-				{
+				} else {
 					EnemyInDamageRange = false;
 				}
 			}
 		}
 
-		public override void SlowUpdate()
-		{
+		public override void SlowUpdate() {
 			base.SlowUpdate();
 
 			if (AttackTarget == null)
@@ -93,37 +83,32 @@ namespace Harvesturr
 			MoveDirection = CalculateMoveDirection();
 		}
 
-		public virtual void Attack(GameUnit Target)
-		{
+		public virtual void Attack(GameUnit Target) {
 			// Console.WriteLine("Attacking!");
 
 			GameMusic.PlaySfx(this, GameMusic.Sfx_Hit);
 			Target.ReceiveDamage(this, AttackDamage);
 		}
 
-		public virtual Vector2 CalculateMoveDirection()
-		{
+		public virtual Vector2 CalculateMoveDirection() {
 			if (AttackTarget == null || EnemyInDamageRange)
 				return Vector2.Zero;
 
 			return Vector2.Normalize(AttackTarget.Position - Position);
 		}
 
-		public override void DrawWorld()
-		{
+		public override void DrawWorld() {
 			GameEngine.DrawTextureCentered(UnitTex, Position, Rotation: Rotation, Clr: DrawColor);
 		}
 
-		public override void DrawGUI()
-		{
+		public override void DrawGUI() {
 			base.DrawGUI();
 
 			if (GameEngine.DrawZoomDetails && GameEngine.DebugView)
 				GameEngine.DrawCircle(Position, AttackRange, Color.PINK);
 		}
 
-		public void ApplyForce(Vector2 Vec)
-		{
+		public void ApplyForce(Vector2 Vec) {
 			Velocity += Vec;
 		}
 	}
