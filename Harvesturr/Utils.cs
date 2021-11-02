@@ -40,6 +40,17 @@ namespace Harvesturr {
 			return new Vector2(X, Y);
 		}
 
+		public static Vector2 RandomDir() {
+			float Angle = (float)(Rnd.Next(0, 360) * (Math.PI / 180));
+			return new Vector2((float)Math.Cos(Angle), (float)Math.Sin(Angle));
+		}
+
+		// TODO
+		/*public static Vector2 Spread(Vector2 Normal, float AngleDeg) {
+			float Angle = (float)(Math.Atan2(Normal.Y, Normal.X) * (180.0 / Math.PI));
+			Angle = Angle + Rnd.
+		}*/
+
 		public static Vector2 RandomPoint(float Radius, bool Uniform = false) {
 			float Angle = (float)(Rnd.NextDouble() * Math.PI * 2);
 			float Rad;
