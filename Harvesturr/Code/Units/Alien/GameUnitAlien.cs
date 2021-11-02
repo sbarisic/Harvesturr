@@ -84,10 +84,10 @@ namespace Harvesturr {
 		}
 
 		public virtual void Attack(GameUnit Target) {
-			// Console.WriteLine("Attacking!");
-
 			GameMusic.PlaySfx(this, GameMusic.Sfx_Hit);
 			Target.ReceiveDamage(this, AttackDamage);
+
+			ApplyForce(Utils.RandomDir() * 128);
 		}
 
 		public virtual Vector2 CalculateMoveDirection() {
