@@ -9,6 +9,7 @@ using Raylib_cs;
 using Raygui_cs;
 using System.Numerics;
 using System.Diagnostics;
+using NuklearDotNet;
 
 namespace Harvesturr
 {
@@ -20,10 +21,16 @@ namespace Harvesturr
         public static List<GameTool> GameTools = new List<GameTool>();
         public static GameTool ActiveGameTool;
 
+        static RaylibDevice Dev;
+
         public static void Init()
         {
             GUIPanelColor = Raylib.Fade(Color.BLACK, 0.8f);
             GameTools.AddRange(IsGameToolAttribute.CreateAllGameTools());
+
+            Dev = new RaylibDevice();
+            
+            //GUI_Test.Init(Dev);
         }
 
         public static void UpdateGUI(float Dt)
@@ -72,6 +79,8 @@ namespace Harvesturr
                     ActiveGameTool = T;
                 }
             }
+
+            //GUI_Test.DrawLoop();
         }
 
         public static void DrawWorld()
