@@ -1,0 +1,3 @@
+[submodule "NuklearDotNet"]
+	path = NuklearDotNet
+	url = https://github.com/sbarisic/NuklearDotNet
