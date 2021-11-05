@@ -24,14 +24,19 @@ namespace Harvesturr {
 		// Resources
 		public static Texture2DRef TexButton;
 		public static Font GUIFont;
+		public static Font GUIFontLarge;
 
 		public static GUIState CurrentState;
 
 		public static void Init() {
 			TexButton = ResMgr.LoadTexture("button");
 			GUIFont = ResMgr.LoadFont("pixantiqua", 12);
+			GUIFontLarge = ResMgr.LoadFont("pixantiqua", 24);
 
-			CurrentState = new InGameState();
+			CurrentState = new MainMenuState();
+
+			// CurrentState = new InGameState();
+
 			CurrentState.Init();
 			CurrentState.RecalculatePositions();
 		}
@@ -47,18 +52,20 @@ namespace Harvesturr {
 		}
 
 		public static void UpdateGUI(float Dt) {
-			if (Raylib.IsWindowResized())
-				CurrentState.RecalculatePositions();
+			if (CurrentState != null) {
+				if (Raylib.IsWindowResized())
+					CurrentState.RecalculatePositions();
 
-			CurrentState.Update(Dt);
+				CurrentState.Update(Dt);
+			}
 		}
 
 		public static void DrawScreen() {
-			CurrentState.DrawScreen();
+			CurrentState?.DrawScreen();
 		}
 
 		public static void DrawWorld() {
-			CurrentState.DrawWorld();
+			CurrentState?.DrawWorld();
 		}
 
 		public static void DrawTooltip(Vector2 Pos, string Text, Color? Clr = null, bool Offset = true) {

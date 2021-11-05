@@ -59,14 +59,14 @@ namespace Harvesturr {
 		public event OnClickFunc OnClick;
 		public event CheckToggleFunc OnCheckToggle;
 
-		public GUIButton(string Text, int X, int Y, int W, int H) : base() {
+		public GUIButton(Font Font, string Text, int X, int Y, int W, int H) : base() {
 			this.X = X;
 			this.Y = Y;
 			this.W = W;
 			this.H = H;
 			this.Text = Text;
 
-			Font = GUI.GUIFont;
+			this.Font = Font;
 			FontSize = Font.baseSize;
 			FontColor = Color.WHITE;
 			FontSpacing = 1;

@@ -27,7 +27,7 @@ namespace Harvesturr {
 			for (int i = 0; i < GameTools.Count; i++) {
 				GameTool T = GameTools[i];
 
-				GUIButton Btn = new GUIButton(T.Name, 0, 0, 0, GUIButtonHeight);
+				GUIButton Btn = new GUIButton(GUI.GUIFont, T.Name, 0, 0, 0, GUIButtonHeight);
 				Btn.OnCheckToggle += () => T.Active;
 
 				Btn.OnClick += () => {
