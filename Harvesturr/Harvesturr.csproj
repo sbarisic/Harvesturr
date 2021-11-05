@@ -48,8 +48,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Code\GUI\GUIState.cs" />
     <Compile Include="Code\GUI\GUILayout.cs" />
     <Compile Include="Code\GUI\GUIControl.cs" />
+    <Compile Include="Code\GUI\States\InGameState.cs" />
     <Compile Include="CSV.cs" />
     <Compile Include="EffectPainter.cs" />
     <Compile Include="GameEngine.cs" />

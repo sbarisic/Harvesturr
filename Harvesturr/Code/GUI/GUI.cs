@@ -12,15 +12,6 @@ using System.Diagnostics;
 
 namespace Harvesturr {
 	static class GUI {
-		public static int GUIButtonHeight = 40;
-		public static int GUIPadding = 10;
-		public static int GUIRectHeight = GUIButtonHeight + GUIPadding * 2;
-
-		public static Color GUIPanelColor;
-
-		public static List<GameTool> GameTools = new List<GameTool>();
-		public static GameTool ActiveGameTool;
-
 		// static RaylibDevice Dev;
 		public static Vector2 MousePos;
 		public static bool MouseLeft;
@@ -30,55 +21,19 @@ namespace Harvesturr {
 		public static bool MouseRightPressed;
 		public static bool MouseRightReleased;
 
-		static GUILayout MainLayout;
-		static List<GUIControl> Controls = new List<GUIControl>();
-
-		// Textures
+		// Resources
 		public static Texture2DRef TexButton;
-
 		public static Font GUIFont;
 
-		public static void Init() {
-			GUIPanelColor = Raylib.Fade(Color.BLACK, 0.5f);
-			GameTools.AddRange(IsGameToolAttribute.CreateAllGameTools().OrderBy(T => T.GameToolAttribute.Index));
+		public static GUIState CurrentState;
 
+		public static void Init() {
 			TexButton = ResMgr.LoadTexture("button");
 			GUIFont = ResMgr.LoadFont("pixantiqua", 12);
 
-			CreateGUI();
-		}
-
-		static void CreateGUI() {
-			MainLayout = new GUILayout();
-
-			for (int i = 0; i < GameTools.Count; i++) {
-				GameTool T = GameTools[i];
-
-				GUIButton Btn = new GUIButton(T.Name, 0, 0, 0, GUIButtonHeight);
-				Btn.OnCheckToggle += () => T.Active;
-
-				Btn.OnClick += () => {
-					for (int j = 0; j < GameTools.Count; j++)
-						GameTools[j].Active = false;
-
-					T.Active = true;
-					T.OnSelected();
-					ActiveGameTool = T;
-				};
-
-				MainLayout.Controls.Add(Btn);
-				Controls.Add(Btn);
-			}
-
-			RecalculatePositions();
-		}
-
-		static void RecalculatePositions() {
-			MainLayout.X = GUIPadding;
-			MainLayout.Y = GameEngine.ScreenHeight - GUIButtonHeight - GUIPadding;
-
-			MainLayout.CalcAutoWidth();
-			MainLayout.CalcHorizontalLayout(4);
+			CurrentState = new InGameState();
+			CurrentState.Init();
+			CurrentState.RecalculatePositions();
 		}
 
 		public static void UpdateInput() {
@@ -93,57 +48,17 @@ namespace Harvesturr {
 
 		public static void UpdateGUI(float Dt) {
 			if (Raylib.IsWindowResized())
-				RecalculatePositions();
+				CurrentState.RecalculatePositions();
 
-			ActiveGameTool?.Update(Dt);
-
-			if (Utils.IsInside(new Rectangle(0, 0, GameEngine.ScreenWidth, GameEngine.ScreenHeight - GUIRectHeight), GameEngine.MousePosScreen) && GameMap.IsInBounds(GameEngine.MousePosWorld)) {
-				if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_LEFT_BUTTON))
-					ActiveGameTool?.OnWorldMousePress(GameEngine.MousePosWorld, true);
-
-				if (Raylib.IsMouseButtonReleased(MouseButton.MOUSE_LEFT_BUTTON))
-					ActiveGameTool?.OnWorldMousePress(GameEngine.MousePosWorld, false);
-			}
-
-			for (int i = 0; i < Controls.Count; i++) {
-				Controls[i].Update();
-			}
+			CurrentState.Update(Dt);
 		}
 
 		public static void DrawScreen() {
-			Raylib.DrawRectangle(0, GameEngine.ScreenHeight - GUIRectHeight, GameEngine.ScreenWidth, GUIRectHeight, GUIPanelColor);
-			Raylib.DrawRectangle(0, 0, GameEngine.ScreenWidth, 24, GUIPanelColor);
-
-			if (GameEngine.DebugView) {
-				float FrameTime = Raylib.GetFrameTime();
-				float FPS = 1.0f / FrameTime;
-				Raylib.DrawText(string.Format("{0} / {1} Units, {2:0.000} ms, {3:0.00} FPS", GameEngine.GameUnits.Count(U => U != null), GameEngine.GameUnits.Length, FrameTime, FPS), 2, 2, 20, Color.WHITE);
-			}
-
-			string ResourcesText = "R$ " + GameEngine.Resources;
-			int TextWidth = Raylib.MeasureText(ResourcesText, 20);
-			Raylib.DrawText(ResourcesText, GameEngine.ScreenWidth - TextWidth - 10, 2, 20, Color.GREEN);
-
-			for (int i = 0; i < Controls.Count; i++) {
-				Controls[i].Draw();
-			}
+			CurrentState.DrawScreen();
 		}
 
 		public static void DrawWorld() {
-			ActiveGameTool?.DrawWorld();
-		}
-
-		public static bool AddButton(ref int ButtonCount, string Text, bool Active) {
-			int ButtonHeight = (int)(GUIRectHeight * 0.8f);
-			int ButtonWidth = 80;
-			int ButtonPadding = 10;
-
-			int ButtonX = ButtonPadding + (ButtonWidth * ButtonCount + ButtonPadding * ButtonCount);
-			int ButtonY = (GameEngine.ScreenHeight - GUIRectHeight) + (GUIRectHeight - ButtonHeight) / 2;
-
-			bool Ret = Raygui.GuiToggle(new Rectangle(ButtonX, ButtonY, ButtonWidth, ButtonHeight), Text, Active);
-			ButtonCount++;
-			return Ret;
+			CurrentState.DrawWorld();
 		}
 
 		public static void DrawTooltip(Vector2 Pos, string Text, Color? Clr = null, bool Offset = true) {
@@ -166,7 +81,7 @@ namespace Harvesturr {
 			int MaxWidth = Lines.Select(L => Raylib.MeasureText(L, FontSize)).Max();
 
 
-			Raylib.DrawRectangle((int)Pos.X, (int)Pos.Y, MaxWidth + XPadding * 2, Lines.Length * FontSize + (Lines.Length + 2) * YPadding, GUIPanelColor);
+			Raylib.DrawRectangle((int)Pos.X, (int)Pos.Y, MaxWidth + XPadding * 2, Lines.Length * FontSize + (Lines.Length + 2) * YPadding, new Color(0, 0, 0, 200));
 
 			for (int i = 0; i < Lines.Length; i++)
 				Raylib.DrawText(Lines[i], (int)Pos.X + XPadding, (int)Pos.Y + YPadding * (i + 1) + FontSize * i, FontSize, Clr ?? Color.WHITE);
@@ -196,7 +111,7 @@ namespace Harvesturr {
 			else if (Amt > 1)
 				Amt = 1;
 
-			Raylib.DrawRectangle((int)Pos.X, (int)Pos.Y, Width, Height, GUIPanelColor);
+			Raylib.DrawRectangle((int)Pos.X, (int)Pos.Y, Width, Height, new Color(0, 0, 0, 200));
 			Raylib.DrawRectangle((int)Pos.X + Padding, (int)Pos.Y + Padding, (int)((Width - Padding * 2) * Amt), Height - Padding * 2, Clr);
 
 			if (GameEngine.CurrentDrawState == DrawState.WORLD)
