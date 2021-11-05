@@ -12,6 +12,8 @@ namespace Harvesturr
 {
     class GameTool
     {
+        public IsGameToolAttribute GameToolAttribute;
+
         public string Name;
         public bool Active;
 

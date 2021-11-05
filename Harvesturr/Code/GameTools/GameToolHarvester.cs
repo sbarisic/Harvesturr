@@ -10,7 +10,7 @@ using System.Globalization;
 
 namespace Harvesturr
 {
-    [IsGameTool]
+    [IsGameTool(3)]
     class GameToolHarvester : GameToolBuilder
     {
         public GameToolHarvester() : base("Harvester", 8)

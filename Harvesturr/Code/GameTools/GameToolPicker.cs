@@ -10,7 +10,7 @@ using System.Globalization;
 
 namespace Harvesturr
 {
-    [IsGameTool]
+    [IsGameTool(1)]
     class GameToolPicker : GameTool
     {
         Color DragLineColor;

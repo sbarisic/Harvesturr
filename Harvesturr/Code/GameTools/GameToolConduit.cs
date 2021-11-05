@@ -10,7 +10,7 @@ using System.Globalization;
 
 namespace Harvesturr
 {
-    [IsGameTool]
+    [IsGameTool(2)]
     class GameToolConduit : GameToolBuilder
     {
         public GameToolConduit() : base("Conduit", 5)

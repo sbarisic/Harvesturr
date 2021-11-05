@@ -8,29 +8,27 @@ using System.Reflection;
 using Raylib_cs;
 using System.Globalization;
 
-namespace Harvesturr
-{
-    [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
-    sealed class IsGameToolAttribute : Attribute
-    {
-        public IsGameToolAttribute()
-        {
-        }
+namespace Harvesturr {
+	[AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
+	sealed class IsGameToolAttribute : Attribute {
+		public int Index;
 
-        public static IEnumerable<GameTool> CreateAllGameTools()
-        {
-            Type[] AllTypes = Assembly.GetExecutingAssembly().GetTypes();
+		public IsGameToolAttribute(int Index) {
+			this.Index = Index;
+		}
 
-            foreach (var T in AllTypes)
-            {
-                bool HasAttribute = T.GetCustomAttribute<IsGameToolAttribute>() != null;
+		public static IEnumerable<GameTool> CreateAllGameTools() {
+			Type[] AllTypes = Assembly.GetExecutingAssembly().GetTypes();
 
-                if (HasAttribute)
-                {
-                    GameTool ToolInstance = Activator.CreateInstance(T) as GameTool;
-                    yield return ToolInstance;
-                }
-            }
-        }
-    }
+			foreach (var T in AllTypes) {
+				IsGameToolAttribute IsGameTool = T.GetCustomAttribute<IsGameToolAttribute>();
+
+				if (IsGameTool != null) {
+					GameTool ToolInstance = Activator.CreateInstance(T) as GameTool;
+					ToolInstance.GameToolAttribute = IsGameTool;
+					yield return ToolInstance;
+				}
+			}
+		}
+	}
 }

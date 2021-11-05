@@ -10,7 +10,7 @@ using System.Globalization;
 
 namespace Harvesturr
 {
-    [IsGameTool]
+    [IsGameTool(4)]
     class GameToolSolarPanel : GameToolBuilder
     {
         public GameToolSolarPanel() : base("Solar Panel", 10)
