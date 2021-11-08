@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -19,6 +20,8 @@ namespace Harvesturr {
 		GameTool ActiveGameTool;
 
 		public override void Init() {
+			GameEngine.GameCamera = new Camera2D(new Vector2(GameEngine.ScreenWidth, GameEngine.ScreenHeight) / 2, Vector2.Zero, 0, 2);
+
 			GUIPanelColor = Raylib.Fade(Color.BLACK, 0.5f);
 			MainLayout = new GUILayout();
 
@@ -50,6 +53,57 @@ namespace Harvesturr {
 
 			MainLayout.CalcAutoWidth();
 			MainLayout.CalcHorizontalLayout(4);
+		}
+
+		public override void UpdateInput(float Dt) {
+			GameEngine.Zoom = GameEngine.GameCamera.zoom;
+			GameEngine.DrawZoomDetails = GameEngine.Zoom >= 2;
+
+			if (Raylib.IsKeyPressed(KeyboardKey.KEY_ESCAPE))
+				GUI.ChangeState(new MainMenuState());
+
+			float Amt = 100 * Dt;
+
+			if (Raylib.IsKeyDown(KeyboardKey.KEY_W))
+				GameEngine.GameCamera.target += new Vector2(0, -Amt);
+
+			if (Raylib.IsKeyDown(KeyboardKey.KEY_A))
+				GameEngine.GameCamera.target += new Vector2(-Amt, 0);
+
+			if (Raylib.IsKeyDown(KeyboardKey.KEY_S))
+				GameEngine.GameCamera.target += new Vector2(0, Amt);
+
+			if (Raylib.IsKeyDown(KeyboardKey.KEY_D))
+				GameEngine.GameCamera.target += new Vector2(Amt, 0);
+
+			if (!GameEngine.IsMouseDragging) {
+				int Wheel = (int)Raylib.GetMouseWheelMove();
+				if (Wheel != 0) {
+					GameEngine.GameCamera.zoom += Wheel / 10.0f;
+
+					if (GameEngine.GameCamera.zoom < 0.5f)
+						GameEngine.GameCamera.zoom = 0.5f;
+
+					if (GameEngine.GameCamera.zoom > 3)
+						GameEngine.GameCamera.zoom = 3;
+				}
+			}
+
+			if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_MIDDLE_BUTTON))
+				GameEngine.GameCamera.zoom = 2;
+
+			if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_RIGHT_BUTTON)) {
+				GameEngine.MouseDragStartMouse = GameEngine.MousePosScreen;
+				GameEngine.MouseDragStartLocation = GameEngine.GameCamera.target;
+				GameEngine.IsMouseDragging = true;
+			} else if (Raylib.IsMouseButtonReleased(MouseButton.MOUSE_RIGHT_BUTTON)) {
+				GameEngine.IsMouseDragging = false;
+			}
+
+			if (GameEngine.IsMouseDragging) {
+				Vector2 Delta = (GameEngine.MouseDragStartMouse - GameEngine.MousePosScreen) * (1.0f / GameEngine.GameCamera.zoom);
+				GameEngine.GameCamera.target = GameEngine.MouseDragStartLocation + Delta;
+			}
 		}
 
 		public override void Update(float Dt) {

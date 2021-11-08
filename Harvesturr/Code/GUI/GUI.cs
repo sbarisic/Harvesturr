@@ -32,16 +32,15 @@ namespace Harvesturr {
 			TexButton = ResMgr.LoadTexture("button");
 			GUIFont = ResMgr.LoadFont("pixantiqua", 12);
 			GUIFontLarge = ResMgr.LoadFont("pixantiqua", 24);
+		}
 
-			CurrentState = new MainMenuState();
-
-			// CurrentState = new InGameState();
-
+		public static void ChangeState(GUIState NewState) {
+			CurrentState = NewState;
 			CurrentState.Init();
 			CurrentState.RecalculatePositions();
 		}
 
-		public static void UpdateInput() {
+		public static void UpdateInput(float Dt) {
 			MousePos = Raylib.GetMousePosition();
 			MouseLeft = Raylib.IsMouseButtonDown(MouseButton.MOUSE_LEFT_BUTTON);
 			MouseRight = Raylib.IsMouseButtonDown(MouseButton.MOUSE_RIGHT_BUTTON);
@@ -49,6 +48,8 @@ namespace Harvesturr {
 			MouseRightPressed = Raylib.IsMouseButtonPressed(MouseButton.MOUSE_RIGHT_BUTTON);
 			MouseLeftReleased = Raylib.IsMouseButtonReleased(MouseButton.MOUSE_LEFT_BUTTON);
 			MouseRightReleased = Raylib.IsMouseButtonReleased(MouseButton.MOUSE_RIGHT_BUTTON);
+
+			CurrentState?.UpdateInput(Dt);
 		}
 
 		public static void UpdateGUI(float Dt) {

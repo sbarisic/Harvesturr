@@ -42,43 +42,19 @@ namespace Harvesturr {
 
 			ResMgr.InitFileWatcher();
 			Raylib.InitWindow(Width, Height, "Harvesturr");
+			Raylib.SetExitKey(KeyboardKey.KEY_NULL);
 			InitSizes();
 
 			GameMusic.Init();
 			GUI.Init();
+			GUI.ChangeState(new MainMenuState());
 
 			Raylib.SetWindowState(ConfigFlags.FLAG_WINDOW_RESIZABLE);
 			Raylib.SetTargetFPS(60);
 
-			GameEngine.GUILoadStyle("jungle");
-
-			GameEngine.GameCamera = new Camera2D(new Vector2(Width, Height) / 2, Vector2.Zero, 0, 2);
-
-			GameMap.Load("test");
-
-			if (GameEngine.DebugPerformance) {
-				GameMap.DestroyAllMinerals();
-				const float Dist = 50;
-
-				Rectangle Rect = GameMap.GetBounds();
-				Vector2 Pos = new Vector2(Rect.x, Rect.y) + new Vector2(10);
-				int XCount = (int)(Rect.width / Dist);
-				int YCount = (int)(Rect.height / Dist);
-
-				for (int X = 0; X < XCount; X++)
-					for (int Y = 0; Y < YCount; Y++)
-						GameEngine.Spawn(new UnitConduit(Pos + new Vector2(X, Y) * Dist));
-			}
-
-			//Spawn(new UnitAlienUfo(Vector2.Zero));
-
-			GameEngine.Resources = 50;
-
-			if (GameEngine.DebugView)
-				GameEngine.Resources = 10000000;
+			// GameEngine.GUILoadStyle("jungle");
 
 			Texture2DRef BackgroundNoise = ResMgr.LoadTexture("background_noise");
-
 			GameEngine.GameTimer.Restart();
 
 			while (!Raylib.WindowShouldClose()) {

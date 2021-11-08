@@ -27,6 +27,9 @@ namespace Harvesturr {
 		public virtual void RecalculatePositions() {		
 		}
 
+		public virtual void UpdateInput(float Dt) {
+		}
+
 		public virtual void Update(float Dt) {
 			for (int i = 0; i < Controls.Count; i++) 
 				Controls[i].Update();			

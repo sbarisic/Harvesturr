@@ -61,9 +61,9 @@ namespace Harvesturr {
 
 		static float NextWaveSpawnTime;
 
-		public static void GUILoadStyle(string Name) {
+		/*public static void GUILoadStyle(string Name) {
 			Raygui.GuiLoadStyle(string.Format("data/gui_styles/{0}/{0}.rgs", Name));
-		}
+		}*/
 
 		public static void SpawnStarters() {
 			Spawn(new UnitMineral(new Vector2(-36, -20), true));
@@ -94,55 +94,8 @@ namespace Harvesturr {
 		public static void Update(float Dt) {
 			MousePosScreen = Raylib.GetMousePosition();
 			MousePosWorld = Raylib.GetScreenToWorld2D(MousePosScreen, GameCamera);
-			Zoom = GameCamera.zoom;
-			DrawZoomDetails = Zoom >= 2;
 
-			float Amt = 100 * Dt;
-
-			if (Raylib.IsKeyDown(KeyboardKey.KEY_W))
-				GameCamera.target += new Vector2(0, -Amt);
-
-			if (Raylib.IsKeyDown(KeyboardKey.KEY_A))
-				GameCamera.target += new Vector2(-Amt, 0);
-
-			if (Raylib.IsKeyDown(KeyboardKey.KEY_S))
-				GameCamera.target += new Vector2(0, Amt);
-
-			if (Raylib.IsKeyDown(KeyboardKey.KEY_D))
-				GameCamera.target += new Vector2(Amt, 0);
-
-			if (!IsMouseDragging) {
-				int Wheel = (int)Raylib.GetMouseWheelMove();
-				if (Wheel != 0) {
-					GameCamera.zoom += Wheel / 10.0f;
-
-					if (GameCamera.zoom < 0.5f)
-						GameCamera.zoom = 0.5f;
-
-					if (GameCamera.zoom > 3)
-						GameCamera.zoom = 3;
-
-					Console.WriteLine("Zoom: {0}", GameCamera.zoom);
-				}
-			}
-
-			if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_MIDDLE_BUTTON))
-				GameCamera.zoom = 2;
-
-			if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_RIGHT_BUTTON)) {
-				MouseDragStartMouse = MousePosScreen;
-				MouseDragStartLocation = GameCamera.target;
-				IsMouseDragging = true;
-			} else if (Raylib.IsMouseButtonReleased(MouseButton.MOUSE_RIGHT_BUTTON)) {
-				IsMouseDragging = false;
-			}
-
-			if (IsMouseDragging) {
-				Vector2 Delta = (MouseDragStartMouse - MousePosScreen) * (1.0f / GameCamera.zoom);
-				GameCamera.target = MouseDragStartLocation + Delta;
-			}
-
-			GUI.UpdateInput();
+			GUI.UpdateInput(Dt);
 			GUI.UpdateGUI(Dt);
 			GameMap.Update(Dt);
 
