@@ -28,6 +28,8 @@ namespace Harvesturr {
 
 		public static GameUnit[] GameUnits = new GameUnit[64];
 		public static EffectPainter[] Effects = new EffectPainter[256];
+		public static int Resources;
+		public static bool IsGameRunning;
 
 		// Used by picking functions, automatically increase in size
 		public static GameUnit[] GameUnitsTemp = new GameUnit[0];
@@ -38,7 +40,6 @@ namespace Harvesturr {
 
 		public static int ScreenWidth;
 		public static int ScreenHeight;
-		public static int Resources;
 
 		public static Vector2 MousePosScreen;
 		public static Vector2 MousePosWorld;
@@ -57,7 +58,7 @@ namespace Harvesturr {
 
 		// Timing stuff
 		//static bool Paused = false;
-		public static Stopwatch GameTimer = Stopwatch.StartNew();
+		static Stopwatch GameTimer = Stopwatch.StartNew();
 
 		static float NextWaveSpawnTime;
 
@@ -65,25 +66,42 @@ namespace Harvesturr {
 			Raygui.GuiLoadStyle(string.Format("data/gui_styles/{0}/{0}.rgs", Name));
 		}*/
 
+		public static void ClearGameState() {
+			IsGameRunning = false;
+			GameTimer.Restart();
+
+			foreach (GameUnit U in GetAllGameUnits(true))
+				U.Destroy();
+
+			for (int i = 0; i < Effects.Length; i++)
+				Effects[i] = null;
+
+			Resources = 0;
+		}
+
 		public static void SpawnStarters() {
 			Spawn(new UnitMineral(new Vector2(-36, -20), true));
 			Spawn(new UnitHarvester(new Vector2(10, -31)));
-			// Spawn(new UnitConduit(new Vector2(-34, 43)));
 			Spawn(new UnitConduit(new Vector2(30, 0)));
 			Spawn(new UnitSolarPanel(new Vector2(34, 50)));
 		}
 
-		public static void Lockstep(float Elapsed, float StepInterval, float MaxTime) {
+		public static void Lockstep(float StepInterval, float MaxTime) {
+			Time = (float)GameTimer.Elapsed.TotalSeconds;
+			float Elapsed = Time;
+
 			float RequiredSteps = (Elapsed / StepInterval) - SimulatedSteps;
 			int RequiredStepsInt = (int)Math.Floor(RequiredSteps);
 
-			if (RequiredStepsInt <= 0)
+			if (RequiredStepsInt <= 0) {
+				Update(StepInterval, true);
 				return;
+			}
 
 			LockstepTimer.Restart();
 
 			for (int i = 0; i < RequiredStepsInt; i++) {
-				Update(StepInterval);
+				Update(StepInterval, false);
 				SimulatedSteps++;
 
 				if (LockstepTimer.Elapsed.TotalSeconds > MaxTime)
@@ -91,28 +109,31 @@ namespace Harvesturr {
 			}
 		}
 
-		public static void Update(float Dt) {
+		public static void Update(float Dt, bool Paused) {
 			MousePosScreen = Raylib.GetMousePosition();
 			MousePosWorld = Raylib.GetScreenToWorld2D(MousePosScreen, GameCamera);
 
 			GUI.UpdateInput(Dt);
 			GUI.UpdateGUI(Dt);
-			GameMap.Update(Dt);
 
-			for (int i = 0; i < GameUnits.Length; i++)
-				if (GameUnits[i] != null) {
-					if (GameUnits[i].Destroyed) {
-						GameUnits[i] = null;
-						continue;
+			if (!Paused) {
+				GameMap.Update(Dt);
+
+				for (int i = 0; i < GameUnits.Length; i++)
+					if (GameUnits[i] != null) {
+						if (GameUnits[i].Destroyed) {
+							GameUnits[i] = null;
+							continue;
+						}
+
+						GameUnits[i].IsMouseHover = Raylib.CheckCollisionPointRec(MousePosWorld, GameUnits[i].GetBoundingRect());
+						GameUnits[i].Update(Dt);
 					}
 
-					GameUnits[i].IsMouseHover = Raylib.CheckCollisionPointRec(MousePosWorld, GameUnits[i].GetBoundingRect());
-					GameUnits[i].Update(Dt);
+				if (NextWaveSpawnTime < Time) {
+					NextWaveSpawnTime = Time + 10;
+					// SpawnEnemyWave(Wave++);
 				}
-
-			if (NextWaveSpawnTime < Time) {
-				NextWaveSpawnTime = Time + 10;
-				// SpawnEnemyWave(Wave++);
 			}
 		}
 
@@ -135,10 +156,8 @@ namespace Harvesturr {
 
 			if (Paused && !Pause) {
 				GameTimer.Start();
-				//Paused = false;
 			} else if (!Paused && Pause) {
 				GameTimer.Stop();
-				//Paused = true;
 			}
 		}
 

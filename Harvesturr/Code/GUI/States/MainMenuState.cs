@@ -9,31 +9,45 @@ using System.Threading.Tasks;
 namespace Harvesturr {
 	class MainMenuState : GUIState {
 		public static int GUIButtonHeight = 40;
+		public static int GUIButtonWidth = 200;
+
 		public static int GUIPadding = 10;
 		public static int GUIRectHeight = GUIButtonHeight + GUIPadding * 2;
 
 		public override void Init() {
-			GUIButton BtnNewGame = new GUIButton(GUI.GUIFontLarge, "New Game", 100, 100, 200, GUIButtonHeight);
-			BtnNewGame.Font = GUI.GUIFontLarge;
+			GameEngine.PauseGame(true);
+
+			int XOffset = 100;
+
+			int YOffset = 100;
+			int YSpacing = 50;
+
+			if (GameEngine.IsGameRunning) {
+				GUIButton BtnContinue = new GUIButton(GUI.GUIFontLarge, "Continue", XOffset, YOffset += YSpacing, GUIButtonWidth, GUIButtonHeight);
+				BtnContinue.OnClick += BtnContinue_OnClick;
+				Controls.Add(BtnContinue);
+			}
+
+			GUIButton BtnNewGame = new GUIButton(GUI.GUIFontLarge, "New Game", XOffset, YOffset += YSpacing, GUIButtonWidth, GUIButtonHeight);
 			BtnNewGame.OnClick += BtnNewGame_OnClick;
 			Controls.Add(BtnNewGame);
 
-			GUIButton BtnSettings = new GUIButton(GUI.GUIFontLarge, "Settings", 100, 150, 200, GUIButtonHeight);
-			BtnSettings.Font = GUI.GUIFontLarge;
+			GUIButton BtnSettings = new GUIButton(GUI.GUIFontLarge, "Settings", XOffset, YOffset += YSpacing, GUIButtonWidth, GUIButtonHeight);
 			BtnSettings.OnClick += BtnSettings_OnClick;
 			Controls.Add(BtnSettings);
 
-			GUIButton BtnQuit = new GUIButton(GUI.GUIFontLarge, "Quit", 100, 200, 200, GUIButtonHeight);
-			BtnQuit.Font = GUI.GUIFontLarge;
+			GUIButton BtnQuit = new GUIButton(GUI.GUIFontLarge, "Quit", XOffset, YOffset += YSpacing, GUIButtonWidth, GUIButtonHeight);
 			BtnQuit.OnClick += BtnQuit_OnClick;
 			Controls.Add(BtnQuit);
 		}
 
-		private void BtnNewGame_OnClick() {
-			foreach (GameUnit U in GameEngine.GetAllGameUnits(true)) 
-				U.Destroy();
+		private void BtnContinue_OnClick() {
+			GUI.ChangeState(new InGameState() { PreserveCamera = true });
+		}
 
+		private void BtnNewGame_OnClick() {
 			GameMap.Load("test");
+			GameEngine.IsGameRunning = true;
 
 			if (GameEngine.DebugPerformance) {
 				GameMap.DestroyAllMinerals();

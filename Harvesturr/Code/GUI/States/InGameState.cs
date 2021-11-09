@@ -14,13 +14,17 @@ namespace Harvesturr {
 		public static int GUIPadding = 10;
 		public static int GUIRectHeight = GUIButtonHeight + GUIPadding * 2;
 
+		public bool PreserveCamera = false;
+
 		GUILayout MainLayout;
 		List<GameTool> GameTools;
-
 		GameTool ActiveGameTool;
 
 		public override void Init() {
-			GameEngine.GameCamera = new Camera2D(new Vector2(GameEngine.ScreenWidth, GameEngine.ScreenHeight) / 2, Vector2.Zero, 0, 2);
+			GameEngine.PauseGame(false);
+
+			if (!PreserveCamera)
+				GameEngine.GameCamera = new Camera2D(new Vector2(GameEngine.ScreenWidth, GameEngine.ScreenHeight) / 2, Vector2.Zero, 0, 2);
 
 			GUIPanelColor = Raylib.Fade(Color.BLACK, 0.5f);
 			MainLayout = new GUILayout();
@@ -32,19 +36,25 @@ namespace Harvesturr {
 
 				GUIButton Btn = new GUIButton(GUI.GUIFont, T.Name, 0, 0, 0, GUIButtonHeight);
 				Btn.OnCheckToggle += () => T.Active;
-
-				Btn.OnClick += () => {
-					for (int j = 0; j < GameTools.Count; j++)
-						GameTools[j].Active = false;
-
-					T.Active = true;
-					T.OnSelected();
-					ActiveGameTool = T;
-				};
+				Btn.OnClick += () => SelectTool(T);
 
 				MainLayout.Controls.Add(Btn);
 				Controls.Add(Btn);
 			}
+
+			SelectTool(GameTools.Where(T => T is GameToolPicker).FirstOrDefault());
+		}
+
+		void SelectTool(GameTool T) {
+			if (ActiveGameTool == T)
+				return;
+
+			for (int j = 0; j < GameTools.Count; j++)
+				GameTools[j].Active = false;
+
+			T.Active = true;
+			T.OnSelected();
+			ActiveGameTool = T;
 		}
 
 		public override void RecalculatePositions() {

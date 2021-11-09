@@ -55,8 +55,7 @@ namespace Harvesturr {
 			// GameEngine.GUILoadStyle("jungle");
 
 			Texture2DRef BackgroundNoise = ResMgr.LoadTexture("background_noise");
-			GameEngine.GameTimer.Restart();
-
+	
 			while (!Raylib.WindowShouldClose()) {
 				if (Raylib.IsWindowResized()) {
 					InitSizes();
@@ -65,12 +64,8 @@ namespace Harvesturr {
 					GameEngine.GameCamera.offset = new Vector2(GameEngine.ScreenWidth, GameEngine.ScreenHeight) / 2;
 				}
 
-				// float FrameTime = Raylib.GetFrameTime();
-				GameEngine.Time = (float)GameEngine.GameTimer.Elapsed.TotalSeconds;
-
-
 				GameMusic.Update();
-				GameEngine.Lockstep(GameEngine.Time, 1.0f / 60, 1.0f / 10);
+				GameEngine.Lockstep(1.0f / 60, 1.0f / 10);
 				/*if (FrameTime < 0.5f)
 					Update(FrameTime);
 				else
