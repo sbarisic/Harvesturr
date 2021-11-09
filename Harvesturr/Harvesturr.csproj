@@ -48,6 +48,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Code\GUI\GUICheckBox.cs" />
     <Compile Include="Code\GUI\GUIButton.cs" />
     <Compile Include="Code\GUI\GUIState.cs" />
     <Compile Include="Code\GUI\GUILayout.cs" />
