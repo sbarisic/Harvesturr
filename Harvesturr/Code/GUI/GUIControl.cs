@@ -21,19 +21,39 @@ namespace Harvesturr {
 		public int H;
 
 		public bool Disabled;
-		public bool IsHovered;
+
+		public bool IsHovered {
+			get {
+				return Utils.IsInside(new Rectangle(X, Y, W, H), GUI.MousePos);
+			}
+		}
 
 		public GUIControl() {
 			Disabled = false;
 		}
 
-		public virtual bool Update() {
-			if (Disabled)
-				IsHovered = false;
-			else
-				IsHovered = Utils.IsInside(new Rectangle(X, Y, W, H), GUI.MousePos);
+		bool PressedInside = false;
+		public virtual bool CheckClicked() {
+			if (Disabled) {
+				PressedInside = false;
+				return false;
+			}
 
-			return IsHovered;
+			if (!IsHovered) 
+				PressedInside = false;
+
+			if (PressedInside && IsHovered && GUI.MouseLeftReleased) {
+				PressedInside = false;
+				return true;
+			}
+
+			if (IsHovered && GUI.MouseLeftPressed)
+				PressedInside = true;
+
+			return false;
+		}
+
+		public virtual void Update() {
 		}
 
 		public virtual void AddPadding(int Padding) {

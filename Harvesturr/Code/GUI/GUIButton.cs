@@ -57,15 +57,14 @@ namespace Harvesturr {
 			return I;
 		}
 
-		public override bool Update() {
-			if (base.Update()) {
-				if (IsHovered && GUI.MouseLeftReleased)
-					OnClick?.Invoke();
+		public override void Update() {
+			base.Update();
 
-				return IsHovered;
-			}
+			if (Disabled)
+				return;
 
-			return false;
+			if (CheckClicked())
+				OnClick?.Invoke();
 		}
 
 		public override void Draw() {
@@ -80,7 +79,7 @@ namespace Harvesturr {
 				if (IsHovered) {
 					NPatch = InfoHover;
 
-					if (GUI.MouseLeft)
+					if (GUI.MouseLeftDown)
 						NPatch = InfoPress;
 				}
 			}

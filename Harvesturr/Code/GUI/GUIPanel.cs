@@ -32,11 +32,14 @@ namespace Harvesturr {
 			return I;
 		}
 
-		public override bool Update() {
+		public override void Update() {
+			if (Disabled)
+				return;
+
 			foreach (GUIControl C in Controls)
 				C.Update();
 
-			return base.Update();
+			base.Update();
 		}
 
 		public override void Draw() {

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Harvesturr {
 	class InGameState : GUIState {
-		public static Color GUIPanelColor;
+		// public static Color GUIPanelColor;
 
 		public static int GUIButtonHeight = 40;
 		public static int GUIPadding = 10;
@@ -16,7 +16,9 @@ namespace Harvesturr {
 
 		public bool PreserveCamera = false;
 
+		GUIPanel BottomPanel;
 		GUILayout MainLayout;
+
 		List<GameTool> GameTools;
 		GameTool ActiveGameTool;
 
@@ -26,23 +28,26 @@ namespace Harvesturr {
 			if (!PreserveCamera)
 				GameEngine.GameCamera = new Camera2D(new Vector2(GameEngine.ScreenWidth, GameEngine.ScreenHeight) / 2, Vector2.Zero, 0, 2);
 
-			GUIPanelColor = Raylib.Fade(Color.BLACK, 0.5f);
+			// GUIPanelColor = Raylib.Fade(Color.BLACK, 0.5f);
 			MainLayout = new GUILayout();
-
 			GameTools = new List<GameTool>(IsGameToolAttribute.CreateAllGameTools().OrderBy(T => T.GameToolAttribute.Index));
 
-			for (int i = 0; i < GameTools.Count; i++) {
-				GameTool T = GameTools[i];
+			BottomPanel = new GUIPanel();
+			{
+				for (int i = 0; i < GameTools.Count; i++) {
+					GameTool T = GameTools[i];
 
-				GUIButton Btn = new GUIButton(GUI.GUIFont, T.Name, 0, 0, 0, GUIButtonHeight);
-				Btn.OnCheckToggle += () => T.Active;
-				Btn.OnClick += () => SelectTool(T);
+					GUIButton Btn = new GUIButton(GUI.GUIFont, T.Name, 0, 0, 0, GUIButtonHeight);
+					Btn.OnCheckToggle += () => T.Active;
+					Btn.OnClick += () => SelectTool(T);
 
-				MainLayout.Controls.Add(Btn);
-				Controls.Add(Btn);
+					MainLayout.Controls.Add(Btn);
+					BottomPanel.Controls.Add(Btn);
+				}
+
+				SelectTool(GameTools.Where(T => T is GameToolPicker).FirstOrDefault());
 			}
-
-			SelectTool(GameTools.Where(T => T is GameToolPicker).FirstOrDefault());
+			Controls.Add(BottomPanel);
 		}
 
 		void SelectTool(GameTool T) {
@@ -58,11 +63,15 @@ namespace Harvesturr {
 		}
 
 		public override void RecalculatePositions() {
-			MainLayout.X = GUIPadding;
-			MainLayout.Y = GameEngine.ScreenHeight - GUIButtonHeight - GUIPadding;
-
 			MainLayout.CalcAutoWidth();
 			MainLayout.CalcHorizontalLayout(4);
+
+			MainLayout.X = GameEngine.ScreenWidth / 2 - MainLayout.W / 2;
+			MainLayout.Y = GameEngine.ScreenHeight - GUIButtonHeight - GUIPadding;
+			MainLayout.CalcHorizontalLayout(4);
+
+			BottomPanel.AutoSize();
+			BottomPanel.AddPadding(10);
 		}
 
 		public override void UpdateInput(float Dt) {
@@ -118,9 +127,14 @@ namespace Harvesturr {
 
 		public override void Update(float Dt) {
 			base.Update(Dt);
+
+			foreach (GUIControl C in Controls)
+				if (C.IsHovered)
+					return;
+
 			ActiveGameTool?.Update(Dt);
 
-			if (Utils.IsInside(new Rectangle(0, 0, GameEngine.ScreenWidth, GameEngine.ScreenHeight - GUIRectHeight), GameEngine.MousePosScreen) && GameMap.IsInBounds(GameEngine.MousePosWorld)) {
+			if (GameMap.IsInBounds(GameEngine.MousePosWorld)) {
 				if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_LEFT_BUTTON))
 					ActiveGameTool?.OnWorldMousePress(GameEngine.MousePosWorld, true);
 
@@ -130,8 +144,8 @@ namespace Harvesturr {
 		}
 
 		public override void DrawScreen() {
-			Raylib.DrawRectangle(0, GameEngine.ScreenHeight - GUIRectHeight, GameEngine.ScreenWidth, GUIRectHeight, GUIPanelColor);
-			Raylib.DrawRectangle(0, 0, GameEngine.ScreenWidth, 24, GUIPanelColor);
+			// Raylib.DrawRectangle(0, GameEngine.ScreenHeight - GUIRectHeight, GameEngine.ScreenWidth, GUIRectHeight, GUIPanelColor);
+			// Raylib.DrawRectangle(0, 0, GameEngine.ScreenWidth, 24, GUIPanelColor);
 
 			if (GameEngine.DebugView) {
 				float FrameTime = Raylib.GetFrameTime();

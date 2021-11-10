@@ -17,6 +17,9 @@ namespace Harvesturr {
 		public int X;
 		public int Y;
 
+		public int W;
+		public int H;
+
 		public GUILayout() {
 			Controls = new List<GUIControl>();
 		}
@@ -34,6 +37,9 @@ namespace Harvesturr {
 				C.X = X;
 				X += C.W + Padding;
 			}
+
+			X -= Padding;
+			W = X - this.X;
 		}
 	}
 }

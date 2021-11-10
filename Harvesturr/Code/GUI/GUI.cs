@@ -14,10 +14,10 @@ namespace Harvesturr {
 	static class GUI {
 		// static RaylibDevice Dev;
 		public static Vector2 MousePos;
-		public static bool MouseLeft;
+		public static bool MouseLeftDown;
 		public static bool MouseLeftPressed;
 		public static bool MouseLeftReleased;
-		public static bool MouseRight;
+		public static bool MouseRightDown;
 		public static bool MouseRightPressed;
 		public static bool MouseRightReleased;
 
@@ -47,8 +47,8 @@ namespace Harvesturr {
 
 		public static void UpdateInput(float Dt) {
 			MousePos = Raylib.GetMousePosition();
-			MouseLeft = Raylib.IsMouseButtonDown(MouseButton.MOUSE_LEFT_BUTTON);
-			MouseRight = Raylib.IsMouseButtonDown(MouseButton.MOUSE_RIGHT_BUTTON);
+			MouseLeftDown = Raylib.IsMouseButtonDown(MouseButton.MOUSE_LEFT_BUTTON);
+			MouseRightDown = Raylib.IsMouseButtonDown(MouseButton.MOUSE_RIGHT_BUTTON);
 			MouseLeftPressed = Raylib.IsMouseButtonPressed(MouseButton.MOUSE_LEFT_BUTTON);
 			MouseRightPressed = Raylib.IsMouseButtonPressed(MouseButton.MOUSE_RIGHT_BUTTON);
 			MouseLeftReleased = Raylib.IsMouseButtonReleased(MouseButton.MOUSE_LEFT_BUTTON);

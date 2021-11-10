@@ -28,7 +28,7 @@ namespace Harvesturr {
 			this.X = X;
 			this.Y = Y;
 			this.W = W;
-			this.H = H;			
+			this.H = H;
 		}
 
 		NPatchInfo CreateInfo(int X, int Y, int W, int H) {
@@ -42,15 +42,14 @@ namespace Harvesturr {
 			return I;
 		}
 
-		public override bool Update() {
-			if (base.Update()) {
-				if (IsHovered && GUI.MouseLeftReleased)
-					OnClick?.Invoke();
+		public override void Update() {
+			base.Update();
 
-				return IsHovered;
-			}
+			if (Disabled)
+				return;
 
-			return false;
+			if (CheckClicked())
+				OnClick?.Invoke();
 		}
 
 		public override void Draw() {

@@ -34,6 +34,7 @@ namespace Harvesturr {
 
 				GUIButton BtnSettings = new GUIButton(GUI.GUIFontLarge, "Settings", XOffset, YOffset += YSpacing, GUIButtonWidth, GUIButtonHeight);
 				BtnSettings.OnClick += BtnSettings_OnClick;
+				BtnSettings.Disabled = true;
 				Pnl.Controls.Add(BtnSettings);
 
 				GUIButton BtnQuit = new GUIButton(GUI.GUIFontLarge, "Quit", XOffset, YOffset += YSpacing, GUIButtonWidth, GUIButtonHeight);
