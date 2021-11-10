@@ -18,27 +18,32 @@ namespace Harvesturr {
 			GameEngine.PauseGame(true);
 
 			int XOffset = 100;
-
 			int YOffset = 100;
 			int YSpacing = 50;
 
-			if (GameEngine.IsGameRunning) {
+			GUIPanel Pnl = new GUIPanel();
+			{
 				GUIButton BtnContinue = new GUIButton(GUI.GUIFontLarge, "Continue", XOffset, YOffset += YSpacing, GUIButtonWidth, GUIButtonHeight);
 				BtnContinue.OnClick += BtnContinue_OnClick;
-				Controls.Add(BtnContinue);
+				BtnContinue.Disabled = !GameEngine.IsGameRunning;
+				Pnl.Controls.Add(BtnContinue);
+
+				GUIButton BtnNewGame = new GUIButton(GUI.GUIFontLarge, "New Game", XOffset, YOffset += YSpacing, GUIButtonWidth, GUIButtonHeight);
+				BtnNewGame.OnClick += BtnNewGame_OnClick;
+				Pnl.Controls.Add(BtnNewGame);
+
+				GUIButton BtnSettings = new GUIButton(GUI.GUIFontLarge, "Settings", XOffset, YOffset += YSpacing, GUIButtonWidth, GUIButtonHeight);
+				BtnSettings.OnClick += BtnSettings_OnClick;
+				Pnl.Controls.Add(BtnSettings);
+
+				GUIButton BtnQuit = new GUIButton(GUI.GUIFontLarge, "Quit", XOffset, YOffset += YSpacing, GUIButtonWidth, GUIButtonHeight);
+				BtnQuit.OnClick += BtnQuit_OnClick;
+				Pnl.Controls.Add(BtnQuit);
 			}
 
-			GUIButton BtnNewGame = new GUIButton(GUI.GUIFontLarge, "New Game", XOffset, YOffset += YSpacing, GUIButtonWidth, GUIButtonHeight);
-			BtnNewGame.OnClick += BtnNewGame_OnClick;
-			Controls.Add(BtnNewGame);
-
-			GUIButton BtnSettings = new GUIButton(GUI.GUIFontLarge, "Settings", XOffset, YOffset += YSpacing, GUIButtonWidth, GUIButtonHeight);
-			BtnSettings.OnClick += BtnSettings_OnClick;
-			Controls.Add(BtnSettings);
-
-			GUIButton BtnQuit = new GUIButton(GUI.GUIFontLarge, "Quit", XOffset, YOffset += YSpacing, GUIButtonWidth, GUIButtonHeight);
-			BtnQuit.OnClick += BtnQuit_OnClick;
-			Controls.Add(BtnQuit);
+			Pnl.AutoSize();
+			Pnl.AddPadding(20);
+			Controls.Add(Pnl);
 		}
 
 		private void BtnContinue_OnClick() {

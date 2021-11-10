@@ -29,13 +29,24 @@ namespace Harvesturr {
 
 		public virtual bool Update() {
 			if (Disabled)
-				return false;
+				IsHovered = false;
+			else
+				IsHovered = Utils.IsInside(new Rectangle(X, Y, W, H), GUI.MousePos);
 
-			IsHovered = Utils.IsInside(new Rectangle(X, Y, W, H), GUI.MousePos);
 			return IsHovered;
 		}
 
+		public virtual void AddPadding(int Padding) {
+			X -= Padding;
+			Y -= Padding;
+			W += Padding * 2;
+			H += Padding * 2;
+		}
+
 		public virtual void Draw() {
+		}
+
+		public virtual void AutoSize() {
 		}
 
 		public virtual void CalcAutoWidth() {

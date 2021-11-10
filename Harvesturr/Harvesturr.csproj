@@ -48,6 +48,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Code\GUI\GUIPanel.cs" />
     <Compile Include="Code\GUI\GUICheckBox.cs" />
     <Compile Include="Code\GUI\GUIButton.cs" />
     <Compile Include="Code\GUI\GUIState.cs" />
@@ -312,6 +313,9 @@
     <Content Include="data\textures\button.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="data\textures\checkbox.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="data\textures\conduit.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -341,6 +345,9 @@
     </Content>
     <Content Include="data\textures\minecraft.png" />
     <Content Include="data\textures\mineral.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="data\textures\panel.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="data\textures\solarpanel.png">

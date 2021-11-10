@@ -54,7 +54,7 @@ namespace Harvesturr {
 
 		// Lockstep stuff
 		public static Stopwatch LockstepTimer = Stopwatch.StartNew();
-		public static int SimulatedSteps;
+		public static long SimulatedSteps;
 
 		// Timing stuff
 		//static bool Paused = false;
@@ -69,9 +69,10 @@ namespace Harvesturr {
 		public static void ClearGameState() {
 			IsGameRunning = false;
 			GameTimer.Restart();
+			SimulatedSteps = 0;
 
 			foreach (GameUnit U in GetAllGameUnits(true))
-				U.Destroy();
+				U.Destroy(true);
 
 			for (int i = 0; i < Effects.Length; i++)
 				Effects[i] = null;
@@ -90,7 +91,7 @@ namespace Harvesturr {
 			Time = (float)GameTimer.Elapsed.TotalSeconds;
 			float Elapsed = Time;
 
-			float RequiredSteps = (Elapsed / StepInterval) - SimulatedSteps;
+			double RequiredSteps = (Elapsed / StepInterval) - SimulatedSteps;
 			int RequiredStepsInt = (int)Math.Floor(RequiredSteps);
 
 			if (RequiredStepsInt <= 0) {

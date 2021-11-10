@@ -23,6 +23,8 @@ namespace Harvesturr {
 
 		// Resources
 		public static Texture2DRef TexButton;
+		public static Texture2DRef TexPanel;
+		public static Texture2DRef TexCheckbox;
 		public static Font GUIFont;
 		public static Font GUIFontLarge;
 
@@ -30,6 +32,9 @@ namespace Harvesturr {
 
 		public static void Init() {
 			TexButton = ResMgr.LoadTexture("button");
+			TexPanel = ResMgr.LoadTexture("panel");
+			TexCheckbox = ResMgr.LoadTexture("checkbox");
+
 			GUIFont = ResMgr.LoadFont("pixantiqua", 12);
 			GUIFontLarge = ResMgr.LoadFont("pixantiqua", 24);
 		}
