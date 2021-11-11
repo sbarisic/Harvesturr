@@ -10,9 +10,9 @@ namespace Harvesturr {
 	class InGameState : GUIState {
 		// public static Color GUIPanelColor;
 
-		public static int GUIButtonHeight = 40;
-		public static int GUIPadding = 10;
-		public static int GUIRectHeight = GUIButtonHeight + GUIPadding * 2;
+		//public static int GUIButtonHeight = 40;
+		//public static int GUIPadding = 10;
+		//public static int GUIRectHeight = GUIButtonHeight + GUIPadding * 2;
 
 		public bool PreserveCamera = false;
 
@@ -37,7 +37,7 @@ namespace Harvesturr {
 				for (int i = 0; i < GameTools.Count; i++) {
 					GameTool T = GameTools[i];
 
-					GUIButton Btn = new GUIButton(GUI.GUIFont, T.Name, 0, 0, 0, GUIButtonHeight);
+					GUIButton Btn = new GUIButton(GUI.GUIFontLarge, T.Name, 0, 0, 0, GUIButtonHeight);
 					Btn.OnCheckToggle += () => T.Active;
 					Btn.OnClick += () => SelectTool(T);
 
@@ -64,14 +64,14 @@ namespace Harvesturr {
 
 		public override void RecalculatePositions() {
 			MainLayout.CalcAutoWidth();
-			MainLayout.CalcHorizontalLayout(4);
+			MainLayout.CalcHorizontalLayout(GUIPadding);
 
 			MainLayout.X = GameEngine.ScreenWidth / 2 - MainLayout.W / 2;
 			MainLayout.Y = GameEngine.ScreenHeight - GUIButtonHeight - GUIPadding;
-			MainLayout.CalcHorizontalLayout(4);
+			MainLayout.CalcHorizontalLayout(GUIPadding);
 
 			BottomPanel.AutoSize();
-			BottomPanel.AddPadding(10);
+			BottomPanel.AddPadding(GUIPadding);
 		}
 
 		public override void UpdateInput(float Dt) {

@@ -23,6 +23,7 @@ namespace Harvesturr {
 		public int FontSize;
 		public Color FontColor;
 		public float FontSpacing;
+		public int FontPadding;
 
 		public event OnClickFunc OnClick;
 		public event CheckToggleFunc OnCheckToggle;
@@ -38,6 +39,7 @@ namespace Harvesturr {
 			FontSize = Font.baseSize;
 			FontColor = Color.WHITE;
 			FontSpacing = 1;
+			FontPadding = 15;
 
 			InfoDefault = CreateInfo(0, 0, 64, 20);
 			InfoHover = CreateInfo(0, 20, 64, 20);
@@ -97,7 +99,7 @@ namespace Harvesturr {
 
 		public override void CalcAutoWidth() {
 			Vector2 Size = Raylib.MeasureTextEx(Font, Text, FontSize, FontSpacing);
-			W = 20 + (int)Size.X;
+			W = (int)Size.X + FontPadding * 2;
 		}
 	}
 }

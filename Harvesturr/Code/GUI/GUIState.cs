@@ -12,6 +12,14 @@ using System.Diagnostics;
 
 namespace Harvesturr {
 	class GUIState {
+		public static int GUIButtonHeight = 50;
+		public static int GUIButtonWidth = 400;
+
+		public static int GUIPadding = 10;
+		public static int GUIRectHeight = GUIButtonHeight + GUIPadding * 2;
+
+
+
 		public List<GUIControl> Controls = new List<GUIControl>();
 
 		public int X;

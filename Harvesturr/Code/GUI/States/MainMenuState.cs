@@ -8,18 +8,12 @@ using System.Threading.Tasks;
 
 namespace Harvesturr {
 	class MainMenuState : GUIState {
-		public static int GUIButtonHeight = 40;
-		public static int GUIButtonWidth = 200;
-
-		public static int GUIPadding = 10;
-		public static int GUIRectHeight = GUIButtonHeight + GUIPadding * 2;
-
 		public override void Init() {
 			GameEngine.PauseGame(true);
 
 			int XOffset = 100;
 			int YOffset = 100;
-			int YSpacing = 50;
+			int YSpacing = GUIButtonHeight + GUIPadding;
 
 			GUIPanel Pnl = new GUIPanel();
 			{
