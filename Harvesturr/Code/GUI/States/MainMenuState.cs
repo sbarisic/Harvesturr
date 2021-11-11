@@ -39,6 +39,11 @@ namespace Harvesturr {
 			Pnl.AutoSize();
 			Pnl.AddPadding(20);
 			Controls.Add(Pnl);
+
+
+			GUICheckBox CB = new GUICheckBox(GUI.GUIFontLarge, "Test", 600, 200, 200, 50);
+			CB.Checked = true;
+			Controls.Add(CB);
 		}
 
 		private void BtnContinue_OnClick() {

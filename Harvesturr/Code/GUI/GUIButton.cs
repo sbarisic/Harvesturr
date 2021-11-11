@@ -95,6 +95,8 @@ namespace Harvesturr {
 
 				Raylib.DrawTextEx(Font, Text, Pos, FontSize, FontSpacing, FontColor);
 			}
+			
+			base.Draw();
 		}
 
 		public override void CalcAutoWidth() {

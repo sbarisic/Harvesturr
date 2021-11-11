@@ -64,6 +64,7 @@ namespace Harvesturr {
 		}
 
 		public virtual void Draw() {
+			Raylib.DrawRectangleLines(X, Y, W, H, Color.RED);
 		}
 
 		public virtual void AutoSize() {

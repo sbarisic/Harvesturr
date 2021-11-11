@@ -48,6 +48,8 @@ namespace Harvesturr {
 
 			foreach (GUIControl C in Controls)
 				C.Draw();
+			
+			base.Draw();
 		}
 
 		public override void AutoSize() {
