@@ -33,12 +33,7 @@ namespace Harvesturr {
 		public float FontSpacing;
 		public int FontPadding;
 
-		public GUICheckBox(Font Font, string Text, int X, int Y, int W, int H) : base() {
-			this.X = X;
-			this.Y = Y;
-			this.W = W;
-			this.H = H;
-
+		public GUICheckBox(Font Font, string Text) : base() {
 			this.Text = Text;
 			this.Font = Font;
 			FontSize = Font.baseSize;
@@ -81,6 +76,7 @@ namespace Harvesturr {
 		}
 
 		public override void Draw() {
+			CalculateXYWH(out int X, out int Y, out int W, out int H);
 			NPatchInfo NPatch = InfoDefault;
 
 			if (Disabled) {
@@ -107,7 +103,7 @@ namespace Harvesturr {
 				}
 			}
 
-			int WH = Math.Min(GUI.TexCheckbox.width, GUI.TexCheckbox.height);
+			int WH = Math.Min((int)InfoDefault.sourceRec.width, (int)InfoDefault.sourceRec.height);
 			Raylib.DrawTextureNPatch(GUI.TexCheckbox, NPatch, new Rectangle(X + W - WH, Y + (H / 2) - WH / 2, WH, WH), Vector2.Zero, 0, Color.WHITE);
 
 			if (Text != null) {
@@ -119,36 +115,11 @@ namespace Harvesturr {
 			}
 
 			base.Draw();
-			/*NPatchInfo NPatch = InfoDefault;
-
-			if (Disabled) {
-				NPatch = InfoDisabled;
-			} else {
-				if (OnCheckToggle != null && (OnCheckToggle?.Invoke() ?? false))
-					NPatch = InfoDefaultOn;
-
-				if (IsHovered) {
-					NPatch = InfoHover;
-
-					if (GUI.MouseLeft)
-						NPatch = InfoPress;
-				}
-			}
-
-			Raylib.DrawTextureNPatch(GUI.TexButton, NPatch, new Rectangle(X, Y, W, H), Vector2.Zero, 0, Color.WHITE);
-
-			if (Text != null) {
-				Vector2 Pos = new Vector2(X, Y) + new Vector2(W, H) / 2;
-				Vector2 Size = Raylib.MeasureTextEx(Font, Text, FontSize, FontSpacing);
-				Pos = Pos - Size / 2;
-
-				Raylib.DrawTextEx(Font, Text, Pos, FontSize, FontSpacing, FontColor);
-			}*/
 		}
 
-		public override void CalcAutoWidth() {
+		/*public override void CalcAutoWidth() {
 			//Vector2 Size = Raylib.MeasureTextEx(Font, Text, FontSize, FontSpacing);
 			//W = 20 + (int)Size.X;
-		}
+		}*/
 	}
 }

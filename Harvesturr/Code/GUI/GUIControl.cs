@@ -14,16 +14,29 @@ namespace Harvesturr {
 	public delegate void OnClickFunc();
 	public delegate bool CheckToggleFunc();
 
+	enum GUIControlLayout {
+		Absolute,
+		ParentRelative
+	}
+
 	class GUIControl {
-		public int X;
-		public int Y;
-		public int W;
-		public int H;
+		public const int SIZE_AUTO = -1;
+
+		public int Left = 0;
+		public int Top = 0;
+		public int Bottom = 0;
+		public int Right = 0;
+
+		public int Width = SIZE_AUTO;
+		public int Height = SIZE_AUTO;
+
+		public GUIControlLayout Layout = GUIControlLayout.Absolute;
 
 		public bool Disabled;
 
 		public bool IsHovered {
 			get {
+				CalculateXYWH(out int X, out int Y, out int W, out int H);
 				return Utils.IsInside(new Rectangle(X, Y, W, H), GUI.MousePos);
 			}
 		}
@@ -39,7 +52,7 @@ namespace Harvesturr {
 				return false;
 			}
 
-			if (!IsHovered) 
+			if (!IsHovered)
 				PressedInside = false;
 
 			if (PressedInside && IsHovered && GUI.MouseLeftReleased) {
@@ -56,21 +69,48 @@ namespace Harvesturr {
 		public virtual void Update() {
 		}
 
-		public virtual void AddPadding(int Padding) {
+		public void SetPadding(int Padding) {
+			Top = Left = Bottom = Right = Padding;
+		}
+
+		public void CalculateXYWH(out int X, out int Y, out int W, out int H) {
+			GUIControl Parent = null;
+			X = Y = W = H = -2;
+
+			if (Layout == GUIControlLayout.Absolute) {
+				X = Left;
+				Y = Top;
+
+				W = Width;
+				H = Height;
+			} else if (Layout == GUIControlLayout.ParentRelative) {
+				Parent.CalculateXYWH(out int PX, out int PY, out int PW, out int PH);
+
+				X = PX + Left;
+				Y = PY + Top;
+
+				W = PW - Left - Right;
+				H = PH - Right - Bottom;
+			}
+		}
+
+		/*public virtual void AddPadding(int Padding) {
 			X -= Padding;
 			Y -= Padding;
 			W += Padding * 2;
 			H += Padding * 2;
-		}
+		}*/
 
 		public virtual void Draw() {
+			CalculateXYWH(out int X, out int Y, out int W, out int H);
+
 			Raylib.DrawRectangleLines(X, Y, W, H, Color.RED);
 		}
 
-		public virtual void AutoSize() {
+		/*public virtual void AutoSize() {
 		}
 
 		public virtual void CalcAutoWidth() {
-		}
+		}*/
 	}
 }

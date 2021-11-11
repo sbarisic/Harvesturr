@@ -24,12 +24,12 @@ namespace Harvesturr {
 			Controls = new List<GUIControl>();
 		}
 
-		public void CalcAutoWidth() {
+		/*public void CalcAutoWidth() {
 			foreach (GUIControl C in Controls)
 				C.CalcAutoWidth();
-		}
+		}*/
 
-		public void CalcHorizontalLayout(int Padding) {
+		/*public void CalcHorizontalLayout(int Padding) {
 			int X = this.X;
 
 			foreach (GUIControl C in Controls) {
@@ -40,6 +40,6 @@ namespace Harvesturr {
 
 			X -= Padding;
 			W = X - this.X;
-		}
+		}*/
 	}
 }

@@ -37,7 +37,9 @@ namespace Harvesturr {
 				for (int i = 0; i < GameTools.Count; i++) {
 					GameTool T = GameTools[i];
 
-					GUIButton Btn = new GUIButton(GUI.GUIFontLarge, T.Name, 0, 0, 0, GUIButtonHeight);
+					GUIButton Btn = new GUIButton(GUI.GUIFontLarge, T.Name);
+					Btn.Height = GUIButtonHeight;
+
 					Btn.OnCheckToggle += () => T.Active;
 					Btn.OnClick += () => SelectTool(T);
 
@@ -63,15 +65,15 @@ namespace Harvesturr {
 		}
 
 		public override void RecalculatePositions() {
-			MainLayout.CalcAutoWidth();
+			/*MainLayout.CalcAutoWidth();
 			MainLayout.CalcHorizontalLayout(GUIPadding);
 
 			MainLayout.X = GameEngine.ScreenWidth / 2 - MainLayout.W / 2;
 			MainLayout.Y = GameEngine.ScreenHeight - GUIButtonHeight - GUIPadding;
-			MainLayout.CalcHorizontalLayout(GUIPadding);
+			MainLayout.CalcHorizontalLayout(GUIPadding);*/
 
-			BottomPanel.AutoSize();
-			BottomPanel.AddPadding(GUIPadding);
+			// BottomPanel.AutoSize();
+			// BottomPanel.AddPadding(GUIPadding);
 		}
 
 		public override void UpdateInput(float Dt) {

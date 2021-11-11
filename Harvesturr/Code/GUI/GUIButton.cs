@@ -28,11 +28,7 @@ namespace Harvesturr {
 		public event OnClickFunc OnClick;
 		public event CheckToggleFunc OnCheckToggle;
 
-		public GUIButton(Font Font, string Text, int X, int Y, int W, int H) : base() {
-			this.X = X;
-			this.Y = Y;
-			this.W = W;
-			this.H = H;
+		public GUIButton(Font Font, string Text) : base() {
 			this.Text = Text;
 
 			this.Font = Font;
@@ -70,6 +66,7 @@ namespace Harvesturr {
 		}
 
 		public override void Draw() {
+			CalculateXYWH(out int X, out int Y, out int W, out int H);
 			NPatchInfo NPatch = InfoDefault;
 
 			if (Disabled) {
@@ -99,9 +96,9 @@ namespace Harvesturr {
 			base.Draw();
 		}
 
-		public override void CalcAutoWidth() {
+		/*public override void CalcAutoWidth() {
 			Vector2 Size = Raylib.MeasureTextEx(Font, Text, FontSize, FontSpacing);
 			W = (int)Size.X + FontPadding * 2;
-		}
+		}*/
 	}
 }

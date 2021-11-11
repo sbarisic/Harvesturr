@@ -16,34 +16,50 @@ namespace Harvesturr {
 			int YSpacing = GUIButtonHeight + GUIPadding;
 
 			GUIPanel Pnl = new GUIPanel();
+			Pnl.Layout = GUIControlLayout.Absolute;
+			Pnl.Left = 100;
+			Pnl.Top = 100;
+
 			{
-				GUIButton BtnContinue = new GUIButton(GUI.GUIFontLarge, "Continue", XOffset, YOffset += YSpacing, GUIButtonWidth, GUIButtonHeight);
+				int BtnOffset = 0;
+
+				GUIButton BtnContinue = new GUIButton(GUI.GUIFontLarge, "Continue");
+				BtnContinue.SetPadding(GUIPadding);
+				BtnContinue.Width = GUIButtonWidth;
+				BtnContinue.Height = GUIButtonHeight;
 				BtnContinue.OnClick += BtnContinue_OnClick;
 				BtnContinue.Disabled = !GameEngine.IsGameRunning;
 				Pnl.Controls.Add(BtnContinue);
 
-				GUIButton BtnNewGame = new GUIButton(GUI.GUIFontLarge, "New Game", XOffset, YOffset += YSpacing, GUIButtonWidth, GUIButtonHeight);
+				GUIButton BtnNewGame = new GUIButton(GUI.GUIFontLarge, "New Game");
+				BtnContinue.SetPadding(GUIPadding);
+				BtnNewGame.Width = GUIButtonWidth;
+				BtnNewGame.Height = GUIButtonHeight;
 				BtnNewGame.OnClick += BtnNewGame_OnClick;
 				Pnl.Controls.Add(BtnNewGame);
 
-				GUIButton BtnSettings = new GUIButton(GUI.GUIFontLarge, "Settings", XOffset, YOffset += YSpacing, GUIButtonWidth, GUIButtonHeight);
+				GUIButton BtnSettings = new GUIButton(GUI.GUIFontLarge, "Settings");
+				BtnContinue.SetPadding(GUIPadding);
+				BtnSettings.Width = GUIButtonWidth;
+				BtnSettings.Height = GUIButtonHeight;
 				BtnSettings.OnClick += BtnSettings_OnClick;
 				BtnSettings.Disabled = true;
 				Pnl.Controls.Add(BtnSettings);
 
-				GUIButton BtnQuit = new GUIButton(GUI.GUIFontLarge, "Quit", XOffset, YOffset += YSpacing, GUIButtonWidth, GUIButtonHeight);
+				GUIButton BtnQuit = new GUIButton(GUI.GUIFontLarge, "Quit");
+				BtnContinue.SetPadding(GUIPadding);
+				BtnQuit.Width = GUIButtonWidth;
+				BtnQuit.Height = GUIButtonHeight;
 				BtnQuit.OnClick += BtnQuit_OnClick;
 				Pnl.Controls.Add(BtnQuit);
 			}
 
-			Pnl.AutoSize();
-			Pnl.AddPadding(20);
 			Controls.Add(Pnl);
 
 
-			GUICheckBox CB = new GUICheckBox(GUI.GUIFontLarge, "Test", 600, 200, 200, 50);
+			/*GUICheckBox CB = new GUICheckBox(GUI.GUIFontLarge, "Test", 600, 200, 200, 50);
 			CB.Checked = true;
-			Controls.Add(CB);
+			Controls.Add(CB);*/
 		}
 
 		private void BtnContinue_OnClick() {

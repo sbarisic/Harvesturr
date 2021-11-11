@@ -43,6 +43,7 @@ namespace Harvesturr {
 		}
 
 		public override void Draw() {
+			CalculateXYWH(out int X, out int Y, out int W, out int H);
 			NPatchInfo NPatch = InfoDefault;
 			Raylib.DrawTextureNPatch(GUI.TexPanel, NPatch, new Rectangle(X, Y, W, H), Vector2.Zero, 0, Color.WHITE);
 
@@ -52,7 +53,7 @@ namespace Harvesturr {
 			base.Draw();
 		}
 
-		public override void AutoSize() {
+		/*public override void AutoSize() {
 			if (Controls.Count <= 0)
 				return;
 
@@ -73,6 +74,6 @@ namespace Harvesturr {
 			Y = MinY;
 			W = MaxX - MinX;
 			H = MaxY - MinY;
-		}
+		}*/
 	}
 }
