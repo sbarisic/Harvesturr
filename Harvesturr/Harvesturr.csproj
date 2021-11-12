@@ -387,6 +387,11 @@
   <ItemGroup>
     <TypeScriptCompile Include="data\maps\tileset.tsx" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\FML\FishMarkupLanguage\FishMarkupLanguage.csproj">
+      <Project>{deba5fb3-ec87-493f-9908-e04242fe290d}</Project>
+      <Name>FishMarkupLanguage</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
