@@ -42,6 +42,10 @@ namespace Harvesturr {
 			base.Update();
 		}
 
+		public override void CalculateXYWH(out int X, out int Y, out int W, out int H) {
+			base.CalculateXYWH(out X, out Y, out W, out H);
+		}
+
 		public override void Draw() {
 			CalculateXYWH(out int X, out int Y, out int W, out int H);
 			NPatchInfo NPatch = InfoDefault;

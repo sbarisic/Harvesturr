@@ -19,6 +19,8 @@ namespace Harvesturr {
 			Pnl.Layout = GUIControlLayout.Absolute;
 			Pnl.Left = 100;
 			Pnl.Top = 100;
+			Pnl.Width = GUIButtonWidth + GUIPadding * 2;
+			Pnl.Height = GUIButtonHeight * 4 + GUIPadding * 5;
 
 			{
 				int BtnOffset = 0;

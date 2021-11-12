@@ -27,8 +27,8 @@ namespace Harvesturr {
 		public int Bottom = 0;
 		public int Right = 0;
 
-		public int Width = SIZE_AUTO;
-		public int Height = SIZE_AUTO;
+		public int Width = 0;
+		public int Height = 0;
 
 		public GUIControlLayout Layout = GUIControlLayout.Absolute;
 
@@ -73,7 +73,7 @@ namespace Harvesturr {
 			Top = Left = Bottom = Right = Padding;
 		}
 
-		public void CalculateXYWH(out int X, out int Y, out int W, out int H) {
+		public virtual void CalculateXYWH(out int X, out int Y, out int W, out int H) {
 			GUIControl Parent = null;
 			X = Y = W = H = -2;
 
