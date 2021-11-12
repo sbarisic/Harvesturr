@@ -22,9 +22,6 @@ namespace Harvesturr {
 		List<GUIControl> Controls = new List<GUIControl>();
 		Node FlexRoot;
 
-		public int X;
-		public int Y;
-
 		public GUIState() {
 			Controls = new List<GUIControl>();
 			FlexRoot = Flex.CreateDefaultNode();

@@ -62,7 +62,7 @@ namespace Harvesturr {
 				return;
 
 			if (CheckClicked())
-				OnClick?.Invoke();
+				OnClick?.Invoke(this);
 		}
 
 		public override void Draw() {
@@ -72,7 +72,7 @@ namespace Harvesturr {
 			if (Disabled) {
 				NPatch = InfoDisabled;
 			} else {
-				if (OnCheckToggle != null && (OnCheckToggle?.Invoke() ?? false))
+				if (OnCheckToggle != null && (OnCheckToggle?.Invoke(this) ?? false))
 					NPatch = InfoDefaultOn;
 
 				if (IsHovered) {

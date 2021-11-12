@@ -12,102 +12,94 @@ using System.Diagnostics;
 using Flexbox;
 
 namespace Harvesturr {
-	public delegate void OnClickFunc();
-	public delegate bool CheckToggleFunc();
+    delegate void OnClickFunc(GUIControl Ctrl);
+    delegate bool CheckToggleFunc(GUIControl Ctrl);
 
-	class GUIControl {
-		public const int SIZE_AUTO = -1;
-		/*
-		public int Left = 0;
-		public int Top = 0;
-		public int Bottom = 0;
-		public int Right = 0;
+    class GUIControl {
+        public const int SIZE_AUTO = -1;
 
-		public int Width = 0;
-		public int Height = 0;
-		*/
-		List<GUIControl> Controls;
-		public Node FlexNode;
+        List<GUIControl> Controls;
+        public Node FlexNode;
 
-		public bool Disabled;
+        public bool Disabled;
 
-		public bool IsHovered {
-			get {
-				CalculateXYWH(out int X, out int Y, out int W, out int H);
-				return Utils.IsInside(new Rectangle(X, Y, W, H), GUI.MousePos);
-			}
-		}
+        public bool IsHovered {
+            get {
+                CalculateXYWH(out int X, out int Y, out int W, out int H);
+                return Utils.IsInside(new Rectangle(X, Y, W, H), GUI.MousePos);
+            }
+        }
 
-		public GUIControl() {
-			Disabled = false;
-			Controls = new List<GUIControl>();
-			FlexNode = Flex.CreateDefaultNode();
-		}
+        public GUIControl() {
+            Disabled = false;
+            Controls = new List<GUIControl>();
+            FlexNode = Flex.CreateDefaultNode();
+        }
 
-		public virtual void ApplyStyle(string Style) {
-			FlexNode.nodeStyle.Apply(Style);
-		}
+        public virtual void ApplyStyle(string Style) {
+            FlexNode.nodeStyle.Apply(Style);
+        }
 
-		bool PressedInside = false;
-		public virtual bool CheckClicked() {
-			if (Disabled) {
-				PressedInside = false;
-				return false;
-			}
+        bool PressedInside = false;
+        public virtual bool CheckClicked() {
+            if (Disabled) {
+                PressedInside = false;
+                return false;
+            }
 
-			if (!IsHovered)
-				PressedInside = false;
+            if (!IsHovered)
+                PressedInside = false;
 
-			if (PressedInside && IsHovered && GUI.MouseLeftReleased) {
-				PressedInside = false;
-				return true;
-			}
+            if (PressedInside && IsHovered && GUI.MouseLeftReleased) {
+                PressedInside = false;
+                return true;
+            }
 
-			if (IsHovered && GUI.MouseLeftPressed)
-				PressedInside = true;
+            if (IsHovered && GUI.MouseLeftPressed)
+                PressedInside = true;
 
-			return false;
-		}
+            return false;
+        }
 
-		public virtual void AddControl(GUIControl Ctrl) {
-			FlexNode.AddChild(Ctrl.FlexNode);
-			Controls.Add(Ctrl);
-		}
+        public virtual void AddControl(GUIControl Ctrl) {
+            FlexNode.AddChild(Ctrl.FlexNode);
+            Controls.Add(Ctrl);
+        }
 
-		public virtual void Update() {
-			if (Disabled)
-				return;
+        public virtual void Update() {
+            if (Disabled)
+                return;
 
-			foreach (GUIControl C in Controls)
-				C.Update();
-		}
+            foreach (GUIControl C in Controls)
+                C.Update();
+        }
 
-		public virtual void CalculateXYWH(out int X, out int Y, out int W, out int H) {
-			X = (int)FlexNode.LayoutGetX();
-			Y = (int)FlexNode.LayoutGetY();
-			W = (int)FlexNode.LayoutGetWidth();
-			H = (int)FlexNode.LayoutGetHeight();
-		}
+        public virtual void CalculateXYWH(out int X, out int Y, out int W, out int H) {
+            X = (int)FlexNode.LayoutGetX();
+            Y = (int)FlexNode.LayoutGetY();
+            W = (int)FlexNode.LayoutGetWidth();
+            H = (int)FlexNode.LayoutGetHeight();
+        }
 
-		/*public virtual void AddPadding(int Padding) {
+        /*public virtual void AddPadding(int Padding) {
 			X -= Padding;
 			Y -= Padding;
 			W += Padding * 2;
 			H += Padding * 2;
 		}*/
 
-		public virtual void Draw() {
-			CalculateXYWH(out int X, out int Y, out int W, out int H);
-			//Raylib.DrawRectangleLines(X, Y, W, H, Color.RED);
+        public virtual void Draw() {
+            CalculateXYWH(out int X, out int Y, out int W, out int H);
+            //Raylib.DrawRectangleLines(X, Y, W, H, Color.RED);
 
-			foreach (GUIControl C in Controls)
-				C.Draw();
-		}
+            foreach (GUIControl C in Controls)
+                C.Draw();
+        }
 
-		/*public virtual void AutoSize() {
+        /*public virtual void AutoSize() {
 		}
 
 		public virtual void CalcAutoWidth() {
 		}*/
-	}
+    }
 }

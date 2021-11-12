@@ -71,7 +71,7 @@ namespace Harvesturr {
 
 			if (CheckClicked()) {
 				Checked = !Checked;
-				OnClick?.Invoke();
+				OnClick?.Invoke(this);
 			}
 		}
 

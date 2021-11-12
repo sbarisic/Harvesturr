@@ -54,11 +54,11 @@ namespace Harvesturr {
 			AddControl(Pnl);
 		}
 
-		private void BtnContinue_OnClick() {
+		private void BtnContinue_OnClick(GUIControl Ctrl) {
 			GUI.ChangeState(new InGameState() { PreserveCamera = true });
 		}
 
-		private void BtnNewGame_OnClick() {
+		private void BtnNewGame_OnClick(GUIControl Ctrl) {
 			GameMap.Load("test");
 			GameEngine.IsGameRunning = true;
 
@@ -86,11 +86,11 @@ namespace Harvesturr {
 			GUI.ChangeState(new InGameState());
 		}
 
-		private void BtnSettings_OnClick() {
+		private void BtnSettings_OnClick(GUIControl Ctrl) {
 
 		}
 
-		private void BtnQuit_OnClick() {
+		private void BtnQuit_OnClick(GUIControl Ctrl) {
 			Environment.Exit(0);
 		}
 	}
