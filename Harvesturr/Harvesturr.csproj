@@ -65,7 +65,6 @@
     <Compile Include="Code\GUI\GUICheckBox.cs" />
     <Compile Include="Code\GUI\GUIButton.cs" />
     <Compile Include="Code\GUI\GUIState.cs" />
-    <Compile Include="Code\GUI\GUILayout.cs" />
     <Compile Include="Code\GUI\GUIControl.cs" />
     <Compile Include="Code\GUI\States\MainMenuState.cs" />
     <Compile Include="Code\GUI\States\InGameState.cs" />
@@ -107,6 +106,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="Code\GUI\Flexbox\LICENSE" />
     <None Include="data\fonts\pixantiqua.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

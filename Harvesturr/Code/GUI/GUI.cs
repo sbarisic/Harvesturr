@@ -9,6 +9,7 @@ using Raylib_cs;
 using Raygui_cs;
 using System.Numerics;
 using System.Diagnostics;
+using Flexbox;
 
 namespace Harvesturr {
 	static class GUI {
@@ -42,7 +43,6 @@ namespace Harvesturr {
 		public static void ChangeState(GUIState NewState) {
 			CurrentState = NewState;
 			CurrentState.Init();
-			CurrentState.RecalculatePositions();
 		}
 
 		public static void UpdateInput(float Dt) {
@@ -58,10 +58,7 @@ namespace Harvesturr {
 		}
 
 		public static void UpdateGUI(float Dt) {
-			if (CurrentState != null) {
-				if (Raylib.IsWindowResized())
-					CurrentState.RecalculatePositions();
-
+			if (CurrentState != null) {				
 				CurrentState.Update(Dt);
 			}
 		}

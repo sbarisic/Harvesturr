@@ -13,11 +13,7 @@ using System.Diagnostics;
 namespace Harvesturr {
 	class GUIPanel : GUIControl {
 		NPatchInfo InfoDefault;
-
-		public List<GUIControl> Controls;
-
 		public GUIPanel() : base() {
-			Controls = new List<GUIControl>();
 			InfoDefault = CreateInfo(0, 0, 64, 20);
 		}
 
@@ -32,16 +28,6 @@ namespace Harvesturr {
 			return I;
 		}
 
-		public override void Update() {
-			if (Disabled)
-				return;
-
-			foreach (GUIControl C in Controls)
-				C.Update();
-
-			base.Update();
-		}
-
 		public override void CalculateXYWH(out int X, out int Y, out int W, out int H) {
 			base.CalculateXYWH(out X, out Y, out W, out H);
 		}
@@ -51,9 +37,6 @@ namespace Harvesturr {
 			NPatchInfo NPatch = InfoDefault;
 			Raylib.DrawTextureNPatch(GUI.TexPanel, NPatch, new Rectangle(X, Y, W, H), Vector2.Zero, 0, Color.WHITE);
 
-			foreach (GUIControl C in Controls)
-				C.Draw();
-			
 			base.Draw();
 		}
 

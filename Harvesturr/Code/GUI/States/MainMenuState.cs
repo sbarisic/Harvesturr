@@ -11,57 +11,47 @@ namespace Harvesturr {
 		public override void Init() {
 			GameEngine.PauseGame(true);
 
-			int XOffset = 100;
-			int YOffset = 100;
-			int YSpacing = GUIButtonHeight + GUIPadding;
-
 			GUIPanel Pnl = new GUIPanel();
-			Pnl.Layout = GUIControlLayout.Absolute;
-			Pnl.Left = 100;
-			Pnl.Top = 100;
-			Pnl.Width = GUIButtonWidth + GUIPadding * 2;
-			Pnl.Height = GUIButtonHeight * 4 + GUIPadding * 5;
+			Pnl.ApplyStyle(@"
+				position: absolute;
+				left: 100px;
+				top: 100px;
+				width: 30%;
+				height: 40%;
+
+				padding: 10px;
+				align-items: center;
+				flex-direction: column;
+				justify-content: space-between;
+			");
 
 			{
-				int BtnOffset = 0;
+				string ButtonStyle = "width: 100%; height: 23%;";
 
 				GUIButton BtnContinue = new GUIButton(GUI.GUIFontLarge, "Continue");
-				BtnContinue.SetPadding(GUIPadding);
-				BtnContinue.Width = GUIButtonWidth;
-				BtnContinue.Height = GUIButtonHeight;
-				BtnContinue.OnClick += BtnContinue_OnClick;
-				BtnContinue.Disabled = !GameEngine.IsGameRunning;
-				Pnl.Controls.Add(BtnContinue);
+				BtnContinue.ApplyStyle(ButtonStyle);
+				BtnContinue.OnClick += BtnContinue_OnClick; // TODO: from script
+				BtnContinue.Disabled = !GameEngine.IsGameRunning; // TODO: from script
+				Pnl.AddControl(BtnContinue);
 
 				GUIButton BtnNewGame = new GUIButton(GUI.GUIFontLarge, "New Game");
-				BtnContinue.SetPadding(GUIPadding);
-				BtnNewGame.Width = GUIButtonWidth;
-				BtnNewGame.Height = GUIButtonHeight;
-				BtnNewGame.OnClick += BtnNewGame_OnClick;
-				Pnl.Controls.Add(BtnNewGame);
+				BtnNewGame.ApplyStyle(ButtonStyle);
+				BtnNewGame.OnClick += BtnNewGame_OnClick; // TODO: from script
+				Pnl.AddControl(BtnNewGame);
 
 				GUIButton BtnSettings = new GUIButton(GUI.GUIFontLarge, "Settings");
-				BtnContinue.SetPadding(GUIPadding);
-				BtnSettings.Width = GUIButtonWidth;
-				BtnSettings.Height = GUIButtonHeight;
-				BtnSettings.OnClick += BtnSettings_OnClick;
+				BtnSettings.ApplyStyle(ButtonStyle);
+				BtnSettings.OnClick += BtnSettings_OnClick; // TODO: from script
 				BtnSettings.Disabled = true;
-				Pnl.Controls.Add(BtnSettings);
+				Pnl.AddControl(BtnSettings);
 
 				GUIButton BtnQuit = new GUIButton(GUI.GUIFontLarge, "Quit");
-				BtnContinue.SetPadding(GUIPadding);
-				BtnQuit.Width = GUIButtonWidth;
-				BtnQuit.Height = GUIButtonHeight;
-				BtnQuit.OnClick += BtnQuit_OnClick;
-				Pnl.Controls.Add(BtnQuit);
+				BtnQuit.ApplyStyle(ButtonStyle);
+				BtnQuit.OnClick += BtnQuit_OnClick; // TODO: from script
+				Pnl.AddControl(BtnQuit);
 			}
 
-			Controls.Add(Pnl);
-
-
-			/*GUICheckBox CB = new GUICheckBox(GUI.GUIFontLarge, "Test", 600, 200, 200, 50);
-			CB.Checked = true;
-			Controls.Add(CB);*/
+			AddControl(Pnl);
 		}
 
 		private void BtnContinue_OnClick() {
@@ -102,10 +92,6 @@ namespace Harvesturr {
 
 		private void BtnQuit_OnClick() {
 			Environment.Exit(0);
-		}
-
-		public override void RecalculatePositions() {
-
 		}
 	}
 }

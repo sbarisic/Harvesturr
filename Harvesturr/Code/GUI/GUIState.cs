@@ -9,6 +9,7 @@ using Raylib_cs;
 using Raygui_cs;
 using System.Numerics;
 using System.Diagnostics;
+using Flexbox;
 
 namespace Harvesturr {
 	class GUIState {
@@ -18,29 +19,38 @@ namespace Harvesturr {
 		public static int GUIPadding = 10;
 		public static int GUIRectHeight = GUIButtonHeight + GUIPadding * 2;
 
-
-
-		public List<GUIControl> Controls = new List<GUIControl>();
+		List<GUIControl> Controls = new List<GUIControl>();
+		Node FlexRoot;
 
 		public int X;
 		public int Y;
 
 		public GUIState() {
 			Controls = new List<GUIControl>();
+			FlexRoot = Flex.CreateDefaultNode();
+			FlexRoot.nodeStyle.Apply("display: flex;");
 		}
 
-		public virtual void Init() {		
-		}
-
-		public virtual void RecalculatePositions() {		
+		public virtual void Init() {
 		}
 
 		public virtual void UpdateInput(float Dt) {
 		}
 
+		public virtual void AddControl(GUIControl Ctrl) {
+			Controls.Add(Ctrl);
+			FlexRoot.AddChild(Ctrl.FlexNode);
+		}
+
+		public virtual IEnumerable<GUIControl> GetControls() {
+			return Controls;
+		}
+
 		public virtual void Update(float Dt) {
-			for (int i = 0; i < Controls.Count; i++) 
-				Controls[i].Update();			
+			Flex.CalculateLayout(FlexRoot, GameEngine.ScreenWidth, GameEngine.ScreenHeight, Direction.LTR);
+
+			for (int i = 0; i < Controls.Count; i++)
+				Controls[i].Update();
 		}
 
 		public virtual void DrawScreen() {

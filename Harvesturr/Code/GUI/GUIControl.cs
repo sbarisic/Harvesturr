@@ -9,19 +9,15 @@ using Raylib_cs;
 using Raygui_cs;
 using System.Numerics;
 using System.Diagnostics;
+using Flexbox;
 
 namespace Harvesturr {
 	public delegate void OnClickFunc();
 	public delegate bool CheckToggleFunc();
 
-	enum GUIControlLayout {
-		Absolute,
-		ParentRelative
-	}
-
 	class GUIControl {
 		public const int SIZE_AUTO = -1;
-
+		/*
 		public int Left = 0;
 		public int Top = 0;
 		public int Bottom = 0;
@@ -29,8 +25,9 @@ namespace Harvesturr {
 
 		public int Width = 0;
 		public int Height = 0;
-
-		public GUIControlLayout Layout = GUIControlLayout.Absolute;
+		*/
+		List<GUIControl> Controls;
+		public Node FlexNode;
 
 		public bool Disabled;
 
@@ -43,6 +40,12 @@ namespace Harvesturr {
 
 		public GUIControl() {
 			Disabled = false;
+			Controls = new List<GUIControl>();
+			FlexNode = Flex.CreateDefaultNode();
+		}
+
+		public virtual void ApplyStyle(string Style) {
+			FlexNode.nodeStyle.Apply(Style);
 		}
 
 		bool PressedInside = false;
@@ -66,32 +69,24 @@ namespace Harvesturr {
 			return false;
 		}
 
-		public virtual void Update() {
+		public virtual void AddControl(GUIControl Ctrl) {
+			FlexNode.AddChild(Ctrl.FlexNode);
+			Controls.Add(Ctrl);
 		}
 
-		public void SetPadding(int Padding) {
-			Top = Left = Bottom = Right = Padding;
+		public virtual void Update() {
+			if (Disabled)
+				return;
+
+			foreach (GUIControl C in Controls)
+				C.Update();
 		}
 
 		public virtual void CalculateXYWH(out int X, out int Y, out int W, out int H) {
-			GUIControl Parent = null;
-			X = Y = W = H = -2;
-
-			if (Layout == GUIControlLayout.Absolute) {
-				X = Left;
-				Y = Top;
-
-				W = Width;
-				H = Height;
-			} else if (Layout == GUIControlLayout.ParentRelative) {
-				Parent.CalculateXYWH(out int PX, out int PY, out int PW, out int PH);
-
-				X = PX + Left;
-				Y = PY + Top;
-
-				W = PW - Left - Right;
-				H = PH - Right - Bottom;
-			}
+			X = (int)FlexNode.LayoutGetX();
+			Y = (int)FlexNode.LayoutGetY();
+			W = (int)FlexNode.LayoutGetWidth();
+			H = (int)FlexNode.LayoutGetHeight();
 		}
 
 		/*public virtual void AddPadding(int Padding) {
@@ -103,8 +98,10 @@ namespace Harvesturr {
 
 		public virtual void Draw() {
 			CalculateXYWH(out int X, out int Y, out int W, out int H);
+			//Raylib.DrawRectangleLines(X, Y, W, H, Color.RED);
 
-			Raylib.DrawRectangleLines(X, Y, W, H, Color.RED);
+			foreach (GUIControl C in Controls)
+				C.Draw();
 		}
 
 		/*public virtual void AutoSize() {
