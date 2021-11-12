@@ -1,0 +1,19 @@
+
+GUIPanel Style = [[
+	position: absolute;
+	left: 100px;
+	top: 100px;
+	width: 30%;
+	height: 40%;
+
+	padding: 10px;
+	align-items: center;
+	flex-direction: column;
+	justify-content: space-between;
+]] {
+
+	// GUIButton Style = [[ width: 100%; height: 23%; ]] OnClick = "BtnContinue_OnClick" Text = "Continue";
+
+
+}
+
