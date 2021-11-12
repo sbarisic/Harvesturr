@@ -48,6 +48,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Code\GUI\Flexbox\Config.cs" />
+    <Compile Include="Code\GUI\Flexbox\Constant.cs" />
+    <Compile Include="Code\GUI\Flexbox\Enums.cs" />
+    <Compile Include="Code\GUI\Flexbox\Flex.cs" />
+    <Compile Include="Code\GUI\Flexbox\Flex.Layout.cs" />
+    <Compile Include="Code\GUI\Flexbox\Flex.Parser.cs" />
+    <Compile Include="Code\GUI\Flexbox\Node.cs" />
+    <Compile Include="Code\GUI\Flexbox\Node.Layout.cs" />
+    <Compile Include="Code\GUI\Flexbox\Node.Style.cs" />
+    <Compile Include="Code\GUI\Flexbox\Size.cs" />
+    <Compile Include="Code\GUI\Flexbox\Style.cs" />
+    <Compile Include="Code\GUI\Flexbox\Utils.cs" />
+    <Compile Include="Code\GUI\Flexbox\Value.cs" />
     <Compile Include="Code\GUI\GUIPanel.cs" />
     <Compile Include="Code\GUI\GUICheckBox.cs" />
     <Compile Include="Code\GUI\GUIButton.cs" />
