@@ -1,4 +1,5 @@
 ﻿using Raylib_cs;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,144 +8,156 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Harvesturr {
-	class InGameState : GUIState {
-		// public static Color GUIPanelColor;
+    class InGameState : GUIState {
+        // public static Color GUIPanelColor;
 
-		//public static int GUIButtonHeight = 40;
-		//public static int GUIPadding = 10;
-		//public static int GUIRectHeight = GUIButtonHeight + GUIPadding * 2;
+        //public static int GUIButtonHeight = 40;
+        //public static int GUIPadding = 10;
+        //public static int GUIRectHeight = GUIButtonHeight + GUIPadding * 2;
 
-		public bool PreserveCamera = false;
+        public bool PreserveCamera = false;
 
-		GUIPanel BottomPanel;
-		List<GameTool> GameTools;
-		GameTool ActiveGameTool;
+        GUIPanel BottomPanel;
+        List<GameTool> GameTools;
+        GameTool ActiveGameTool;
 
-		public override void Init() {
-			GameEngine.PauseGame(false);
+        public override void Init() {
+            GameEngine.PauseGame(false);
 
-			if (!PreserveCamera)
-				GameEngine.GameCamera = new Camera2D(new Vector2(GameEngine.ScreenWidth, GameEngine.ScreenHeight) / 2, Vector2.Zero, 0, 2);
+            if (!PreserveCamera)
+                GameEngine.GameCamera = new Camera2D(new Vector2(GameEngine.ScreenWidth, GameEngine.ScreenHeight) / 2, Vector2.Zero, 0, 2);
 
-			// GUIPanelColor = Raylib.Fade(Color.BLACK, 0.5f);
-			GameTools = new List<GameTool>(IsGameToolAttribute.CreateAllGameTools().OrderBy(T => T.GameToolAttribute.Index));
 
-			BottomPanel = new GUIPanel();
-			{
-				for (int i = 0; i < GameTools.Count; i++) {
-					GameTool T = GameTools[i];
+            BottomPanel = new GUIPanel();
+            BottomPanel.ApplyStyle(@"
+                position: absolute;
+                left: 10%;
+                right: 10%;
+                bottom: 1%;
+                height: 64px;
 
-					GUIButton Btn = new GUIButton(GUI.GUIFontLarge, T.Name);
-					Btn.OnCheckToggle += (Ctrl) => T.Active;
-					Btn.OnClick += (Ctrl) => SelectTool(T);
-					BottomPanel.AddControl(Btn);
-				}
+                padding: 5px;
+                align-items: center;
+                flex-direction: row;
+                justify-content: flex-start;
+            ");
 
-				SelectTool(GameTools.Where(T => T is GameToolPicker).FirstOrDefault());
-			}
-			AddControl(BottomPanel);
-		}
+            GameTools = new List<GameTool>(IsGameToolAttribute.CreateAllGameTools().OrderBy(T => T.GameToolAttribute.Index));
 
-		void SelectTool(GameTool T) {
-			if (ActiveGameTool == T)
-				return;
+            for (int i = 0; i < GameTools.Count; i++) {
+                GameTool T = GameTools[i];
 
-			for (int j = 0; j < GameTools.Count; j++)
-				GameTools[j].Active = false;
+                GUIButton Btn = new GUIButton(GUI.GUIFontLarge, T.Name);
+                Btn.ApplyStyle("width: 180px; height: 100%;");
+                Btn.OnCheckToggle += (Ctrl) => T.Active;
+                Btn.OnClick += (Ctrl) => SelectTool(T);
+                BottomPanel.AddControl(Btn);
+            }
 
-			T.Active = true;
-			T.OnSelected();
-			ActiveGameTool = T;
-		}
+            SelectTool(GameTools.Where(T => T is GameToolPicker).FirstOrDefault());
+            AddControl(BottomPanel);
+        }
 
-		public override void UpdateInput(float Dt) {
-			GameEngine.Zoom = GameEngine.GameCamera.zoom;
-			GameEngine.DrawZoomDetails = GameEngine.Zoom >= 2;
+        void SelectTool(GameTool T) {
+            if (ActiveGameTool == T)
+                return;
 
-			if (Raylib.IsKeyPressed(KeyboardKey.KEY_ESCAPE))
-				GUI.ChangeState(new MainMenuState());
+            for (int j = 0; j < GameTools.Count; j++)
+                GameTools[j].Active = false;
 
-			float Amt = 100 * Dt;
+            T.Active = true;
+            T.OnSelected();
+            ActiveGameTool = T;
+        }
 
-			if (Raylib.IsKeyDown(KeyboardKey.KEY_W))
-				GameEngine.GameCamera.target += new Vector2(0, -Amt);
+        public override void UpdateInput(float Dt) {
+            GameEngine.Zoom = GameEngine.GameCamera.zoom;
+            GameEngine.DrawZoomDetails = GameEngine.Zoom >= 2;
 
-			if (Raylib.IsKeyDown(KeyboardKey.KEY_A))
-				GameEngine.GameCamera.target += new Vector2(-Amt, 0);
+            if (Raylib.IsKeyPressed(KeyboardKey.KEY_ESCAPE))
+                GUI.ChangeState(new MainMenuState());
 
-			if (Raylib.IsKeyDown(KeyboardKey.KEY_S))
-				GameEngine.GameCamera.target += new Vector2(0, Amt);
+            float Amt = 100 * Dt;
 
-			if (Raylib.IsKeyDown(KeyboardKey.KEY_D))
-				GameEngine.GameCamera.target += new Vector2(Amt, 0);
+            if (Raylib.IsKeyDown(KeyboardKey.KEY_W))
+                GameEngine.GameCamera.target += new Vector2(0, -Amt);
 
-			if (!GameEngine.IsMouseDragging) {
-				int Wheel = (int)Raylib.GetMouseWheelMove();
-				if (Wheel != 0) {
-					GameEngine.GameCamera.zoom += Wheel / 10.0f;
+            if (Raylib.IsKeyDown(KeyboardKey.KEY_A))
+                GameEngine.GameCamera.target += new Vector2(-Amt, 0);
 
-					if (GameEngine.GameCamera.zoom < 0.5f)
-						GameEngine.GameCamera.zoom = 0.5f;
+            if (Raylib.IsKeyDown(KeyboardKey.KEY_S))
+                GameEngine.GameCamera.target += new Vector2(0, Amt);
 
-					if (GameEngine.GameCamera.zoom > 3)
-						GameEngine.GameCamera.zoom = 3;
-				}
-			}
+            if (Raylib.IsKeyDown(KeyboardKey.KEY_D))
+                GameEngine.GameCamera.target += new Vector2(Amt, 0);
 
-			if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_MIDDLE_BUTTON))
-				GameEngine.GameCamera.zoom = 2;
+            if (!GameEngine.IsMouseDragging) {
+                int Wheel = (int)Raylib.GetMouseWheelMove();
+                if (Wheel != 0) {
+                    GameEngine.GameCamera.zoom += Wheel / 10.0f;
 
-			if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_RIGHT_BUTTON)) {
-				GameEngine.MouseDragStartMouse = GameEngine.MousePosScreen;
-				GameEngine.MouseDragStartLocation = GameEngine.GameCamera.target;
-				GameEngine.IsMouseDragging = true;
-			} else if (Raylib.IsMouseButtonReleased(MouseButton.MOUSE_RIGHT_BUTTON)) {
-				GameEngine.IsMouseDragging = false;
-			}
+                    if (GameEngine.GameCamera.zoom < 0.5f)
+                        GameEngine.GameCamera.zoom = 0.5f;
 
-			if (GameEngine.IsMouseDragging) {
-				Vector2 Delta = (GameEngine.MouseDragStartMouse - GameEngine.MousePosScreen) * (1.0f / GameEngine.GameCamera.zoom);
-				GameEngine.GameCamera.target = GameEngine.MouseDragStartLocation + Delta;
-			}
-		}
+                    if (GameEngine.GameCamera.zoom > 3)
+                        GameEngine.GameCamera.zoom = 3;
+                }
+            }
 
-		public override void Update(float Dt) {
-			base.Update(Dt);
+            if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_MIDDLE_BUTTON))
+                GameEngine.GameCamera.zoom = 2;
 
-			foreach (GUIControl C in GetControls())
-				if (C.IsHovered)
-					return;
+            if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_RIGHT_BUTTON)) {
+                GameEngine.MouseDragStartMouse = GameEngine.MousePosScreen;
+                GameEngine.MouseDragStartLocation = GameEngine.GameCamera.target;
+                GameEngine.IsMouseDragging = true;
+            } else if (Raylib.IsMouseButtonReleased(MouseButton.MOUSE_RIGHT_BUTTON)) {
+                GameEngine.IsMouseDragging = false;
+            }
 
-			ActiveGameTool?.Update(Dt);
+            if (GameEngine.IsMouseDragging) {
+                Vector2 Delta = (GameEngine.MouseDragStartMouse - GameEngine.MousePosScreen) * (1.0f / GameEngine.GameCamera.zoom);
+                GameEngine.GameCamera.target = GameEngine.MouseDragStartLocation + Delta;
+            }
+        }
 
-			if (GameMap.IsInBounds(GameEngine.MousePosWorld)) {
-				if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_LEFT_BUTTON))
-					ActiveGameTool?.OnWorldMousePress(GameEngine.MousePosWorld, true);
+        public override void Update(float Dt) {
+            base.Update(Dt);
 
-				if (Raylib.IsMouseButtonReleased(MouseButton.MOUSE_LEFT_BUTTON))
-					ActiveGameTool?.OnWorldMousePress(GameEngine.MousePosWorld, false);
-			}
-		}
+            foreach (GUIControl C in GetControls())
+                if (C.IsHovered)
+                    return;
 
-		public override void DrawScreen() {
-			// Raylib.DrawRectangle(0, GameEngine.ScreenHeight - GUIRectHeight, GameEngine.ScreenWidth, GUIRectHeight, GUIPanelColor);
-			// Raylib.DrawRectangle(0, 0, GameEngine.ScreenWidth, 24, GUIPanelColor);
+            ActiveGameTool?.Update(Dt);
 
-			if (GameEngine.DebugView) {
-				float FrameTime = Raylib.GetFrameTime();
-				float FPS = 1.0f / FrameTime;
-				Raylib.DrawText(string.Format("{0} / {1} Units, {2:0.000} ms, {3:0.00} FPS", GameEngine.GameUnits.Count(U => U != null), GameEngine.GameUnits.Length, FrameTime, FPS), 2, 2, 20, Color.WHITE);
-			}
+            if (GameMap.IsInBounds(GameEngine.MousePosWorld)) {
+                if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_LEFT_BUTTON))
+                    ActiveGameTool?.OnWorldMousePress(GameEngine.MousePosWorld, true);
 
-			string ResourcesText = "R$ " + GameEngine.Resources;
-			int TextWidth = Raylib.MeasureText(ResourcesText, 20);
-			Raylib.DrawText(ResourcesText, GameEngine.ScreenWidth - TextWidth - 10, 2, 20, Color.GREEN);
+                if (Raylib.IsMouseButtonReleased(MouseButton.MOUSE_LEFT_BUTTON))
+                    ActiveGameTool?.OnWorldMousePress(GameEngine.MousePosWorld, false);
+            }
+        }
 
-			base.DrawScreen();
-		}
+        public override void DrawScreen() {
+            // Raylib.DrawRectangle(0, GameEngine.ScreenHeight - GUIRectHeight, GameEngine.ScreenWidth, GUIRectHeight, GUIPanelColor);
+            // Raylib.DrawRectangle(0, 0, GameEngine.ScreenWidth, 24, GUIPanelColor);
 
-		public override void DrawWorld() {
-			ActiveGameTool?.DrawWorld();
-		}
-	}
+            if (GameEngine.DebugView) {
+                float FrameTime = Raylib.GetFrameTime();
+                float FPS = 1.0f / FrameTime;
+                Raylib.DrawText(string.Format("{0} / {1} Units, {2:0.000} ms, {3:0.00} FPS", GameEngine.GameUnits.Count(U => U != null), GameEngine.GameUnits.Length, FrameTime, FPS), 2, 2, 20, Color.WHITE);
+            }
+
+            string ResourcesText = "R$ " + GameEngine.Resources;
+            int TextWidth = Raylib.MeasureText(ResourcesText, 20);
+            Raylib.DrawText(ResourcesText, GameEngine.ScreenWidth - TextWidth - 10, 2, 20, Color.GREEN);
+
+            base.DrawScreen();
+        }
+
+        public override void DrawWorld() {
+            ActiveGameTool?.DrawWorld();
+        }
+    }
 }
