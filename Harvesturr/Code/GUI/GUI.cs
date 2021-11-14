@@ -134,19 +134,37 @@ namespace Harvesturr {
             DrawBar(Pos, Amt, Clr, out int BarHeight);
         }
 
-        public static IEnumerable<GUIControl> ParseFML(string FileName) {
+        public static IEnumerable<GUIControl> ParseFML(string FileName, GUIState State) {
             // TODO: Hack
-            
+            Type[] Types = Assembly.GetExecutingAssembly().GetTypes().Where(T => T.IsSubclassOf(typeof(GUIControl))).ToArray();
+
 
             FMLDocument Doc = FML.Parse(FileName);
             Doc.FlattenTemplates();
 
             foreach (FMLTag T in Doc.Tags)
-                yield return FMLTagToGUIControl(T);
+                yield return FMLTagToGUIControl(T, Types, State);
         }
 
-        public static GUIControl FMLTagToGUIControl(FMLTag T) {
+        public static GUIControl FMLTagToGUIControl(FMLTag T, Type[] Types, GUIState State) {
+            Type TagType = Types.Where(Type => Type.Name == T.TagName).FirstOrDefault();
+            GUIControl Ctrl = Activator.CreateInstance(TagType) as GUIControl;
 
+            KeyValuePair<string, object>[] Attrs = T.Attributes.ToArray();
+            foreach (var KV in Attrs) {
+                object Val = KV.Value;
+
+                if (Val is FMLHereDoc HD)
+                    Val = HD.Content;
+
+                Ctrl.SetAttribute(KV.Key, Val, State);
+            }
+
+            foreach (FMLTag C in T.Children)
+                Ctrl.AddControl(FMLTagToGUIControl(C, Types, State));
+            ;
+
+            return Ctrl;
         }
     }
 }

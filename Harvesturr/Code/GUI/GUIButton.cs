@@ -11,94 +11,115 @@ using System.Numerics;
 using System.Diagnostics;
 
 namespace Harvesturr {
-	class GUIButton : GUIControl {
-		NPatchInfo InfoDefault;
-		NPatchInfo InfoHover;
-		NPatchInfo InfoPress;
-		NPatchInfo InfoDisabled;
-		NPatchInfo InfoDefaultOn;
+    class GUIButton : GUIControl {
+        NPatchInfo InfoDefault;
+        NPatchInfo InfoHover;
+        NPatchInfo InfoPress;
+        NPatchInfo InfoDisabled;
+        NPatchInfo InfoDefaultOn;
 
-		public string Text;
-		public Font Font;
-		public int FontSize;
-		public Color FontColor;
-		public float FontSpacing;
-		public int FontPadding;
+        public string Text {
+            get; set;
+        }
 
-		public event OnClickFunc OnClick;
-		public event CheckToggleFunc OnCheckToggle;
+        public Font Font {
+            get; set;
+        }
 
-		public GUIButton(Font Font, string Text) : base() {
-			this.Text = Text;
+        public int FontSize {
+            get; set;
+        }
 
-			this.Font = Font;
-			FontSize = Font.baseSize;
-			FontColor = Color.WHITE;
-			FontSpacing = 1;
-			FontPadding = 15;
+        public Color FontColor {
+            get; set;
+        }
 
-			InfoDefault = CreateInfo(0, 0, 64, 20);
-			InfoHover = CreateInfo(0, 20, 64, 20);
-			InfoPress = CreateInfo(0, 40, 64, 20);
-			InfoDisabled = CreateInfo(0, 60, 64, 20);
-			InfoDefaultOn = CreateInfo(0, 80, 64, 20);
-		}
+        public float FontSpacing {
+            get; set;
+        }
 
-		NPatchInfo CreateInfo(int X, int Y, int W, int H) {
-			NPatchInfo I = new NPatchInfo();
-			I.sourceRec = new Rectangle(X, Y, W, H);
-			I.layout = NPatchLayout.NPATCH_NINE_PATCH;
-			I.top = 4;
-			I.bottom = 4;
-			I.left = 4;
-			I.right = 4;
-			return I;
-		}
+        public int FontPadding {
+            get; set;
+        }
 
-		public override void Update() {
-			base.Update();
 
-			if (Disabled)
-				return;
+        public event OnClickFunc OnClick;
+        public event CheckToggleFunc OnCheckToggle;
 
-			if (CheckClicked())
-				OnClick?.Invoke(this);
-		}
+        public GUIButton(Font Font, string Text) : base() {
+            this.Text = Text;
 
-		public override void Draw() {
-			CalculateXYWH(out int X, out int Y, out int W, out int H);
-			NPatchInfo NPatch = InfoDefault;
+            this.Font = Font;
+            FontSize = Font.baseSize;
+            FontColor = Color.WHITE;
+            FontSpacing = 1;
+            FontPadding = 15;
 
-			if (Disabled) {
-				NPatch = InfoDisabled;
-			} else {
-				if (OnCheckToggle != null && (OnCheckToggle?.Invoke(this) ?? false))
-					NPatch = InfoDefaultOn;
+            InfoDefault = CreateInfo(0, 0, 64, 20);
+            InfoHover = CreateInfo(0, 20, 64, 20);
+            InfoPress = CreateInfo(0, 40, 64, 20);
+            InfoDisabled = CreateInfo(0, 60, 64, 20);
+            InfoDefaultOn = CreateInfo(0, 80, 64, 20);
+        }
 
-				if (IsHovered) {
-					NPatch = InfoHover;
+        public GUIButton() : this(GUI.GUIFontLarge, null) {
+        }
 
-					if (GUI.MouseLeftDown)
-						NPatch = InfoPress;
-				}
-			}
+        NPatchInfo CreateInfo(int X, int Y, int W, int H) {
+            NPatchInfo I = new NPatchInfo();
+            I.sourceRec = new Rectangle(X, Y, W, H);
+            I.layout = NPatchLayout.NPATCH_NINE_PATCH;
+            I.top = 4;
+            I.bottom = 4;
+            I.left = 4;
+            I.right = 4;
+            return I;
+        }
 
-			Raylib.DrawTextureNPatch(GUI.TexButton, NPatch, new Rectangle(X, Y, W, H), Vector2.Zero, 0, Color.WHITE);
+        public override void Update() {
+            base.Update();
 
-			if (Text != null) {
-				Vector2 Pos = new Vector2(X, Y) + new Vector2(W, H) / 2;
-				Vector2 Size = Raylib.MeasureTextEx(Font, Text, FontSize, FontSpacing);
-				Pos = Pos - Size / 2;
+            if (Disabled)
+                return;
 
-				Raylib.DrawTextEx(Font, Text, Pos, FontSize, FontSpacing, FontColor);
-			}
-			
-			base.Draw();
-		}
+            if (CheckClicked())
+                OnClick?.Invoke(this);
+        }
 
-		/*public override void CalcAutoWidth() {
+        public override void Draw() {
+            CalculateXYWH(out int X, out int Y, out int W, out int H);
+            NPatchInfo NPatch = InfoDefault;
+
+            if (Disabled) {
+                NPatch = InfoDisabled;
+            } else {
+                if (OnCheckToggle != null && (OnCheckToggle?.Invoke(this) ?? false))
+                    NPatch = InfoDefaultOn;
+
+                if (IsHovered) {
+                    NPatch = InfoHover;
+
+                    if (GUI.MouseLeftDown)
+                        NPatch = InfoPress;
+                }
+            }
+
+            Raylib.DrawTextureNPatch(GUI.TexButton, NPatch, new Rectangle(X, Y, W, H), Vector2.Zero, 0, Color.WHITE);
+
+            if (Text != null) {
+                Vector2 Pos = new Vector2(X, Y) + new Vector2(W, H) / 2;
+                Vector2 Size = Raylib.MeasureTextEx(Font, Text, FontSize, FontSpacing);
+                Pos = Pos - Size / 2;
+
+                Raylib.DrawTextEx(Font, Text, Pos, FontSize, FontSpacing, FontColor);
+            }
+
+            base.Draw();
+        }
+
+        /*public override void CalcAutoWidth() {
 			Vector2 Size = Raylib.MeasureTextEx(Font, Text, FontSize, FontSpacing);
 			W = (int)Size.X + FontPadding * 2;
 		}*/
-	}
+    }
 }

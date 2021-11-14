@@ -10,6 +10,7 @@ using Raygui_cs;
 using System.Numerics;
 using System.Diagnostics;
 using Flexbox;
+using System.Reflection;
 
 namespace Harvesturr {
     delegate void OnClickFunc(GUIControl Ctrl);
@@ -21,13 +22,41 @@ namespace Harvesturr {
         List<GUIControl> Controls;
         public Node FlexNode;
 
-        public bool Disabled;
+        public bool Disabled {
+            get; set;
+        }
 
         public bool IsHovered {
             get {
                 CalculateXYWH(out int X, out int Y, out int W, out int H);
                 return Utils.IsInside(new Rectangle(X, Y, W, H), GUI.MousePos);
             }
+        }
+
+        public virtual void SetAttribute(string Name, object Value, GUIState State) {
+            if (Name == "Style") {
+                ApplyStyle((string)Value);
+                return;
+            }
+
+            Type T = GetType();
+            Type StateT = State.GetType();
+
+            PropertyInfo Prop = T.GetProperty(Name);
+            if (Prop != null) {
+                Prop.SetValue(this, Value);
+                return;
+            }
+
+            EventInfo Event = T.GetEvent(Name);
+            if (Event != null) {
+                MethodInfo MI = StateT.GetMethod((string)Value, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
+                Delegate EventDelegate = Delegate.CreateDelegate(Event.EventHandlerType, State, MI);
+                Event.AddEventHandler(this, EventDelegate);
+                return;
+            }
+
+            throw new NotImplementedException();
         }
 
         public GUIControl() {

@@ -1,3 +1,11 @@
+template MenuButton Disabled = false {
+	GUIButton
+		Style = [[ width: 100%; height: 23%; ]]
+		OnClick = $OnClick
+		Text = $Text
+		Disabled = $Disabled
+	;
+}
 
 GUIPanel Style = [[
 	position: absolute;
@@ -11,9 +19,12 @@ GUIPanel Style = [[
 	flex-direction: column;
 	justify-content: space-between;
 ]] {
-
-	// GUIButton Style = [[ width: 100%; height: 23%; ]] OnClick = "BtnContinue_OnClick" Text = "Continue";
-
-
+	MenuButton OnClick = "BtnContinue_OnClick" Text = "Continue";
+	
+	MenuButton OnClick = "BtnNewGame_OnClick" Text = "New Game";
+	
+	MenuButton OnClick = "BtnSettings_OnClick" Text = "Settings" Disabled = true;
+	
+	MenuButton OnClick = "BtnQuit_OnClick" Text = "Quit";
 }
 

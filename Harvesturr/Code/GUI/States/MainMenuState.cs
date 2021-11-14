@@ -11,9 +11,13 @@ namespace Harvesturr {
     class MainMenuState : GUIState {
         public override void Init() {
             GameEngine.PauseGame(true);
-            GUI.ParseFML("data/gui/main_menu.fml");
 
-            GUIPanel Pnl = new GUIPanel();
+            GUIControl[] GUIControls = GUI.ParseFML("data/gui/main_menu.fml", this).ToArray();
+            foreach (GUIControl C in GUIControls) {
+                AddControl(C);
+            }
+
+            /*GUIPanel Pnl = new GUIPanel();
             Pnl.ApplyStyle(@"
 				position: absolute;
 				left: 100px;
@@ -53,14 +57,14 @@ namespace Harvesturr {
                 Pnl.AddControl(BtnQuit);
             }
 
-            AddControl(Pnl);
+            AddControl(Pnl);*/
         }
 
-        private void BtnContinue_OnClick(GUIControl Ctrl) {
+        void BtnContinue_OnClick(GUIControl Ctrl) {
             GUI.ChangeState(new InGameState() { PreserveCamera = true });
         }
 
-        private void BtnNewGame_OnClick(GUIControl Ctrl) {
+        void BtnNewGame_OnClick(GUIControl Ctrl) {
             GameMap.Load("test");
             GameEngine.IsGameRunning = true;
 
@@ -88,11 +92,11 @@ namespace Harvesturr {
             GUI.ChangeState(new InGameState());
         }
 
-        private void BtnSettings_OnClick(GUIControl Ctrl) {
+        void BtnSettings_OnClick(GUIControl Ctrl) {
 
         }
 
-        private void BtnQuit_OnClick(GUIControl Ctrl) {
+        void BtnQuit_OnClick(GUIControl Ctrl) {
             Environment.Exit(0);
         }
     }
