@@ -12,7 +12,7 @@ using System.Diagnostics;
 using Flexbox;
 
 namespace Harvesturr {
-	class GUIState {
+	public class GUIState {
 		public static int GUIButtonHeight = 50;
 		public static int GUIButtonWidth = 400;
 

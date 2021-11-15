@@ -6,18 +6,36 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using FishMarkupLanguage;
 
 namespace Harvesturr {
-    class MainMenuState : GUIState {
-        public override void Init() {
-            GameEngine.PauseGame(true);
+	public class MainMenuState : GUIState {
+		public bool IsGameRunning {
+			get {
+				return GameEngine.IsGameRunning;
+			}
+		}
 
-            GUIControl[] GUIControls = GUI.ParseFML("data/gui/main_menu.fml", this).ToArray();
-            foreach (GUIControl C in GUIControls) {
-                AddControl(C);
-            }
+		public void Print(string Str) {
+			Console.WriteLine(Str);
+		}
 
-            /*GUIPanel Pnl = new GUIPanel();
+		public override void Init() {
+			GameEngine.PauseGame(true);
+
+			Scripting Scr = new Scripting();
+			Scr.Compile(@"
+				return BtnContinue_OnClick;
+            ", GetType());
+
+			object Ret = Scr.Run(this);
+
+			GUIControl[] GUIControls = GUI.ParseFML("data/gui/main_menu.fml", this).ToArray();
+			foreach (GUIControl C in GUIControls) {
+				AddControl(C);
+			}
+
+			/*GUIPanel Pnl = new GUIPanel();
             Pnl.ApplyStyle(@"
 				position: absolute;
 				left: 100px;
@@ -58,46 +76,46 @@ namespace Harvesturr {
             }
 
             AddControl(Pnl);*/
-        }
+		}
 
-        void BtnContinue_OnClick(GUIControl Ctrl) {
-            GUI.ChangeState(new InGameState() { PreserveCamera = true });
-        }
+		public void BtnContinue_OnClick(GUIControl Ctrl) {
+			GUI.ChangeState(new InGameState() { PreserveCamera = true });
+		}
 
-        void BtnNewGame_OnClick(GUIControl Ctrl) {
-            GameMap.Load("test");
-            GameEngine.IsGameRunning = true;
+		public void BtnNewGame_OnClick(GUIControl Ctrl) {
+			GameMap.Load("test");
+			GameEngine.IsGameRunning = true;
 
-            if (GameEngine.DebugPerformance) {
-                GameMap.DestroyAllMinerals();
-                const float Dist = 50;
+			if (GameEngine.DebugPerformance) {
+				GameMap.DestroyAllMinerals();
+				const float Dist = 50;
 
-                Rectangle Rect = GameMap.GetBounds();
-                Vector2 Pos = new Vector2(Rect.x, Rect.y) + new Vector2(10);
-                int XCount = (int)(Rect.width / Dist);
-                int YCount = (int)(Rect.height / Dist);
+				Rectangle Rect = GameMap.GetBounds();
+				Vector2 Pos = new Vector2(Rect.x, Rect.y) + new Vector2(10);
+				int XCount = (int)(Rect.width / Dist);
+				int YCount = (int)(Rect.height / Dist);
 
-                for (int X = 0; X < XCount; X++)
-                    for (int Y = 0; Y < YCount; Y++)
-                        GameEngine.Spawn(new UnitConduit(Pos + new Vector2(X, Y) * Dist));
-            }
+				for (int X = 0; X < XCount; X++)
+					for (int Y = 0; Y < YCount; Y++)
+						GameEngine.Spawn(new UnitConduit(Pos + new Vector2(X, Y) * Dist));
+			}
 
-            //Spawn(new UnitAlienUfo(Vector2.Zero));
+			//Spawn(new UnitAlienUfo(Vector2.Zero));
 
-            GameEngine.Resources = 50;
+			GameEngine.Resources = 50;
 
-            if (GameEngine.DebugView)
-                GameEngine.Resources = 10000000;
+			if (GameEngine.DebugView)
+				GameEngine.Resources = 10000000;
 
-            GUI.ChangeState(new InGameState());
-        }
+			GUI.ChangeState(new InGameState());
+		}
 
-        void BtnSettings_OnClick(GUIControl Ctrl) {
+		public void BtnSettings_OnClick(GUIControl Ctrl) {
 
-        }
+		}
 
-        void BtnQuit_OnClick(GUIControl Ctrl) {
-            Environment.Exit(0);
-        }
-    }
+		public void BtnQuit_OnClick(GUIControl Ctrl) {
+			Environment.Exit(0);
+		}
+	}
 }
