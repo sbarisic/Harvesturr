@@ -23,17 +23,20 @@ namespace Harvesturr {
 		public override void Init() {
 			GameEngine.PauseGame(true);
 
-			Scripting Scr = new Scripting();
-			Scr.Compile(@"
-				return BtnContinue_OnClick;
-            ", GetType());
 
-			object Ret = Scr.Run(this);
 
 			GUIControl[] GUIControls = GUI.ParseFML("data/gui/main_menu.fml", this).ToArray();
 			foreach (GUIControl C in GUIControls) {
 				AddControl(C);
 			}
+
+			Scripting Scr = new Scripting();
+			Scr.Compile(@"
+				return BtnContinue_OnClick;
+            ", GetType());
+
+			Scr.Run(this);
+			Scr.GetReturnValue();
 
 			/*GUIPanel Pnl = new GUIPanel();
             Pnl.ApplyStyle(@"

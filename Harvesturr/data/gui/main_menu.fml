@@ -28,3 +28,6 @@ GUIPanel Style = [[
 	MenuButton OnClick = "BtnQuit_OnClick" Text = "Quit";
 }
 
+@Script CSharp = [[
+	
+]];
