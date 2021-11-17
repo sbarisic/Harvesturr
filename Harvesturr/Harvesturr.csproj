@@ -61,6 +61,7 @@
     <Compile Include="Code\GUI\Flexbox\Style.cs" />
     <Compile Include="Code\GUI\Flexbox\Utils.cs" />
     <Compile Include="Code\GUI\Flexbox\Value.cs" />
+    <Compile Include="Code\GUI\GUIScriptControl.cs" />
     <Compile Include="Code\GUI\GUIPanel.cs" />
     <Compile Include="Code\GUI\GUICheckBox.cs" />
     <Compile Include="Code\GUI\GUIButton.cs" />

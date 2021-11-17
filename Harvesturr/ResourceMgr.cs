@@ -8,7 +8,7 @@ using System.IO;
 using Raylib_cs;
 
 namespace Harvesturr {
-	static class ResMgr {
+	public static class ResMgr {
 		//static Dictionary<string, Font> Fonts = new Dictionary<string, Font>();
 		static Dictionary<string, Texture2DRef> Textures = new Dictionary<string, Texture2DRef>();
 		static Dictionary<string, SoundRef> Sounds = new Dictionary<string, SoundRef>();
@@ -46,7 +46,7 @@ namespace Harvesturr {
 			/*if (Fonts.ContainsKey(Name))
 				return Fonts[Name];*/
 
-			Font Fnt = Raylib.LoadFontEx("data/fonts/" + Name + ".ttf", Size, null, 250);			
+			Font Fnt = Raylib.LoadFontEx("data/fonts/" + Name + ".ttf", Size, null, 250);
 			//Fonts.Add(Name, Fnt);
 			return Fnt;
 		}
@@ -88,7 +88,7 @@ namespace Harvesturr {
 		}
 	}
 
-	class Texture2DRef {
+	public class Texture2DRef {
 		public string FullPath;
 		public bool MarkForReload;
 		Texture2D Texture;
@@ -132,7 +132,7 @@ namespace Harvesturr {
 		}
 	}
 
-	class SoundRef {
+	public class SoundRef {
 		public string FullPath;
 		public bool MarkForReload;
 		Sound Sound;
@@ -165,7 +165,7 @@ namespace Harvesturr {
 		}
 	}
 
-	class MultiSoundRef : SoundRef {
+	public class MultiSoundRef : SoundRef {
 		SoundRef[] Sounds;
 
 		public MultiSoundRef(params SoundRef[] Sounds) : base(null) {

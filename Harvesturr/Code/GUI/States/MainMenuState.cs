@@ -16,69 +16,23 @@ namespace Harvesturr {
 			}
 		}
 
-		public void Print(string Str) {
-			Console.WriteLine(Str);
+		public GUIButton FindButton(string ID) {
+			return (GUIButton)FindControlByID(ID);
 		}
 
 		public override void Init() {
 			GameEngine.PauseGame(true);
 
-
-
-			GUIControl[] GUIControls = GUI.ParseFML("data/gui/main_menu.fml", this).ToArray();
-			foreach (GUIControl C in GUIControls) {
+			GUIControl[] Controls = GUI.ParseFML("data/gui/main_menu.fml", this).ToArray();
+			foreach (GUIControl C in Controls) 
 				AddControl(C);
+		}
+
+		public override void ChangedStateTo() {
+			foreach (GUIControl C in Controls) {
+				if (C is GUIScriptControl ScriptCtrl)
+					ScriptCtrl.Run(this);
 			}
-
-			Scripting Scr = new Scripting();
-			Scr.Compile(@"
-				return BtnContinue_OnClick;
-            ", GetType());
-
-			Scr.Run(this);
-			Scr.GetReturnValue();
-
-			/*GUIPanel Pnl = new GUIPanel();
-            Pnl.ApplyStyle(@"
-				position: absolute;
-				left: 100px;
-				top: 100px;
-				width: 30%;
-				height: 40%;
-
-				padding: 10px;
-				align-items: center;
-				flex-direction: column;
-				justify-content: space-between;
-			");
-
-            {
-                string ButtonStyle = "width: 100%; height: 23%;";
-
-                GUIButton BtnContinue = new GUIButton(GUI.GUIFontLarge, "Continue");
-                BtnContinue.ApplyStyle(ButtonStyle);
-                BtnContinue.OnClick += BtnContinue_OnClick; // TODO: from script
-                BtnContinue.Disabled = !GameEngine.IsGameRunning; // TODO: from script
-                Pnl.AddControl(BtnContinue);
-
-                GUIButton BtnNewGame = new GUIButton(GUI.GUIFontLarge, "New Game");
-                BtnNewGame.ApplyStyle(ButtonStyle);
-                BtnNewGame.OnClick += BtnNewGame_OnClick; // TODO: from script
-                Pnl.AddControl(BtnNewGame);
-
-                GUIButton BtnSettings = new GUIButton(GUI.GUIFontLarge, "Settings");
-                BtnSettings.ApplyStyle(ButtonStyle);
-                BtnSettings.OnClick += BtnSettings_OnClick; // TODO: from script
-                BtnSettings.Disabled = true;
-                Pnl.AddControl(BtnSettings);
-
-                GUIButton BtnQuit = new GUIButton(GUI.GUIFontLarge, "Quit");
-                BtnQuit.ApplyStyle(ButtonStyle);
-                BtnQuit.OnClick += BtnQuit_OnClick; // TODO: from script
-                Pnl.AddControl(BtnQuit);
-            }
-
-            AddControl(Pnl);*/
 		}
 
 		public void BtnContinue_OnClick(GUIControl Ctrl) {

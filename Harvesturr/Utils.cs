@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Numerics;
 using Raylib_cs;
 namespace Harvesturr {
-	struct IntersectionResult {
+	public struct IntersectionResult {
 		public static readonly IntersectionResult Empty = new IntersectionResult();
 
 		public Vector2 Direction;

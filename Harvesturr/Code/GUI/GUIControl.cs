@@ -11,6 +11,7 @@ using System.Numerics;
 using System.Diagnostics;
 using Flexbox;
 using System.Reflection;
+using FishMarkupLanguage;
 
 namespace Harvesturr {
 	public delegate void OnClickFunc(GUIControl Ctrl);
@@ -19,8 +20,13 @@ namespace Harvesturr {
 	public class GUIControl {
 		public const int SIZE_AUTO = -1;
 
-		List<GUIControl> Controls;
+		protected List<GUIControl> Controls;
 		public Node FlexNode;
+		public FMLTag FMLTag;
+
+		public string ID {
+			get; set;
+		}
 
 		public bool Disabled {
 			get; set;
@@ -95,6 +101,25 @@ namespace Harvesturr {
 			Controls.Add(Ctrl);
 		}
 
+		public virtual bool TryFindControlByID(string ID, out GUIControl Control) {
+			foreach (GUIControl C in Controls) {
+				if (C.ID == ID) {
+					Control = C;
+					return true;
+				}
+			}
+
+			Control = null;
+			return false;
+		}
+
+		public virtual GUIControl FindControlByID(string ID) {
+			if (TryFindControlByID(ID, out GUIControl Control))
+				return Control;
+
+			return null;
+		}
+
 		public virtual void Update() {
 			if (Disabled)
 				return;
@@ -110,13 +135,6 @@ namespace Harvesturr {
 			H = (int)FlexNode.LayoutGetHeight();
 		}
 
-		/*public virtual void AddPadding(int Padding) {
-			X -= Padding;
-			Y -= Padding;
-			W += Padding * 2;
-			H += Padding * 2;
-		}*/
-
 		public virtual void Draw() {
 			CalculateXYWH(out int X, out int Y, out int W, out int H);
 			//Raylib.DrawRectangleLines(X, Y, W, H, Color.RED);
@@ -124,11 +142,5 @@ namespace Harvesturr {
 			foreach (GUIControl C in Controls)
 				C.Draw();
 		}
-
-		/*public virtual void AutoSize() {
-		}
-
-		public virtual void CalcAutoWidth() {
-		}*/
 	}
 }

@@ -19,8 +19,8 @@ namespace Harvesturr {
 		public static int GUIPadding = 10;
 		public static int GUIRectHeight = GUIButtonHeight + GUIPadding * 2;
 
-		List<GUIControl> Controls = new List<GUIControl>();
-		Node FlexRoot;
+		protected List<GUIControl> Controls = new List<GUIControl>();
+		protected Node FlexRoot;
 
 		public GUIState() {
 			Controls = new List<GUIControl>();
@@ -31,12 +31,42 @@ namespace Harvesturr {
 		public virtual void Init() {
 		}
 
+		public virtual void ChangedStateTo() {
+		}
+
+		public virtual void ChangedStateFrom() {
+		}
+
 		public virtual void UpdateInput(float Dt) {
 		}
 
 		public virtual void AddControl(GUIControl Ctrl) {
 			Controls.Add(Ctrl);
-			FlexRoot.AddChild(Ctrl.FlexNode);
+
+			if (Ctrl.FlexNode != null)
+				FlexRoot.AddChild(Ctrl.FlexNode);
+		}
+
+		public virtual bool TryFindControlByID(string ID, out GUIControl Control) {
+			foreach (GUIControl C in Controls) {
+				if (C.ID == ID) {
+					Control = C;
+					return true;
+				}
+
+				if (C.TryFindControlByID(ID, out Control))
+					return true;
+			}
+
+			Control = null;
+			return false;
+		}
+
+		public virtual GUIControl FindControlByID(string ID) {
+			if (TryFindControlByID(ID, out GUIControl Control))
+				return Control;
+
+			return null;
 		}
 
 		public virtual IEnumerable<GUIControl> GetControls() {

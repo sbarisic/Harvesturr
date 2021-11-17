@@ -1,13 +1,13 @@
 template MenuButton Disabled = false {
 	GUIButton
+		ID = $ID
 		Style = [[ width: 100%; height: 23%; ]]
-		OnClick = $OnClick
 		Text = $Text
 		Disabled = $Disabled
 	;
 }
 
-GUIPanel Style = [[
+GUIPanel ID = "MainPanel" Style = [[
 	position: absolute;
 	left: 100px;
 	top: 100px;
@@ -19,15 +19,23 @@ GUIPanel Style = [[
 	flex-direction: column;
 	justify-content: space-between;
 ]] {
-	MenuButton OnClick = "BtnContinue_OnClick" Text = "Continue";
-	
-	MenuButton OnClick = "BtnNewGame_OnClick" Text = "New Game";
-	
-	MenuButton OnClick = "BtnSettings_OnClick" Text = "Settings" Disabled = true;
-	
-	MenuButton OnClick = "BtnQuit_OnClick" Text = "Quit";
+	MenuButton ID = "BtnContinue" Text = "Continue";	
+	MenuButton ID = "BtnNewGame" Text = "New Game";	
+	MenuButton ID = "BtnSettings" Text = "Settings" Disabled = true;	
+	MenuButton ID = "BtnQuit" Text = "Quit";
 }
 
 @Script CSharp = [[
-	
+	GUIButton BtnContinue = FindButton("BtnContinue");
+	GUIButton BtnNewGame = FindButton("BtnNewGame");
+	GUIButton BtnSettings = FindButton("BtnSettings");
+	GUIButton BtnQuit = FindButton("BtnQuit");
+
+	BtnContinue.Disabled = !IsGameRunning;
+
+	BtnContinue.OnClick += BtnContinue_OnClick;
+	BtnNewGame.OnClick += BtnNewGame_OnClick;
+	BtnSettings.OnClick += BtnSettings_OnClick;
+	BtnQuit.OnClick += BtnQuit_OnClick;
 ]];
+

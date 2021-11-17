@@ -43,8 +43,14 @@ namespace Harvesturr {
 		}
 
 		public static void ChangeState(GUIState NewState) {
+			if (CurrentState != null) {
+				CurrentState.ChangedStateFrom();
+				CurrentState = null;
+			}
+
 			CurrentState = NewState;
 			CurrentState.Init();
+			CurrentState.ChangedStateTo();
 		}
 
 		public static void UpdateInput(float Dt) {
@@ -135,34 +141,26 @@ namespace Harvesturr {
 		}
 
 		public static IEnumerable<GUIControl> ParseFML(string FileName, GUIState State) {
-			// TODO: Hack
 			Type[] Types = Assembly.GetExecutingAssembly().GetTypes().Where(T => T.IsSubclassOf(typeof(GUIControl))).ToArray();
 
-
+			List<GUIControl> Controls = new List<GUIControl>();
 			FMLDocument Doc = FML.Parse(FileName);
 			Doc.FlattenTemplates();
 
-			FMLTag ScriptTag = Doc.Tags.Where(Tag => Tag.TagName == "@Script").FirstOrDefault();
-			if (ScriptTag != null) {
-				string SourceCode = ScriptTag.Attributes.GetAttribute<FMLHereDoc>("CSharp", null)?.Content ?? "";
-
-				if (!string.IsNullOrEmpty(SourceCode)) {
-					Scripting Scr = new Scripting();
-					Scr.Compile(SourceCode, State.GetType());
-					Scr.Run(State);
-				}
-			}
-			
-			// TODO assign gui control to tag and run script
-
-
 			foreach (FMLTag T in Doc.Tags)
-				yield return FMLTagToGUIControl(T, Types, State);
+				Controls.Add(FMLTagToGUIControl(T, Types, State));
+
+			return Controls;
 		}
 
 		public static GUIControl FMLTagToGUIControl(FMLTag T, Type[] Types, GUIState State) {
 			Type TagType = Types.Where(Type => Type.Name == T.TagName).FirstOrDefault();
+
+			if (T.TagName == "@Script")
+				TagType = typeof(GUIScriptControl);
+
 			GUIControl Ctrl = Activator.CreateInstance(TagType) as GUIControl;
+			Ctrl.FMLTag = T;
 
 			KeyValuePair<string, object>[] Attrs = T.Attributes.ToArray();
 			foreach (var KV in Attrs) {

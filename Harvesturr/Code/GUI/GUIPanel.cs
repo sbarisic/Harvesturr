@@ -11,7 +11,7 @@ using System.Numerics;
 using System.Diagnostics;
 
 namespace Harvesturr {
-	class GUIPanel : GUIControl {
+	public class GUIPanel : GUIControl {
 		NPatchInfo InfoDefault;
 		public GUIPanel() : base() {
 			InfoDefault = CreateInfo(0, 0, 64, 20);
